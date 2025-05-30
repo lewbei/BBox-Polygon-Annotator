@@ -8,6 +8,7 @@ from tkinter import ttk, messagebox, filedialog
 
 from image_labelling.helpers import center_window
 from image_labelling.constants import PROJECTS_DIR
+from image_labelling.startup_optimizer import SplashScreen
 from image_labelling.editor import BoundingBoxEditor
 class ProjectManager:
     """
@@ -253,6 +254,7 @@ class ProjectManager:
         Launches the BoundingBoxEditor in a new Tk window with the chosen project loaded.
         """
         editor_root = tk.Tk()
-        BoundingBoxEditor(editor_root, project)
+        splash = SplashScreen(subtitle="Loading dataset...")
+        BoundingBoxEditor(editor_root, project, splash=splash)
         editor_root.mainloop()
 

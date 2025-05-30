@@ -27,9 +27,10 @@ class BoundingBoxEditor:
     organizational structure for labeling tasks.
     """
 
-    def __init__(self, root, project):
+    def __init__(self, root, project, splash=None):
         self.root = root
         self.project = project
+        self.splash = splash
         self.root.title(f"Bounding Box Editor - Project: {project['project_name']}")
 
         self._init_project_attributes()
@@ -38,14 +39,11 @@ class BoundingBoxEditor:
         self._setup_ui()
         self._initialize_annotation_variables()
 
-        self.load_dataset()
         self.setup_bindings()
 
-        self.save_history()
-        if self.auto_save_interval and self.auto_save_interval > 0:
-            self.start_auto_save()
-
-        self._restore_last_opened_image()
+        if self.splash:
+            self.splash.update_status("Scanning dataset...")
+        self.start_dataset_loading()
 
 
     # --------------------------------------------------
@@ -677,6 +675,58 @@ class BoundingBoxEditor:
         for display_name in counts:
             self.status_labels[display_name].config(text=f"{display_name}: {counts[display_name]}")
 
+    def start_dataset_loading(self):
+        """
+        Starts background loading of dataset files and populates the Treeview incrementally.
+        """
+        self.cancel_event = threading.Event()
+        thread = threading.Thread(target=self._load_dataset_thread, daemon=True)
+        thread.start()
+
+    def _load_dataset_thread(self):
+        """
+        Background thread: scan dataset folder for image files.
+        """
+        image_files = []
+        for root_dir, _, files in os.walk(self.folder_path):
+            for file in files:
+                if file.lower().endswith(('.jpg', '.png', '.jpeg')):
+                    rel = os.path.relpath(os.path.join(root_dir, file), self.folder_path)
+                    image_files.append(rel)
+        image_files.sort()
+        self.root.after(0, lambda: self._finish_dataset_loading(image_files))
+
+    def _finish_dataset_loading(self, image_files):
+        """
+        Populate the Treeview with the scanned image files in batches.
+        """
+        for item in self.image_tree.get_children():
+            self.image_tree.delete(item)
+        self.image_files = image_files
+        self.load_statuses()
+        self._batch_insert(0)
+
+    def _batch_insert(self, start_index, batch_size=100):
+        """
+        Insert a batch of items into the Treeview and schedule the next batch.
+        """
+        end_index = min(start_index + batch_size, len(self.image_files))
+        for idx in range(start_index, end_index):
+            rel = self.image_files[idx]
+            status = self.image_status.get(rel, "not_viewed")
+            self.image_tree.insert("", tk.END, iid=rel, values=(rel,), tags=(status,))
+        self.update_status_labels()
+        if end_index < len(self.image_files):
+            self.root.after(10, lambda: self._batch_insert(end_index, batch_size))
+        else:
+            self.save_statuses()
+            if self.splash:
+                self.splash.destroy()
+            self.save_history()
+            if self.auto_save_interval and self.auto_save_interval > 0:
+                self.start_auto_save()
+            self._restore_last_opened_image()
+
     # --------------------------------------------------
     # Auto-Save Mechanism
     # --------------------------------------------------
@@ -935,9 +985,22 @@ class BoundingBoxEditor:
         # Ensure the label directory exists for nested paths
         os.makedirs(os.path.dirname(label_path), exist_ok=True)
 
-        # Use original image dimensions for denormalization to ensure consistent bbox coords
         img_shape = self.original_image.shape if hasattr(self, 'original_image') and self.original_image is not None else self.image.shape
-        self.bboxes, self.polygons = read_annotations_from_file(label_path, img_shape)
+        orig_bboxes, orig_polygons = read_annotations_from_file(label_path, img_shape)
+        orig_h, orig_w = img_shape[:2]
+        scale_x = self.canvas_width / orig_w if orig_w else 1
+        scale_y = self.canvas_height / orig_h if orig_h else 1
+        self.bboxes = [
+            (int(x * scale_x), int(y * scale_y), int(w * scale_x), int(h * scale_y), class_id)
+            for x, y, w, h, class_id in orig_bboxes
+        ]
+        self.polygons = [
+            {
+                'class_id': poly['class_id'],
+                'points': [(int(px * scale_x), int(py * scale_y)) for px, py in poly['points']]
+            }
+            for poly in orig_polygons
+        ]
 
         # Show annotations
         self.display_annotations()
@@ -963,6 +1026,14 @@ class BoundingBoxEditor:
             relative_image_path = os.path.relpath(self.image_path, self.folder_path)
             self.project['last_opened_image_relative'] = relative_image_path
             self._save_project_config()
+
+            # Highlight and scroll to the current image in the list
+            try:
+                self.image_tree.selection_set(relative_image_path)
+                self.image_tree.focus(relative_image_path)
+                self.image_tree.see(relative_image_path)
+            except Exception:
+                pass
 
     def _save_project_config(self):
         """Saves the current self.project dictionary to its JSON file."""
@@ -1517,9 +1588,25 @@ class BoundingBoxEditor:
         # Ensure label directory exists
         os.makedirs(os.path.dirname(label_path), exist_ok=True)
 
-        # Normalize annotations based on original image dimensions to avoid resizing distortions
-        img_shape = self.original_image.shape if hasattr(self, 'original_image') and self.original_image is not None else self.image.shape
-        write_annotations_to_file(label_path, self.bboxes, self.polygons, img_shape)
+        orig_h, orig_w = (
+            self.original_image.shape[:2]
+            if hasattr(self, 'original_image') and self.original_image is not None
+            else self.image.shape[:2]
+        )
+        scale_x = self.canvas_width / orig_w if orig_w else 1
+        scale_y = self.canvas_height / orig_h if orig_h else 1
+        bboxes_to_save = [
+            (int(x / scale_x), int(y / scale_y), int(w / scale_x), int(h / scale_y), class_id)
+            for x, y, w, h, class_id in self.bboxes
+        ]
+        polygons_to_save = [
+            {
+                'class_id': poly['class_id'],
+                'points': [(int(px / scale_x), int(py / scale_y)) for px, py in poly['points']]
+            }
+            for poly in self.polygons
+        ]
+        write_annotations_to_file(label_path, bboxes_to_save, polygons_to_save, (orig_h, orig_w))
 
         logging.info("Saved labels for %s", self.image_path)
 
