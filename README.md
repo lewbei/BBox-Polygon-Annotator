@@ -41,7 +41,7 @@ pip install -r requirements.txt
 
 ### Launch
 ```bash
-python bbox_polygon_annotator.py
+python -m image_labelling.main
 ```
 
 ## Usage

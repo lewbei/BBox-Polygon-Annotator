@@ -1,16 +1,17 @@
 # Project Roadmap: BBox & Polygon Annotator
 
-This document outlines the development roadmap and to-do list for the BBox & Polygon Annotator application, based on its current state (v9.x) and planned enhancements.
+This document outlines the development roadmap and to-do list for the BBox & Polygon Annotator application, based on its current state (v10+) and planned enhancements.
 
 ## I. Current Status (as of May 2025)
 
-The application (v9.x) is a feature-rich tool with:
-- Dual annotation (bounding box and polygon).
-- Integrated Project Manager with a project list panel.
-- YOLO auto-annotation.
-- Multi-format export (YOLO YAML, COCO JSON, Pascal VOC XML, CSV, Generic JSON).
-- Undo/Redo, status tracking, and various UX features.
-- Recent critical bug fixes for UI interactions and attribute errors.
+The application (v10+) is a mature, feature-rich annotation tool with:
+- **Complete Dual Annotation**: Full bounding box & polygon support with advanced editing
+- **Professional Project Manager**: Integrated project management with status tracking, last-modified dates
+- **AI-Powered Annotation**: YOLO auto-annotation with confidence filtering and progress tracking
+- **Comprehensive Export Suite**: 5 export formats (YOLO YAML, COCO JSON, Pascal VOC XML, CSV, Generic JSON)
+- **Advanced User Experience**: Icons, zoom/pan, keyboard shortcuts, auto-save, undo/redo
+- **Robust Architecture**: Modular codebase with proper separation of concerns
+- **Production-Ready Features**: Error handling, logging, responsive UI, background processing
 
 ## II. Overall Vision
 
