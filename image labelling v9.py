@@ -1,6 +1,7 @@
 import os
 import shutil
 import json
+import logging
 import yaml
 import threading
 import csv
@@ -14,6 +15,29 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 from PIL import Image, ImageTk
+
+# Setup logging for global error handling
+LOG_FILE = os.path.join(os.getcwd(), "error.log")
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.ERROR,
+    format="%(asctime)s %(levelname)s %(message)s"
+)
+
+# Icon glyphs for toolbar buttons (using simple Unicode emojis)
+ICON_UNICODE = {
+    'auto_annotate': '⚡',
+    'save': '💾',
+    'load_model': '📂',
+    'export': '📤',
+    'mode_box': '⬜',
+    'mode_polygon': '🔷',
+    'undo': '↶',
+    'redo': '↷',
+    'zoom_in': '🔍+',
+    'zoom_out': '🔍-',
+    'shortcuts': '⌨️',
+}
 
 # --------------------------------------------------
 # Global Constants and Helpers
@@ -180,6 +204,7 @@ class BoundingBoxEditor:
         # Paths used in the YAML (optional usage)
         self.paths = data.get("paths", {"dataset": self.folder_path, "train": "", "val": ""})
         self.validation = bool(self.paths.get("val"))
+        self.auto_save_interval = data.get("auto_save_interval", 0)
 
         # Color mapping for classes
         self.update_class_colors()        # Dictionary to hold status of each image
@@ -217,6 +242,7 @@ class BoundingBoxEditor:
         # Initialize image-related variables
         self.image = None
         self.image_path = None
+        self.original_image = None # Explicitly initialize
         self.bboxes = [] # Stores (x, y, w, h, class_id) for boxes
         self.polygons = [] # Stores {'class_id': int, 'points': [(x1, y1), (x2, y2), ...]} for polygons
         self.current_bbox = None
@@ -231,10 +257,15 @@ class BoundingBoxEditor:
         self.drag_point_index = -1 # Index of point being dragged
         self.hover_polygon_index = -1 # Index of polygon with hovered point
         self.hover_point_index = -1 # Index of hovered point
+        # Polygon movement state
+        self.dragging_whole_polygon = False # Track if currently dragging entire polygon
+        self.drag_whole_polygon_index = -1  # Index of polygon being moved
+        self.polygon_move_start = (0, 0)    # Starting position for polygon move
         self.image_files = []
         self.current_image_index = -1
         self.selected_class_index = None
         self.annotation_mode = 'box' # Default mode
+        self.zoom_level = 1.0 # Initialize zoom level
 
         # History for Undo/Redo
         self.history = []
@@ -249,6 +280,35 @@ class BoundingBoxEditor:
 
         # Initial save to history
         self.save_history()
+        if self.auto_save_interval and self.auto_save_interval > 0:
+            self.start_auto_save()
+
+        # Attempt to load the last opened image for this project
+        if 'last_opened_image_relative' in self.project:
+            last_image_relative_path = self.project['last_opened_image_relative']
+            if last_image_relative_path: # Ensure it's not empty
+                last_image_full_path = os.path.join(self.folder_path, last_image_relative_path)
+                if os.path.exists(last_image_full_path) and last_image_relative_path in self.image_files:
+                    # Select in tree and load
+                    try:
+                        self.image_tree.selection_set(last_image_relative_path) # Select in tree
+                        self.image_tree.focus(last_image_relative_path)         # Ensure it's visible
+                        self.image_tree.see(last_image_relative_path)           # Scroll to make it visible
+                        self.load_image(last_image_full_path)                   # Load the image
+                    except tk.TclError:
+                        # Item might not exist in tree if image_files list changed, or tree not fully populated
+                        print(f"Info: Could not auto-select last opened image '{last_image_relative_path}' in tree.")
+                        # Fallback to loading the first image if available
+                        if self.image_files:
+                            self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+                            self.image_tree.selection_set(self.image_files[0])
+                elif self.image_files: # If last opened doesn't exist, load first image
+                    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+                    self.image_tree.selection_set(self.image_files[0])
+        elif self.image_files: # If no last opened image, load the first one
+            self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+            self.image_tree.selection_set(self.image_files[0])
+
 
     # --------------------------------------------------
     # Setup / Layout Methods
@@ -288,6 +348,11 @@ class BoundingBoxEditor:
         """
         self.canvas = tk.Canvas(self.content_frame, width=500, height=720)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        # Track canvas size for dynamic resizing
+        self.canvas_width = 500
+        self.canvas_height = 720
+        # Handle resizing event to scale image and annotations
+        self.canvas.bind("<Configure>", self.on_canvas_resize)
         # Mouse wheel for switching images
         self.canvas.bind("<MouseWheel>", self.on_mouse_wheel)
         self.canvas.bind("<Button-4>", self.on_mouse_wheel)  # Linux scroll up
@@ -401,26 +466,77 @@ class BoundingBoxEditor:
         buttons_frame = tk.Frame(top_frame)
         buttons_frame.pack(side=tk.LEFT, pady=5)
 
-        self.auto_annotate_button = tk.Button(buttons_frame, text="Auto Annotate", command=self.auto_annotate_dataset_threaded)
+        self.auto_annotate_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['auto_annotate']} Auto Annotate",
+            command=self.auto_annotate_dataset_threaded
+        )
         self.auto_annotate_button.pack(side=tk.LEFT, padx=5)
  
-        self.save_button = tk.Button(buttons_frame, text="Save Labels", command=self.save_labels)
+        self.save_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['save']} Save Labels",
+            command=self.save_labels
+        )
         self.save_button.pack(side=tk.LEFT, padx=5)
  
-        self.load_model_button = tk.Button(buttons_frame, text="Load Model", command=self.load_model)
+        self.load_model_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['load_model']} Load Model",
+            command=self.load_model
+        )
         self.load_model_button.pack(side=tk.LEFT, padx=5)
  
-        self.export_button = tk.Button(buttons_frame, text="Export Annotations", command=self.export_format_selection_window)
+        self.export_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['export']} Export Annotations",
+            command=self.export_format_selection_window
+        )
         self.export_button.pack(side=tk.LEFT, padx=5)
  
-        self.mode_toggle_button = tk.Button(buttons_frame, text="Mode: Box", command=self.toggle_annotation_mode)
-        self.mode_toggle_button.pack(side=tk.LEFT, padx=15) # More space for mode toggle
+        self.mode_toggle_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['mode_box']} Mode: Box",
+            command=self.toggle_annotation_mode
+        )
+        self.mode_toggle_button.pack(side=tk.LEFT, padx=15)  # More space for mode toggle
  
         # Undo/Redo buttons
-        self.undo_button = tk.Button(buttons_frame, text="Undo", command=self.undo, state=tk.DISABLED)
+        self.undo_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['undo']} Undo",
+            command=self.undo,
+            state=tk.DISABLED
+        )
         self.undo_button.pack(side=tk.LEFT, padx=5)
-        self.redo_button = tk.Button(buttons_frame, text="Redo", command=self.redo, state=tk.DISABLED)
+        self.redo_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['redo']} Redo",
+            command=self.redo,
+            state=tk.DISABLED
+        )
         self.redo_button.pack(side=tk.LEFT, padx=5)
+
+        # Zoom controls
+        self.zoom_in_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['zoom_in']}",
+            command=self.zoom_in
+        )
+        self.zoom_in_button.pack(side=tk.LEFT, padx=5)
+        self.zoom_out_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['zoom_out']}",
+            command=self.zoom_out
+        )
+        self.zoom_out_button.pack(side=tk.LEFT, padx=5)
+        # Keyboard shortcuts help
+        self.shortcuts_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['shortcuts']} Shortcuts",
+            command=self.show_shortcuts
+        )
+        self.shortcuts_button.pack(side=tk.LEFT, padx=5)
 
     def setup_status_bar(self):
         """
@@ -464,6 +580,104 @@ class BoundingBoxEditor:
         self.class_listbox.bind("<Down>", lambda e: "break")
         self.class_listbox.bind("<Up>", lambda e: "break")        # Digit-based quick class selection
         self.root.bind("<Key>", self.on_key_press)
+        # Delete key to remove hovered polygon vertex
+        self.root.bind("<Delete>", self.on_delete_vertex)
+        # Backspace also removes hovered polygon vertex
+        self.root.bind("<BackSpace>", self.on_delete_vertex)
+
+        # Zoom via Ctrl + Mouse Wheel
+        self.canvas.bind("<Control-MouseWheel>", self.on_zoom)
+        self.canvas.bind("<Control-Button-4>", self.on_zoom)  # Linux scroll up
+        self.canvas.bind("<Control-Button-5>", self.on_zoom)  # Linux scroll down
+        # Pan via middle-mouse drag
+        self.canvas.bind("<ButtonPress-2>", lambda e: self.canvas.scan_mark(e.x, e.y))
+        self.canvas.bind("<B2-Motion>",      lambda e: self.canvas.scan_dragto(e.x, e.y, gain=1))
+
+    def show_shortcuts(self):
+        """
+        Displays a dialog listing all available keyboard and mouse shortcuts.
+        """
+        shortcut_list = [
+            ("Ctrl+S", "Save labels"),
+            ("Ctrl+Z", "Undo"),
+            ("Ctrl+Y", "Redo"),
+            ("Esc", "Cancel polygon or clear selection"),
+            ("Up/Down Arrow", "Navigate images"),
+            ("Mouse Wheel", "Navigate images"),
+            ("Ctrl + Mouse Wheel", "Zoom in/out"),
+            ("Middle Mouse Drag", "Pan"),
+            ("Digits 1-9", "Select class"),
+        ]
+        dlg = tk.Toplevel(self.root)
+        dlg.title("Keyboard Shortcuts")
+        dlg.transient(self.root)
+        dlg.grab_set()
+        frame = ttk.Frame(dlg, padding=10)
+        frame.pack(fill=tk.BOTH, expand=True)
+        cols = ("Shortcut", "Description")
+        tree = ttk.Treeview(frame, columns=cols, show="headings", selectmode="none")
+        for col in cols:
+            tree.heading(col, text=col)
+            tree.column(col, anchor="w")
+        for key, desc in shortcut_list:
+            tree.insert("", "end", values=(key, desc))
+        tree.pack(fill=tk.BOTH, expand=True)
+        btn = ttk.Button(frame, text="Close", command=dlg.destroy)
+        btn.pack(pady=(10, 0))
+        dlg.update_idletasks()
+        center_window(dlg, 400, 300)
+        self.root.wait_window(dlg)
+
+    def on_zoom(self, event):
+        """
+        Handles zoom in/out with Ctrl + Mouse Wheel or equivalent.
+        """
+        if hasattr(event, "delta"):
+            delta = event.delta
+        elif hasattr(event, "num") and event.num == 4:
+            delta = 120
+        elif hasattr(event, "num") and event.num == 5:
+            delta = -120
+        else:
+            return
+        factor = 1.1 if delta > 0 else 0.9
+        new_zoom = self.zoom_level * factor
+        new_zoom = max(0.1, min(new_zoom, 10.0))
+        scale = new_zoom / self.zoom_level
+        self.zoom_level = new_zoom
+        # Scale bounding boxes
+        self.bboxes = [
+            (int(x * scale), int(y * scale), int(w * scale), int(h * scale), class_id)
+            for x, y, w, h, class_id in self.bboxes
+        ]
+        # Scale polygons
+        scaled_polygons = []
+        for poly in self.polygons:
+            scaled_polygons.append({
+                "class_id": poly["class_id"],
+                "points": [(int(px * scale), int(py * scale)) for px, py in poly["points"]]
+            })
+        self.polygons = scaled_polygons
+        # Trigger resize logic to update image display with new zoom
+        class _E: pass
+        e = _E()
+        e.width = self.canvas_width
+        e.height = self.canvas_height
+        self.on_canvas_resize(e)
+
+    def zoom_in(self):
+        """Zoom in via toolbar button."""
+        class _E: pass
+        e = _E()
+        e.delta = 120
+        self.on_zoom(e)
+
+    def zoom_out(self):
+        """Zoom out via toolbar button."""
+        class _E: pass
+        e = _E()
+        e.delta = -120
+        self.on_zoom(e)
 
     def on_escape_key(self, event):
         """
@@ -480,6 +694,28 @@ class BoundingBoxEditor:
         """
         if self.annotation_mode == 'polygon' and self.polygon_drawing_active:
             self.cancel_current_polygon()
+
+    def on_delete_vertex(self, event):
+        """
+        Deletes the hovered vertex of a polygon, or removes polygon if vertices < 3.
+        """
+        if self.annotation_mode == 'polygon' and not self.polygon_drawing_active:
+            idx = self.hover_polygon_index
+            vidx = self.hover_point_index
+            if 0 <= idx < len(self.polygons) and 0 <= vidx < len(self.polygons[idx]['points']):
+                points = self.polygons[idx]['points']
+                if len(points) > 3:
+                    del points[vidx]
+                else:
+                    # Removing this point would invalidate polygon; delete entire polygon
+                    if messagebox.askyesno(
+                            "Delete Polygon",
+                            "Deleting this vertex will remove the whole polygon. Proceed?"):
+                        del self.polygons[idx]
+                        self.hover_polygon_index = -1
+                        self.hover_point_index = -1
+                self.display_annotations()
+                self.save_history()
 
     def toggle_annotation_mode(self):
         """
@@ -514,7 +750,8 @@ class BoundingBoxEditor:
                 "train": os.path.join(self.folder_path, 'train'),
                 "val": os.path.join(self.folder_path, 'val'),
                 "nc": 1,   # Number of classes
-                "names": ["person"]
+                "names": ["person"],
+                "auto_save_interval": 120
             }
             with open(self.yaml_path, "w") as f:
                 yaml.dump(default_yaml, f, sort_keys=False)
@@ -606,6 +843,23 @@ class BoundingBoxEditor:
 
         for display_name in counts:
             self.status_labels[display_name].config(text=f"{display_name}: {counts[display_name]}")
+
+    # --------------------------------------------------
+    # Auto-Save Mechanism
+    # --------------------------------------------------
+
+    def start_auto_save(self):
+        """
+        Starts a periodic auto-save timer based on the configured interval.
+        """
+        self.auto_save_id = self.root.after(self.auto_save_interval * 1000, self._auto_save_callback)
+
+    def _auto_save_callback(self):
+        """
+        Auto-save callback: saves labels and statuses and reschedules the timer.
+        """
+        self.save_labels()
+        self.start_auto_save()
 
     # --------------------------------------------------
     # Class Management
@@ -813,11 +1067,28 @@ class BoundingBoxEditor:
         # Read and resize the image to fit the canvas
         # WARNING: This can distort aspect ratio. Consider preserving ratio if you prefer.
         original_image = cv2.imread(self.image_path)
+        if original_image is None:
+            messagebox.showerror("Error", f"Failed to load image: {self.image_path}\nFile might be missing, corrupted, or in an unsupported format.")
+            self.image = None # Set self.image to None first
+            self.original_image = None
+            self.image_name_label.config(text=f"Error loading: {os.path.basename(self.image_path)}")
+            self.bboxes = []
+            self.polygons = []
+            self.display_image()       # Call display_image to show error on canvas
+            self.display_annotations() # Clear any annotation drawings from canvas
+            return
+
         original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 
-        # (Optional) store original shape for more accurate bounding boxes
-        # But for now, we fix the display size at 500 x 720
-        self.image = cv2.resize(original_image, (500, 720))
+        # Store original image for dynamic resizing/zoom
+        self.original_image = original_image
+        # Resize to current canvas size
+        if self.original_image is not None: # Ensure original_image is valid before resize
+            self.image = cv2.resize(self.original_image, (self.canvas_width, self.canvas_height))
+        else: # Should not happen if the above check is in place, but as a safeguard
+            self.image = None
+            messagebox.showerror("Error", "Internal error: Original image became None before resizing.")
+            return
 
         # Draw the image in the canvas
         self.display_image()
@@ -852,11 +1123,54 @@ class BoundingBoxEditor:
         if self.selected_class_index is not None:
             self.class_listbox.selection_set(self.selected_class_index)
 
+        # If image loaded successfully, save it as the last opened image for this project
+        if self.image is not None and self.image_path and self.current_image_index != -1:
+            relative_image_path = os.path.relpath(self.image_path, self.folder_path)
+            self.project['last_opened_image_relative'] = relative_image_path
+            self._save_project_config()
+
+    def _save_project_config(self):
+        """Saves the current self.project dictionary to its JSON file."""
+        if not hasattr(self, 'project') or 'project_name' not in self.project:
+            print("Error: Project name not found, cannot save project config.")
+            return
+
+        project_name = self.project['project_name']
+        # Sanitize project_name for use as a filename, consistent with ProjectManager
+        safe_project_filename = "".join(c if c.isalnum() or c in (' ', '_', '-') else '_' for c in project_name).rstrip()
+        if not safe_project_filename:
+            safe_project_filename = "Untitled_Project" # Fallback, should match ProjectManager logic
+        
+        project_file_path = os.path.join(PROJECTS_DIR, f"{safe_project_filename}.json")
+
+        try:
+            with open(project_file_path, "w") as f:
+                json.dump(self.project, f, indent=4)
+        except Exception as e:
+            # Log this error or show a non-intrusive message, as this save is a background task
+            print(f"Error saving project configuration to {project_file_path}: {e}")
+            # Optionally, inform the user via a status bar message or a one-time dialog
+            # messagebox.showwarning("Save Warning", f"Could not save last opened image state: {e}", parent=self.root)
+
+
     def display_image(self):
         """
         Clears the canvas and displays the current self.image (already resized).
         """
         self.canvas.delete("all")
+        if self.image is None:
+            # Display an error message on the canvas if image data is missing
+            self.canvas.create_text(
+                self.canvas_width / 2 if hasattr(self, 'canvas_width') and self.canvas_width > 0 else 300,
+                self.canvas_height / 2 if hasattr(self, 'canvas_height') and self.canvas_height > 0 else 300,
+                text="Error: Image data is missing or invalid.",
+                fill="red",
+                font=("Arial", 12)
+            )
+            if hasattr(self, 'tk_image'): # Clear previous tk_image if it exists
+                self.tk_image = None
+            return
+
         self.tk_image = ImageTk.PhotoImage(image=Image.fromarray(self.image))
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
 
@@ -909,24 +1223,36 @@ class BoundingBoxEditor:
                 outline="blue", width=2, tags="bbox"
             )
         elif self.annotation_mode == 'polygon':
-            # Check if clicking on an existing polygon point for dragging (when not actively drawing)
-            if not self.polygon_drawing_active and self.hover_polygon_index != -1:
-                # Start dragging the hovered point
-                self.dragging_point = True
-                self.drag_polygon_index = self.hover_polygon_index
-                self.drag_point_index = self.hover_point_index
-                self.canvas.config(cursor="fleur")  # Show dragging cursor
-            else:
-                # Regular polygon drawing
-                x, y = event.x, event.y
-                
-                # If not actively drawing, start a new polygon
-                if not self.polygon_drawing_active:
-                    self.polygon_drawing_active = True
-                    self.current_polygon_points = []  # Clear any residual points
-                
+            x, y = event.x, event.y # Define x, y once at the top
+
+            if self.polygon_drawing_active:
+                # We are in the middle of drawing a polygon, add the new point
                 self.current_polygon_points.append((x, y))
                 self.draw_current_polygon_drawing()
+            else:
+                # We are NOT actively drawing a polygon. This click could be:
+                # 1. Starting to drag an existing vertex
+                # 2. Starting to drag an entire existing polygon
+                # 3. Starting to draw a NEW polygon (if not 1 or 2)
+
+                # Check for vertex dragging
+                if self.hover_polygon_index != -1 and self.hover_point_index != -1:
+                    self.dragging_point = True
+                    self.drag_polygon_index = self.hover_polygon_index
+                    self.drag_point_index = self.hover_point_index
+                    self.canvas.config(cursor="fleur")
+                # Check for whole polygon movement
+                elif self.hover_polygon_index != -1 and self.is_point_in_polygon(
+                        x, y, self.polygons[self.hover_polygon_index]['points']): # Use x,y from above
+                    self.dragging_whole_polygon = True
+                    self.drag_whole_polygon_index = self.hover_polygon_index
+                    self.polygon_move_start = (x, y) # Use x,y from above
+                    self.canvas.config(cursor="fleur")
+                else:
+                    # Not editing an existing polygon, so start drawing a new one
+                    self.polygon_drawing_active = True
+                    self.current_polygon_points = [(x, y)] # Initialize with the first point
+                    self.draw_current_polygon_drawing()
                 
     def on_drag(self, event):
         """
@@ -937,9 +1263,19 @@ class BoundingBoxEditor:
             self.current_bbox[2] = event.x
             self.current_bbox[3] = event.y
             self.canvas.coords(self.rect, *self.current_bbox)
+        elif self.annotation_mode == 'polygon' and self.dragging_whole_polygon:
+            # Move entire polygon by delta
+            dx = event.x - self.polygon_move_start[0]
+            dy = event.y - self.polygon_move_start[1]
+            pts = self.polygons[self.drag_whole_polygon_index]['points']
+            self.polygons[self.drag_whole_polygon_index]['points'] = [
+                (px + dx, py + dy) for px, py in pts]
+            self.polygon_move_start = (event.x, event.y)
+            self.display_annotations()
         elif self.annotation_mode == 'polygon' and self.dragging_point:
             # Update the dragged polygon point position
-            if 0 <= self.drag_polygon_index < len(self.polygons) and 0 <= self.drag_point_index < len(self.polygons[self.drag_polygon_index]['points']):
+            if 0 <= self.drag_polygon_index < len(self.polygons) and \
+               0 <= self.drag_point_index < len(self.polygons[self.drag_polygon_index]['points']):
                 self.polygons[self.drag_polygon_index]['points'][self.drag_point_index] = (event.x, event.y)
                 self.display_annotations()  # Refresh to show updated polygon
     
@@ -974,6 +1310,12 @@ class BoundingBoxEditor:
 
             self.display_annotations()
             self.save_history()
+        elif self.annotation_mode == 'polygon' and self.dragging_whole_polygon:
+            # Finish whole polygon dragging
+            self.dragging_whole_polygon = False
+            self.drag_whole_polygon_index = -1
+            self.canvas.config(cursor="")  # Reset cursor
+            self.save_history()  # Save state after polygon move
         elif self.annotation_mode == 'polygon' and self.dragging_point:
             # Finish polygon point dragging
             self.dragging_point = False
@@ -1071,6 +1413,20 @@ class BoundingBoxEditor:
         elif self.polygon_drawing_active:
             # No points drawn yet, just reset the state
             self.polygon_drawing_active = False
+
+    def is_point_in_polygon(self, x, y, points):
+        """
+        Returns True if point (x, y) is inside polygon defined by list of (px, py) points.
+        """
+        inside = False
+        n = len(points)
+        for i in range(n):
+            j = (i - 1) % n
+            xi, yi = points[i]
+            xj, yj = points[j]
+            if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / (yj - yi) + xi):
+                inside = not inside
+        return inside
 
     def complete_polygon(self):
         """
@@ -1210,6 +1566,53 @@ class BoundingBoxEditor:
                 font=("Arial", 8)
             ).grid(row=0, column=1, rowspan=2, padx=2, sticky="ns")
             poly_info_row.grid_columnconfigure(0, weight=1) # Allow label to expand
+
+    def on_canvas_resize(self, event):
+        """
+        Callback when the canvas is resized: scales the image and annotations.
+        """
+        new_width, new_height = event.width, event.height
+        # Avoid zero-size during initialization
+        if hasattr(self, 'canvas_width') and hasattr(self, 'canvas_height') and hasattr(self, 'image'):
+            scale_x = new_width / self.canvas_width
+            scale_y = new_height / self.canvas_height
+            # Scale bounding boxes
+            self.bboxes = [
+                (int(x * scale_x), int(y * scale_y), int(w * scale_x), int(h * scale_y), class_id)
+                for x, y, w, h, class_id in self.bboxes
+            ]
+            # Scale polygons
+            scaled_polygons = []
+            for poly in self.polygons:
+                scaled_polygons.append({
+                    'class_id': poly['class_id'],
+                    'points': [(int(px * scale_x), int(py * scale_y)) for px, py in poly['points']]
+                })
+            self.polygons = scaled_polygons
+        # Resize image for display (consider zoom level)
+        if hasattr(self, 'original_image'):
+            if self.original_image is None:
+                self.image = None # Original image is missing
+            else:
+                disp_w = int(new_width * self.zoom_level)
+                disp_h = int(new_height * self.zoom_level)
+                if disp_w > 0 and disp_h > 0: # Ensure dimensions are positive
+                    try:
+                        self.image = cv2.resize(self.original_image, (disp_w, disp_h))
+                    except cv2.error as e:
+                        # Log the error or show a message if appropriate
+                        print(f"OpenCV error during resize in on_canvas_resize: {e}")
+                        self.image = None # Set image to None on resize error
+                else:
+                    self.image = None # Invalid dimensions for resize
+        else:
+            self.image = None # No original image to resize
+
+        # Update stored canvas size
+        self.canvas_width, self.canvas_height = new_width, new_height
+        # Redraw
+        self.display_image()
+        self.display_annotations()
 
     def delete_annotation(self, index, annotation_type):
         """
@@ -2454,7 +2857,7 @@ class ProjectManager:
         self.projects_list_frame = ttk.Labelframe(self.paned_window, text="Existing Projects", padding="10")
         self.paned_window.add(self.projects_list_frame, weight=3) # Larger weight for project list
 
-        columns = ("project_name", "dataset_path")
+        columns = ("project_name", "dataset_path", "last_modified_date")
         self.project_tree = ttk.Treeview(
             self.projects_list_frame,
             columns=columns,
@@ -2465,6 +2868,8 @@ class ProjectManager:
         self.project_tree.column("project_name", anchor=tk.W, width=200, stretch=tk.NO)
         self.project_tree.heading("dataset_path", text="Dataset Path")
         self.project_tree.column("dataset_path", anchor=tk.W, width=300) # Allow dataset_path to expand
+        self.project_tree.heading("last_modified_date", text="Last Modified Date")
+        self.project_tree.column("last_modified_date", anchor=tk.W, width=150, stretch=tk.NO)
         
         self.project_tree_scrollbar = ttk.Scrollbar(self.projects_list_frame, orient="vertical", command=self.project_tree.yview)
         self.project_tree.configure(yscrollcommand=self.project_tree_scrollbar.set)
@@ -2484,22 +2889,31 @@ class ProjectManager:
 
         project_files = [f for f in os.listdir(PROJECTS_DIR) if f.endswith(".json")]
         if not project_files:
-            self.project_tree.insert("", tk.END, iid="no_projects_placeholder", values=("No projects found.", ""), tags=("placeholder",))
+            self.project_tree.insert("", tk.END, iid="no_projects_placeholder", values=("No projects found.", "", ""), tags=("placeholder",))
             self._on_project_select() # Ensure buttons are disabled
             return
 
         for f_name in sorted(project_files):
             project_name_display = os.path.splitext(f_name)[0]
             dataset_path_display = "N/A"
+            full_path = os.path.join(PROJECTS_DIR, f_name)
             try:
-                full_path = os.path.join(PROJECTS_DIR, f_name)
+                last_modified_display = datetime.fromtimestamp(os.path.getmtime(full_path)).strftime("%Y-%m-%d %H:%M:%S")
+            except Exception as e:
+                logging.error(f"Error getting last modified time for project file {f_name}", exc_info=True)
+                last_modified_display = ""
+            try:
                 with open(full_path, "r") as f:
                     project_data = json.load(f)
                     dataset_path_display = project_data.get("dataset_path", "N/A")
             except Exception as e:
-                print(f"Error reading project file {f_name}: {e}") 
-            
-            self.project_tree.insert("", tk.END, iid=f_name, values=(project_name_display, dataset_path_display))
+                logging.error(f"Error reading project file {f_name}", exc_info=True)
+                messagebox.showerror(
+                    "Error Reading Project",
+                    f"Error reading project file {f_name}:\n{e}"
+                )
+
+            self.project_tree.insert("", tk.END, iid=f_name, values=(project_name_display, dataset_path_display, last_modified_display))
         self._on_project_select() 
 
     def _on_project_select(self, event=None):
@@ -2656,6 +3070,11 @@ class ProjectManager:
 
 if __name__ == "__main__":
     root = tk.Tk()
+    # Global exception handler for Tkinter callbacks
+    def report_callback_exception(self, exc, val, tb):
+        logging.error("Exception in Tkinter callback", exc_info=(exc, val, tb))
+        messagebox.showerror("Error", f"An unexpected error occurred:\n{val}")
+    tk.Tk.report_callback_exception = report_callback_exception
     # Apply a theme
     style = ttk.Style(root)
     available_themes = style.theme_names()
@@ -2666,5 +3085,9 @@ if __name__ == "__main__":
          style.theme_use("vista")
     # else, it will use the default system theme
 
-    pm = ProjectManager(root)
-    root.mainloop()
+    try:
+        pm = ProjectManager(root)
+        root.mainloop()
+    except Exception as e:
+        logging.exception("Fatal error during application initialization")
+        messagebox.showerror("Fatal Error", f"A fatal error occurred:\n{e}")

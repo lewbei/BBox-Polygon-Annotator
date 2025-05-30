@@ -52,9 +52,9 @@ The application is built with Python Tkinter and follows a modular design patter
 - **Precision Tools**: Exact coordinate display and editing
 
 #### ✅ Data Management
-- **Project System**: JSON-based project organization with metadata
+- **Project System**: JSON-based project organization with metadata (Last Modified Date shown in project list)
 - **Status Tracking**: 4-tier status system (Not Viewed, Viewed, Edited, Review Needed)
-- **Auto-Save**: Automatic annotation persistence on image changes
+- **Auto-Save**: Configurable periodic annotation persistence (auto-save interval in dataset YAML)
 - **Undo/Redo**: Complete history system with 50-action memory
 - **Multi-Format Export**: YAML (YOLO), COCO JSON, Pascal VOC XML, CSV, and Generic JSON formats
 
@@ -154,9 +154,9 @@ Based on thorough analysis of the current v9 implementation, here are prioritize
 #### 🔴 High Priority (Immediate Impact)
 | Improvement | Current State | Proposed Enhancement | Implementation Effort |
 |-------------|---------------|---------------------|----------------------|
-| **Button Icons** | Text-only buttons | Add intuitive icons (📁 💾 🤖 📤) | Low - Icon library integration |
+| **Button Icons** | Unicode icons added | Use simple Unicode glyphs for toolbar icons | Low - No external library required |
 | **Resizable Canvas** | Fixed 500x720 | Dynamic sizing with window | Medium - Layout constraints |
-| **Zoom Controls** | No zoom capability | Zoom in/out with mouse wheel | Medium - Canvas scaling logic |
+| **Zoom Controls** | Mouse wheel + toolbar buttons implemented | Zoom in/out via Ctrl+MouseWheel and toolbar buttons; annotations scale correctly | Medium - Canvas scaling logic |
 | **Panel Splitters** | Fixed 200px panels | Draggable dividers | High - Custom splitter widgets |
 | **Progress Indicators** | No feedback for long ops | Loading bars/spinners | Medium - Threading integration |
 
@@ -164,8 +164,8 @@ Based on thorough analysis of the current v9 implementation, here are prioritize
 | Improvement | Benefit | Technical Notes |
 |-------------|---------|-----------------|
 | **Dark Theme Toggle** | Reduced eye strain | CSS-like theming system |
-| **Keyboard Shortcut Display** | Better discoverability | Modal help dialog |
-| **Auto-Save Intervals** | Data protection | Configurable timer system |
+| **Keyboard Shortcut Display** | Modal help dialog implemented | - |
+| **Auto-Save Intervals** | Data protection | Configurable in dataset YAML (`auto_save_interval`); auto-save timer implemented |
 | **Drag & Drop Support** | Faster file loading | OS integration required |
 | **Search/Filter Images** | Large dataset navigation | Text filtering + regex |
 
@@ -348,12 +348,12 @@ class UserPreferences:
 - **UI Structure Optimization**: Reorganized frame hierarchy for better maintainability
 - **Visual Spacing Enhancement**: Added padding to right panel (10px) for improved aesthetics
 - **Polygon Annotation System**: Full implementation of polygon drawing and editing
+- **Advanced Polygon Editing**: Vertex deletion (Delete key) and polygon movement/dragging.
 - **YOLO Integration**: Seamless polygon support in auto-annotation workflow
 - **Multi-Format Export System**: Complete implementation of COCO JSON, Pascal VOC XML, CSV, and Generic JSON export formats
 - **Export Compatibility**: All export formats updated for both bounding box and polygon annotations
 
 #### 🔄 **In Progress**
-- **Advanced Polygon Editing**: Point dragging and vertex manipulation
 - **Performance Optimization**: Image caching and memory management
 - **Error Handling**: Robust user feedback and recovery systems
 - **✅ Polygon UX Fix**: Fixed accidental polygon creation from left-clicks after completing a polygon (v9.1)
@@ -363,14 +363,12 @@ class UserPreferences:
 ##### Week 1-2: Visual Polish
 ```
 Priority 1: Icon Integration
-- Add SVG icons to all toolbar buttons
-- Implement icon theming system
-- Create custom annotation mode indicators
+- Use simple Unicode glyphs for toolbar icons
 
 Priority 2: Responsive Canvas
-- Replace fixed 500x720 canvas with dynamic sizing
-- Add zoom controls (wheel + toolbar buttons)
-- Implement pan functionality for large images
+- Canvas now dynamically resizes with window; annotations scale accordingly
+- Zoom controls (Ctrl+MouseWheel + toolbar buttons) implemented
+- Pan functionality implemented (middle-mouse drag)
 ```
 
 ##### Week 3-4: Layout Improvements
@@ -389,9 +387,7 @@ Priority 2: Enhanced Navigation
 ##### Week 5-6: Performance & UX
 ```
 Priority 1: Auto-Save System
-- Configurable save intervals (1-10 minutes)
-- Visual save status indicator
-- Recovery from unsaved changes
+- Configurable auto-save intervals implemented (dataset YAML key `auto_save_interval`)
 
 Priority 2: Background Processing
 - Threading for model loading
@@ -427,7 +423,7 @@ Priority 2: Background Processing
 1. Monolithic __init__ method          # Split into focused setup methods
 2. Global state management             # Implement proper state pattern  
 3. Mixed UI/business logic             # Separate concerns with MVC pattern
-4. Limited error handling              # Add comprehensive exception management
+4. Comprehensive exception management    # Global error handling implemented
 5. Hardcoded dimensions                # Make all sizing responsive
 ```
 

@@ -74,30 +74,26 @@ Focus: Platform Enhancement, Broader AI Integration, Extensibility.
 ## IV. Actionable To-Do List (Immediate - Short Term)
 
 ### Core UX & Visual Polish
--   [ ] **Task 1**: Research and select an icon library or create custom SVG icons for toolbar buttons (`Auto Annotate`, `Save Labels`, `Load Model`, `Export Annotations`, `Mode Toggle`, `Undo`, `Redo`).
--   [ ] **Task 2**: Implement icon display on the respective `ttk.Button` widgets.
--   [ ] **Task 3**: Modify `BoundingBoxEditor.setup_canvas` and related image display logic to allow the canvas to resize with the window.
-    -   [ ] Sub-task: Ensure annotation coordinates correctly scale/translate with canvas resize.
--   [ ] **Task 4**: Implement zoom functionality on the canvas:
-    -   [ ] Bind mouse wheel (Ctrl + scroll or Alt + scroll) to zoom.
-    -   [ ] Add zoom in/out buttons to the UI (perhaps near the canvas or in a view menu).
-    -   [ ] Ensure annotations scale correctly with zoom.
--   [ ] **Task 5**: Implement pan functionality on the canvas (e.g., middle-mouse drag or spacebar + drag).
--   [ ] **Task 6**: Design and implement a modal dialog or a dedicated section to display all available keyboard shortcuts.
+-   [x] **Task 1**: Selected simple Unicode glyphs for toolbar icons; mapping defined in `ICON_UNICODE` dictionary.
+-   [x] **Task 2**: Implement icon display on the respective toolbar buttons using Unicode glyphs.
+-   [x] **Task 3**: Modify `BoundingBoxEditor.setup_canvas` and related image display logic to allow the canvas to resize with the window, ensuring annotation coordinates correctly scale/translate with canvas resize.
+-   [x] **Task 4**: Implement zoom functionality on the canvas (Ctrl+MouseWheel + toolbar buttons); annotations now scale correctly with zoom.
+-   [x] **Task 5**: Implement pan functionality on the canvas (middle-mouse drag).
+-   [x] **Task 6**: Design and implement a modal dialog or a dedicated section to display all available keyboard shortcuts.
 
 ### Stability & Polygon Enhancements
--   [ ] **Task 7**: Review and complete any pending "Advanced Polygon Editing" features:
-    -   [ ] Vertex deletion (if not fully implemented/stable).
-    -   [ ] Polygon movement/dragging (if not fully implemented/stable).
--   [ ] **Task 8**: Implement a configurable auto-save mechanism:
-    -   [ ] Add a setting (e.g., in a config file or future settings dialog) for auto-save interval.
-    -   [ ] Implement a timer in `BoundingBoxEditor` to trigger `save_labels` and `save_statuses`.
--   [ ] **Task 9**: Enhance global error handling:
-    -   [ ] Wrap critical operations in try-except blocks.
-    -   [ ] Use `messagebox.showerror` for user-facing errors instead of just print statements where appropriate.
+   -   [x] **Task 7**: Review and complete any pending "Advanced Polygon Editing" features:
+    -   [x] Vertex deletion (Delete key).
+    -   [x] Polygon movement/dragging (click-and-drag interior).
+   [x] **Task 8**: Implement a configurable auto-save mechanism:
+    -   [x] Add a setting (`auto_save_interval` in dataset YAML) for auto-save interval (seconds).
+    -   [x] Implement a timer in `BoundingBoxEditor` to trigger `save_labels` and `save_statuses`.
+-   [x] **Task 9**: Enhance global error handling:
+    -   [x] Wrap critical operations in try-except blocks.
+    -   [x] Use `messagebox.showerror` for user-facing errors instead of just print statements where appropriate.
 
 ### Project Manager Refinements (Post-Upgrade)
--   [ ] **Task 10**: (Low Priority) Consider adding "Last Modified Date" to the Project Manager's Treeview by reading file system metadata for the project JSON files.
+-   [x] **Task 10**: (Low Priority) Add "Last Modified Date" column to the Project Manager's Treeview using file system metadata for project JSON files.
 
 ### Code Quality
 -   [ ] **Task 11**: Begin refactoring `BoundingBoxEditor.__init__`:

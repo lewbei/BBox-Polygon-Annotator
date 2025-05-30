@@ -1,0 +1,42 @@
+2025-05-30 14:52:03,291 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image labelling v9.py", line 1504, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image labelling v9.py", line 1086, in display_image
+    self.tk_image = ImageTk.PhotoImage(image=Image.fromarray(self.image))
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\Image.py", line 3300, in fromarray
+    arr = obj.__array_interface__
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute '__array_interface__'
+2025-05-30 15:13:04,441 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image labelling v9.py", line 1512, in on_canvas_resize
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image labelling v9.py", line 1086, in display_image
+    self.tk_image = ImageTk.PhotoImage(image=Image.fromarray(self.image))
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\Image.py", line 3300, in fromarray
+    arr = obj.__array_interface__
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute '__array_interface__'
+2025-05-30 15:13:25,823 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image labelling v9.py", line 1512, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image labelling v9.py", line 1086, in display_image
+    self.tk_image = ImageTk.PhotoImage(image=Image.fromarray(self.image))
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\Image.py", line 3300, in fromarray
+    arr = obj.__array_interface__
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute '__array_interface__'
