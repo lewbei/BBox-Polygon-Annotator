@@ -4,7 +4,7 @@ MIT License Python 3.8+ Platform: Windows/Linux/macOS
 
 A comprehensive, Tkinter-based image annotation tool supporting both bounding box and polygon annotations for efficient computer vision dataset creation. Features intelligent auto-annotation using YOLO, flexible export formats, robust project management, and an intuitive GUI.
 
-Tip: Add a demo screenshot or GIF here to highlight your UI!
+
 
 ## Table of Contents
 - [Features](#features)
