@@ -935,7 +935,9 @@ class BoundingBoxEditor:
         # Ensure the label directory exists for nested paths
         os.makedirs(os.path.dirname(label_path), exist_ok=True)
 
-        self.bboxes, self.polygons = read_annotations_from_file(label_path, self.image.shape)
+        # Use original image dimensions for denormalization to ensure consistent bbox coords
+        img_shape = self.original_image.shape if hasattr(self, 'original_image') and self.original_image is not None else self.image.shape
+        self.bboxes, self.polygons = read_annotations_from_file(label_path, img_shape)
 
         # Show annotations
         self.display_annotations()
@@ -1515,7 +1517,9 @@ class BoundingBoxEditor:
         # Ensure label directory exists
         os.makedirs(os.path.dirname(label_path), exist_ok=True)
 
-        write_annotations_to_file(label_path, self.bboxes, self.polygons, self.image.shape)
+        # Normalize annotations based on original image dimensions to avoid resizing distortions
+        img_shape = self.original_image.shape if hasattr(self, 'original_image') and self.original_image is not None else self.image.shape
+        write_annotations_to_file(label_path, self.bboxes, self.polygons, img_shape)
 
         logging.info("Saved labels for %s", self.image_path)
 
