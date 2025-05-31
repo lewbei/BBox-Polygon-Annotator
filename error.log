@@ -2367,3 +2367,636 @@ Traceback (most recent call last):
   File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2390, in destroy
     self.tk.call('destroy', self._w)
 _tkinter.TclError: can't invoke "destroy" command: application has been destroyed
+2025-05-31 20:35:00,484 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1253, in on_click
+    self.draw_current_polygon_drawing()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1448, in draw_current_polygon_drawing
+    line_id = self.canvas.create_line(coords, fill="red", width=2, tags="current_polygon_line")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2881, in create_line
+    return self._create('line', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: wrong # coordinates: expected at least 4, got 2
+2025-05-31 20:35:04,741 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1253, in on_click
+    self.draw_current_polygon_drawing()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1448, in draw_current_polygon_drawing
+    line_id = self.canvas.create_line(coords, fill="red", width=2, tags="current_polygon_line")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2881, in create_line
+    return self._create('line', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: wrong # coordinates: expected at least 4, got 2
+2025-05-31 20:35:11,197 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1253, in on_click
+    self.draw_current_polygon_drawing()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1448, in draw_current_polygon_drawing
+    line_id = self.canvas.create_line(coords, fill="red", width=2, tags="current_polygon_line")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2881, in create_line
+    return self._create('line', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: wrong # coordinates: expected at least 4, got 2
+2025-05-31 20:35:12,001 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1253, in on_click
+    self.draw_current_polygon_drawing()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1448, in draw_current_polygon_drawing
+    line_id = self.canvas.create_line(coords, fill="red", width=2, tags="current_polygon_line")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2881, in create_line
+    return self._create('line', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: wrong # coordinates: expected at least 4, got 2
+2025-05-31 20:53:23,452 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 86, in __init__
+    self.setup_canvas()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 241, in setup_canvas
+    self.canvas.bind("<MouseWheel>", self.on_mouse_wheel)
+                                     ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'on_mouse_wheel'
+2025-05-31 20:59:57,652 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 86, in __init__
+    self.setup_canvas()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 246, in setup_canvas
+    self.canvas.bind("<Button-1>", self.on_click)
+                                   ^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'on_click'
+2025-05-31 21:10:17,482 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 90, in __init__
+    self.setup_canvas()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 243, in setup_canvas
+    self.canvas.bind("<Configure>", self.on_canvas_resize)
+                                    ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'on_canvas_resize'
+2025-05-31 21:20:12,602 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+2025-05-31 21:20:12,609 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1019, in on_image_select
+    self.load_image(image_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+2025-05-31 21:20:12,680 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1019, in on_image_select
+    self.load_image(image_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1448, in on_canvas_resize
+    Navigates the image list in the given direction (1 for next, -1 for previous).
+                                           ^^^^^^^^^^^^^^^^^^^
+ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+2025-05-31 21:20:20,654 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+2025-05-31 21:20:20,667 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1019, in on_image_select
+    self.load_image(image_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+2025-05-31 21:20:20,771 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1019, in on_image_select
+    self.load_image(image_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 603, in on_canvas_resize
+    if hasattr(self, 'original_image') and self.original_image:
+                                           ^^^^^^^^^^^^^^^^^^^
+ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+2025-05-31 21:20:47,590 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+2025-05-31 21:20:47,600 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1019, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+2025-05-31 21:20:47,768 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1019, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1067, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1137, in display_image
+    zoomed_img_width = int(self.original_image.width * self.zoom_level)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'width'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 603, in on_canvas_resize
+    if hasattr(self, 'original_image') and self.original_image:
+                                           ^^^^^^^^^^^^^^^^^^^
+ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+2025-05-31 21:23:35,419 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1060, in load_image
+    self.image = cv2.resize(self.original_image, (self.canvas_width, self.canvas_height))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cv2.error: OpenCV(4.11.0) :-1: error: (-5:Bad argument) in function 'resize'
+> Overload resolution failed:
+>  - src is not a numpy array, neither a scalar
+>  - Expected Ptr<cv::UMat> for argument 'src'
+
+2025-05-31 21:23:35,433 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1060, in load_image
+    self.image = cv2.resize(self.original_image, (self.canvas_width, self.canvas_height))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cv2.error: OpenCV(4.11.0) :-1: error: (-5:Bad argument) in function 'resize'
+> Overload resolution failed:
+>  - src is not a numpy array, neither a scalar
+>  - Expected Ptr<cv::UMat> for argument 'src'
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1019, in on_image_select
+    self.load_image(image_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1060, in load_image
+    self.image = cv2.resize(self.original_image, (self.canvas_width, self.canvas_height))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cv2.error: OpenCV(4.11.0) :-1: error: (-5:Bad argument) in function 'resize'
+> Overload resolution failed:
+>  - src is not a numpy array, neither a scalar
+>  - Expected Ptr<cv::UMat> for argument 'src'
+
+2025-05-31 21:23:35,763 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 177, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1060, in load_image
+    self.image = cv2.resize(self.original_image, (self.canvas_width, self.canvas_height))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cv2.error: OpenCV(4.11.0) :-1: error: (-5:Bad argument) in function 'resize'
+> Overload resolution failed:
+>  - src is not a numpy array, neither a scalar
+>  - Expected Ptr<cv::UMat> for argument 'src'
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1019, in on_image_select
+    self.load_image(image_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1060, in load_image
+    self.image = cv2.resize(self.original_image, (self.canvas_width, self.canvas_height))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cv2.error: OpenCV(4.11.0) :-1: error: (-5:Bad argument) in function 'resize'
+> Overload resolution failed:
+>  - src is not a numpy array, neither a scalar
+>  - Expected Ptr<cv::UMat> for argument 'src'
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 604, in on_canvas_resize
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1189, in display_image
+    self.display_annotations() # Refresh annotations based on new view
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1198, in display_annotations
+    for ann_idx, annotation in enumerate(self.annotations):
+                                         ^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'annotations'
+2025-05-31 21:36:09,668 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1378, in on_click
+    self.display_annotations()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1214, in display_annotations
+    text=self.class_names[class_id],
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^
+TypeError: list indices must be integers or slices, not NoneType
+2025-05-31 21:36:11,245 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 563, in on_zoom
+    self.on_canvas_resize(e)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 605, in on_canvas_resize
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.display_annotations() # Refresh annotations based on new view
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1214, in display_annotations
+    text=self.class_names[class_id],
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^
+TypeError: list indices must be integers or slices, not NoneType
+2025-05-31 21:36:12,415 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 563, in on_zoom
+    self.on_canvas_resize(e)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 605, in on_canvas_resize
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.display_annotations() # Refresh annotations based on new view
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1214, in display_annotations
+    text=self.class_names[class_id],
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^
+TypeError: list indices must be integers or slices, not NoneType
+2025-05-31 21:36:14,765 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1020, in on_image_select
+    self.load_image(image_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1070, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.display_annotations() # Refresh annotations based on new view
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1214, in display_annotations
+    text=self.class_names[class_id],
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^
+TypeError: list indices must be integers or slices, not NoneType
+2025-05-31 21:36:15,705 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1020, in on_image_select
+    self.load_image(image_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1070, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.display_annotations() # Refresh annotations based on new view
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1214, in display_annotations
+    text=self.class_names[class_id],
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^
+TypeError: list indices must be integers or slices, not NoneType
+2025-05-31 21:38:46,392 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1400, in on_click
+    self.display_annotations()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1236, in display_annotations
+    text=self.class_names[class_id],
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^
+TypeError: list indices must be integers or slices, not NoneType
+2025-05-31 21:55:34,891 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 707, in on_right_click
+    self.cancel_current_polygon()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'cancel_current_polygon'
+2025-05-31 21:55:36,406 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 707, in on_right_click
+    self.cancel_current_polygon()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'cancel_current_polygon'
+2025-05-31 21:55:37,560 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 698, in on_escape_key
+    self.cancel_current_polygon()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'cancel_current_polygon'
+2025-05-31 21:57:19,059 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1457, in on_click
+    self.display_annotations()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1289, in display_annotations
+    text=self.class_names[class_id],
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^
+TypeError: list indices must be integers or slices, not NoneType
+2025-05-31 22:04:44,429 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1562, in on_double_click
+    self.display_annotations()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1347, in display_annotations
+    text=self.class_names[class_id],
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^
+TypeError: list indices must be integers or slices, not NoneType
+2025-05-31 22:41:56,267 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 149, in __init__
+    self.setup_bindings()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 345, in setup_bindings
+    self.canvas.bind("<ButtonRelease-2>", self.on_pan_end)
+                                          ^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'on_pan_end'. Did you mean: 'on_pan_drag'?
+2025-05-31 22:44:05,298 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 796, in <lambda>
+    tk.Button(bbox_info_row, text="Delete", command=lambda i=i, type='bbox': self.delete_annotation(i, type), font=("Arial",8)).grid(row=1,column=1,padx=2,sticky="e")
+                                                                             ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'delete_annotation'. Did you mean: 'cancel_annotation'?
+2025-05-31 22:44:30,657 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 796, in <lambda>
+    tk.Button(bbox_info_row, text="Delete", command=lambda i=i, type='bbox': self.delete_annotation(i, type), font=("Arial",8)).grid(row=1,column=1,padx=2,sticky="e")
+                                                                             ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'delete_annotation'. Did you mean: 'cancel_annotation'?
+2025-05-31 22:49:25,616 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 797, in <lambda>
+    tk.Button(bbox_info_row, text="Delete", command=lambda i=i, type='bbox': self.delete_annotation(i, type), font=("Arial",8)).grid(row=1,column=1,padx=2,sticky="e")
+                                                                             ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'delete_annotation'. Did you mean: 'cancel_annotation'?
