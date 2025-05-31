@@ -11,9 +11,154 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-from image_labelling.constants import ICON_UNICODE, PROJECTS_DIR
-from image_labelling.helpers import center_window, write_annotations_to_file, read_annotations_from_file, copy_files_recursive
-from image_labelling.startup_optimizer import lazy_importer
+import cv2
+import numpy as np
+from ultralytics import YOLO
+from PIL import Image, ImageTk
+
+# Setup logging for global error handling
+LOG_FILE = os.path.join(os.getcwd(), "error.log")
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.ERROR,
+    format="%(asctime)s %(levelname)s %(message)s"
+)
+
+# Icon glyphs for toolbar buttons (using simple Unicode emojis)
+ICON_UNICODE = {
+    'auto_annotate': '⚡',
+    'save': '💾',
+    'load_model': '📂',
+    'export': '📤',
+    'mode_box': '⬜',
+    'mode_polygon': '🔷',
+    'undo': '↶',
+    'redo': '↷',
+    'zoom_in': '🔍+',
+    'zoom_out': '🔍-',
+    'shortcuts': '⌨️',
+}
+
+# --------------------------------------------------
+# Global Constants and Helpers
+# --------------------------------------------------
+
+PROJECTS_DIR = os.path.join(os.getcwd(), "projects")
+os.makedirs(PROJECTS_DIR, exist_ok=True)
+
+def center_window(win, width, height):
+    """
+    Centers a Tkinter window 'win' given the desired 'width' and 'height'.
+    """
+    win.update_idletasks()
+    screen_width = win.winfo_screenwidth()
+    screen_height = win.winfo_screenheight()
+    x = (screen_width - width) // 2
+    y = (screen_height - height) // 2
+    win.geometry(f"{width}x{height}+{x}+{y}")
+
+def write_annotations_to_file(label_path, bboxes, polygons, image_shape):
+    """
+    Writes bounding boxes (YOLO format) and polygons (normalized points) to a label file.
+
+    :param label_path: Path to the .txt label file.
+    :param bboxes: List of bounding boxes [ (x, y, w, h, class_id), ... ] in pixel coords.
+    :param polygons: List of polygons [ {'class_id': int, 'points': [(x1, y1), ...]}, ... ] in pixel coords.
+    :param image_shape: (height, width) of the image used for normalization.
+    """
+    img_h, img_w = image_shape[:2]
+    with open(label_path, 'w') as label_file:
+        # Write bounding boxes
+        for x, y, w, h, class_id in bboxes:
+            x_center = (x + w / 2) / img_w
+            y_center = (y + h / 2) / img_h
+            width_norm = w / img_w
+            height_norm = h / img_h
+            label_file.write(f"{class_id} {x_center} {y_center} {width_norm} {height_norm}\n")
+
+        # Write polygons in YOLO segmentation format (normalized points)
+        for poly_data in polygons:
+            class_id = poly_data['class_id']
+            points = poly_data['points']
+            normalized_points = []
+            for px, py in points:
+                normalized_points.append(px / img_w)
+                normalized_points.append(py / img_h)
+            # Format: class_id x1_norm y1_norm x2_norm y2_norm ...
+            label_file.write(f"{class_id} {' '.join(map(str, normalized_points))}\n")
+
+def read_annotations_from_file(label_path, image_shape):
+    """
+    Reads YOLO-format bounding boxes and normalized polygons from a label file
+    and converts them to pixel coordinates.
+
+    :param label_path: Path to the .txt label file.
+    :param image_shape: (height, width) of the image used for denormalization.
+    :return: Tuple (list of bboxes, list of polygons)
+             bboxes: [ (x, y, w, h, class_id), ... ] in pixel coords.
+             polygons: [ {'class_id': int, 'points': [(x1, y1), ...]}, ... ] in pixel coords.
+    """
+    bboxes = []
+    polygons = []
+    if not os.path.exists(label_path):
+        return bboxes, polygons
+
+    img_h, img_w = image_shape[:2]
+    with open(label_path, 'r') as label_file:
+        for line in label_file:
+            parts = list(map(float, line.strip().split()))
+            class_id = int(parts[0])
+            coords = parts[1:]
+
+            if len(coords) == 4: # Bounding box (YOLO format: x_center, y_center, width, height)
+                x_center, y_center, width, height = coords
+                x_center_abs = x_center * img_w
+                y_center_abs = y_center * img_h
+                width_abs = width * img_w
+                height_abs = height * img_h
+                x_min = int(x_center_abs - width_abs / 2)
+                y_min = int(y_center_abs - height_abs / 2)
+                bboxes.append((x_min, y_min, int(width_abs), int(height_abs), class_id))
+            elif len(coords) % 2 == 0 and len(coords) >= 6: # Polygon (YOLO segmentation format: x1, y1, x2, y2, ...)
+                points = []
+                for i in range(0, len(coords), 2):
+                    px_norm = coords[i]
+                    py_norm = coords[i+1]
+                    points.append((int(px_norm * img_w), int(py_norm * img_h)))
+                polygons.append({'class_id': class_id, 'points': points})
+            # else: ignore malformed lines
+    return bboxes, polygons
+
+def copy_files_recursive(file_list_relative_paths, base_images_src_dir, images_dst_base, base_labels_src_dir, labels_dst_base):
+    """
+    Copies images and their corresponding label files, preserving subdirectory structure.
+
+    :param file_list_relative_paths: List of image file paths relative to base_images_src_dir.
+    :param base_images_src_dir: The root directory where source images are located.
+    :param images_dst_base: The base destination directory for images.
+    :param base_labels_src_dir: The root directory where source labels are located.
+    :param labels_dst_base: The base destination directory for labels.
+    """
+    for relative_path in file_list_relative_paths:
+        src_image_path = os.path.join(base_images_src_dir, relative_path)
+        
+        # Construct label path based on relative image path
+        label_relative_path = os.path.splitext(relative_path)[0] + '.txt'
+        src_label_path = os.path.join(base_labels_src_dir, label_relative_path)
+
+        # Create destination directories, preserving structure
+        dst_image_path = os.path.join(images_dst_base, relative_path)
+        dst_label_path = os.path.join(labels_dst_base, label_relative_path)
+
+        os.makedirs(os.path.dirname(dst_image_path), exist_ok=True)
+        os.makedirs(os.path.dirname(dst_label_path), exist_ok=True)
+
+        try:
+            shutil.copy(src_image_path, dst_image_path)
+            if os.path.exists(src_label_path):
+                shutil.copy(src_label_path, dst_label_path)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to export {relative_path}:\n{e}")
 
 # --------------------------------------------------
 # BoundingBoxEditor Class
@@ -138,50 +283,32 @@ class BoundingBoxEditor:
         if self.auto_save_interval and self.auto_save_interval > 0:
             self.start_auto_save()
 
-        # Defer loading of last opened image until UI is idle
-        self.root.after_idle(self._attempt_load_initial_image)
-
-
-    def _attempt_load_initial_image(self):
-        """Attempts to load the last opened image or the first image in the dataset."""
-        if not self.image_files: # No images in the dataset
-            return
-
-        loaded_an_image = False
+        # Attempt to load the last opened image for this project
         if 'last_opened_image_relative' in self.project:
             last_image_relative_path = self.project['last_opened_image_relative']
-            if last_image_relative_path:  # Ensure it's not empty
+            if last_image_relative_path: # Ensure it's not empty
                 last_image_full_path = os.path.join(self.folder_path, last_image_relative_path)
                 if os.path.exists(last_image_full_path) and last_image_relative_path in self.image_files:
+                    # Select in tree and load
                     try:
-                        # Check if item exists in tree before trying to select
-                        if self.image_tree.exists(last_image_relative_path):
-                            self.image_tree.selection_set(last_image_relative_path)
-                            self.image_tree.focus(last_image_relative_path)
-                            self.image_tree.see(last_image_relative_path)
-                            self.load_image(last_image_full_path)
-                            loaded_an_image = True
-                        else:
-                            print(f"Info: Last opened image '{last_image_relative_path}' not found in tree. Tree items: {self.image_tree.get_children()}")
-                    except tk.TclError as e:
-                        print(f"Info: TclError while trying to select last opened image '{last_image_relative_path}': {e}")
-                        # Fallback handled below if not loaded_an_image
+                        self.image_tree.selection_set(last_image_relative_path) # Select in tree
+                        self.image_tree.focus(last_image_relative_path)         # Ensure it's visible
+                        self.image_tree.see(last_image_relative_path)           # Scroll to make it visible
+                        self.load_image(last_image_full_path)                   # Load the image
+                    except tk.TclError:
+                        # Item might not exist in tree if image_files list changed, or tree not fully populated
+                        print(f"Info: Could not auto-select last opened image '{last_image_relative_path}' in tree.")
+                        # Fallback to loading the first image if available
+                        if self.image_files:
+                            self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+                            self.image_tree.selection_set(self.image_files[0])
+                elif self.image_files: # If last opened doesn't exist, load first image
+                    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+                    self.image_tree.selection_set(self.image_files[0])
+        elif self.image_files: # If no last opened image, load the first one
+            self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+            self.image_tree.selection_set(self.image_files[0])
 
-        if not loaded_an_image and self.image_files:
-            # Fallback to loading the first image if last opened wasn't loaded or doesn't exist
-            first_image_relative_path = self.image_files[0]
-            first_image_full_path = os.path.join(self.folder_path, first_image_relative_path)
-            try:
-                if self.image_tree.exists(first_image_relative_path):
-                    self.image_tree.selection_set(first_image_relative_path)
-                    self.image_tree.focus(first_image_relative_path)
-                    self.image_tree.see(first_image_relative_path)
-                    self.load_image(first_image_full_path)
-                else:
-                     print(f"Info: First image '{first_image_relative_path}' not found in tree during fallback.")
-            except tk.TclError as e:
-                print(f"Info: TclError while trying to select first image '{first_image_relative_path}': {e}")
-                # If even this fails, the image won't be auto-loaded, user has to click.
 
     # --------------------------------------------------
     # Setup / Layout Methods
@@ -939,7 +1066,6 @@ class BoundingBoxEditor:
 
         # Read and resize the image to fit the canvas
         # WARNING: This can distort aspect ratio. Consider preserving ratio if you prefer.
-        cv2 = lazy_importer.get_cv2()
         original_image = cv2.imread(self.image_path)
         if original_image is None:
             messagebox.showerror("Error", f"Failed to load image: {self.image_path}\nFile might be missing, corrupted, or in an unsupported format.")
@@ -1044,10 +1170,8 @@ class BoundingBoxEditor:
             if hasattr(self, 'tk_image'): # Clear previous tk_image if it exists
                 self.tk_image = None
             return
-        
-        PIL_Image = lazy_importer.get_pil()['Image']
-        PIL_ImageTk = lazy_importer.get_pil()['ImageTk']
-        self.tk_image = PIL_ImageTk.PhotoImage(image=PIL_Image.fromarray(self.image))
+
+        self.tk_image = ImageTk.PhotoImage(image=Image.fromarray(self.image))
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
 
     def navigate_image(self, direction):
@@ -1473,7 +1597,6 @@ class BoundingBoxEditor:
                 disp_w = int(new_width * self.zoom_level)
                 disp_h = int(new_height * self.zoom_level)
                 if disp_w > 0 and disp_h > 0: # Ensure dimensions are positive
-                    cv2 = lazy_importer.get_cv2()
                     try:
                         self.image = cv2.resize(self.original_image, (disp_w, disp_h))
                     except cv2.error as e:
@@ -1668,7 +1791,6 @@ class BoundingBoxEditor:
             filetypes=[("PyTorch Model", "*.pt"), ("All Files", "*.*")]
         )
         if model_path:
-            YOLO = lazy_importer.get_yolo()
             try:
                 self.model = YOLO(model_path)
                 messagebox.showinfo("Success", f"Model loaded successfully from {model_path}")
@@ -1795,7 +1917,6 @@ class BoundingBoxEditor:
                             continue
  
                         # Convert from normalized coords to absolute pixel coords
-                        np = lazy_importer.get_numpy()
                         x_center, y_center, width, height = box.xywhn[0].cpu().numpy()
                         x_center_abs = x_center * img_w
                         y_center_abs = y_center * img_h
@@ -1874,121 +1995,229 @@ class BoundingBoxEditor:
                 ))
 
     # --------------------------------------------------
-    # YAML Export Logic (Refactored)
+    # YAML Export Window
     # --------------------------------------------------
-    def _export_yaml_logic(self, base_export_folder, split_option, test_data, include_val):
+
+    def export_yaml_window(self):
         """
-        Handles the logic for exporting dataset YAML and associated files.
+        Opens a configuration window for exporting a new dataset YAML, optionally splitting
+        the dataset into train/val/test, or performing in-sample validation.
         """
-        try:
-            with open(self.yaml_path, "r") as f:
-                data = yaml.safe_load(f)
-        except Exception as e:
-            messagebox.showerror("Error", f"Could not load YAML file:\n{e}")
-            return
+        export_win = tk.Toplevel(self.root)
+        export_win.title("Export YAML Settings")
+        export_win.transient(self.root)
+        export_win.grab_set()
 
-        # Adjust 'val' if user unchecks validation
-        if not include_val:
-            data["val"] = ""
+        # Export to current or custom
+        export_to_current_var = tk.BooleanVar(value=True)
 
-        export_folder = os.path.join(base_export_folder, "exported_yaml_dataset") # Give a distinct name
-        os.makedirs(export_folder, exist_ok=True)
+        def toggle_custom(*args):
+            if export_to_current_var.get():
+                custom_export_entry.config(state="disabled")
+                custom_export_button.config(state="disabled")
+            else:
+                custom_export_entry.config(state="normal")
+                custom_export_button.config(state="normal")
 
-        if split_option == "in_sample":
-            train_folder = os.path.join(export_folder, "train")
-            os.makedirs(os.path.join(train_folder, "images"), exist_ok=True)
-            os.makedirs(os.path.join(train_folder, "labels"), exist_ok=True)
-            val_folder = train_folder
-            data["train"] = os.path.relpath(train_folder, export_folder) # Use relative paths in YAML
-            data["val"] = os.path.relpath(val_folder, export_folder)
-        else: # split_option == "split"
-            annotated = []
-            for relative_image_path in self.image_files:
-                label_relative_path = os.path.splitext(relative_image_path)[0] + '.txt'
-                src_label_path = os.path.join(self.label_folder, label_relative_path)
-                if os.path.exists(src_label_path) and os.path.getsize(src_label_path) > 0:
-                    with open(src_label_path, 'r') as f:
-                        if any(line.strip() for line in f):
-                            annotated.append(relative_image_path)
+        export_to_current_var.trace("w", toggle_custom)
 
-            num_annotated = len(annotated)
-            if num_annotated == 0:
-                messagebox.showwarning("Warning", "No annotated images found for YAML export.")
+        current_frame = tk.Frame(export_win)
+        current_frame.pack(fill=tk.X, padx=10, pady=5)
+        tk.Checkbutton(
+            current_frame,
+            text="Export to Current Dataset Location",
+            variable=export_to_current_var
+        ).pack(side=tk.LEFT)
+
+        custom_frame = tk.Frame(export_win)
+        custom_frame.pack(fill=tk.X, padx=10, pady=5)
+        tk.Label(custom_frame, text="Custom Export Location:").pack(side=tk.LEFT)
+        custom_export_entry = tk.Entry(custom_frame, width=40)
+        custom_export_entry.pack(side=tk.LEFT, padx=5)
+        custom_export_button = tk.Button(
+            custom_frame,
+            text="Browse",
+            command=lambda: custom_export_entry.insert(0, filedialog.askdirectory(title="Select Export Folder") or "")
+        )
+        custom_export_button.pack(side=tk.LEFT)
+        custom_export_entry.config(state="disabled")
+        custom_export_button.config(state="disabled")
+
+        # Split option: in-sample or full split
+        split_option = tk.StringVar(value="in_sample")  # "in_sample" or "split"
+        split_frame = tk.Frame(export_win)
+        split_frame.pack(fill=tk.X, padx=10, pady=5)
+        tk.Label(split_frame, text="Validation Mode:").pack(side=tk.LEFT)
+        tk.Radiobutton(split_frame, text="In-Sample Validation", variable=split_option, value="in_sample").pack(side=tk.LEFT, padx=5)
+        tk.Radiobutton(split_frame, text="Split Data", variable=split_option, value="split").pack(side=tk.LEFT, padx=5)
+
+        # Test data option
+        test_data_var = tk.BooleanVar(value=False)
+
+        def toggle_test_data(*args):
+            if split_option.get() == "split":
+                test_data_check.config(state="normal")
+            else:
+                test_data_check.config(state="disabled")
+
+        split_option.trace("w", toggle_test_data)
+
+        test_data_frame = tk.Frame(export_win)
+        test_data_frame.pack(fill=tk.X, padx=10, pady=5)
+        test_data_check = tk.Checkbutton(test_data_frame, text="Include Test Data (6:2:2)", variable=test_data_var)
+        test_data_check.pack(side=tk.LEFT)
+        test_data_check.config(state="disabled")
+
+        # Include validation in final YAML
+        include_val_var = tk.BooleanVar(value=self.validation)
+        val_frame = tk.Frame(export_win)
+        val_frame.pack(fill=tk.X, padx=10, pady=5)
+        tk.Checkbutton(
+            val_frame,
+            text="Include Validation in YAML",
+            variable=include_val_var
+        ).pack(side=tk.LEFT)
+
+        # Buttons
+        button_frame = tk.Frame(export_win)
+        button_frame.pack(fill=tk.X, padx=10, pady=10)
+
+        def export_yaml():
+            try:
+                with open(self.yaml_path, "r") as f:
+                    data = yaml.safe_load(f)
+            except Exception as e:
+                messagebox.showerror("Error", f"Could not load YAML file:\n{e}")
                 return
 
-            if test_data:
-                num_train = int(num_annotated * 0.6)
-                num_val = int(num_annotated * 0.2)
-                train_files = annotated[:num_train]
-                val_files = annotated[num_train : num_train + num_val]
-                test_files = annotated[num_train + num_val :]
+            # Adjust 'val' if user unchecks validation
+            if not include_val_var.get():
+                data["val"] = ""
+
+
+            # Determine export folder
+            if export_to_current_var.get():
+                base_export_folder = self.folder_path
             else:
-                num_train = int(num_annotated * 0.8)
-                train_files = annotated[:num_train]
-                val_files = annotated[num_train:]
-                test_files = []
+                base_export_folder = custom_export_entry.get().strip()
+                if not base_export_folder:
+                    messagebox.showerror("Error", "Please select a custom export location.")
+                    return
 
-            train_folder = os.path.join(export_folder, "train")
-            os.makedirs(os.path.join(train_folder, "images"), exist_ok=True)
-            os.makedirs(os.path.join(train_folder, "labels"), exist_ok=True)
-            data["train"] = os.path.relpath(train_folder, export_folder)
+            export_folder = os.path.join(base_export_folder, "exported")
+            os.makedirs(export_folder, exist_ok=True)
 
-            val_folder = os.path.join(export_folder, "val")
-            os.makedirs(os.path.join(val_folder, "images"), exist_ok=True)
-            os.makedirs(os.path.join(val_folder, "labels"), exist_ok=True)
-            data["val"] = os.path.relpath(val_folder, export_folder)
+            # Decide if in-sample or train/val(/test) split
+            if split_option.get() == "in_sample":
+                train_folder = os.path.join(export_folder, "train")
+                os.makedirs(os.path.join(train_folder, "images"), exist_ok=True)
+                os.makedirs(os.path.join(train_folder, "labels"), exist_ok=True)
 
-            if test_files:
-                test_folder = os.path.join(export_folder, "test")
-                os.makedirs(os.path.join(test_folder, "images"), exist_ok=True)
-                os.makedirs(os.path.join(test_folder, "labels"), exist_ok=True)
-                data["test"] = os.path.relpath(test_folder, export_folder)
+                # In-sample => val is the same folder as train
+                val_folder = train_folder
+                data["train"] = train_folder
+                data["val"] = val_folder
+
             else:
-                data["test"] = ""
-        
-        # Update paths in YAML to be relative to the export_folder
-        data["path"] = "." # Indicates that train/val/test paths are relative to this YAML's location
+                # Identify images that have labeled bounding boxes or polygons
+                annotated = []
+                for relative_image_path in self.image_files:
+                    label_relative_path = os.path.splitext(relative_image_path)[0] + '.txt'
+                    src_label_path = os.path.join(self.label_folder, label_relative_path)
+                    if os.path.exists(src_label_path) and os.path.getsize(src_label_path) > 0:
+                        # Check if the file actually contains annotations (not just an empty file)
+                        with open(src_label_path, 'r') as f:
+                            if any(line.strip() for line in f): # Check if any line is not empty
+                                annotated.append(relative_image_path)
 
-        export_yaml_path = os.path.join(export_folder, "dataset.yaml")
-        try:
-            with open(export_yaml_path, "w") as f:
-                yaml.dump(data, f, sort_keys=False)
-        except Exception as e:
-            messagebox.showerror("Error", f"Could not export YAML:\n{e}")
-            return
+                num_annotated = len(annotated)
+                if num_annotated == 0:
+                    messagebox.showwarning("Warning", "No annotated images found for export.")
+                    return
 
-        # Copy files
-        if split_option == "in_sample":
-            all_labeled = [
-                rf_path for rf_path in self.image_files 
-                if os.path.exists(os.path.join(self.label_folder, os.path.splitext(rf_path)[0] + '.txt'))
-            ]
-            copy_files_recursive(all_labeled, self.folder_path,
-                       os.path.join(train_folder, "images"),
-                       self.label_folder,
-                       os.path.join(train_folder, "labels"))
-        else:
-            copy_files_recursive(train_files, self.folder_path,
-                       os.path.join(train_folder, "images"),
-                       self.label_folder,
-                       os.path.join(train_folder, "labels"))
-            copy_files_recursive(val_files, self.folder_path,
-                       os.path.join(val_folder, "images"),
-                       self.label_folder,
-                       os.path.join(val_folder, "labels"))
-            if test_files:
-                test_folder_path = os.path.join(export_folder, "test") # Define test_folder_path here
-                copy_files_recursive(test_files, self.folder_path,
-                           os.path.join(test_folder_path, "images"),
+                if test_data_var.get():
+                    num_train = int(num_annotated * 0.6)
+                    num_val = int(num_annotated * 0.2)
+                    num_test = num_annotated - num_train - num_val
+                    train_files = annotated[:num_train]
+                    val_files = annotated[num_train:num_train + num_val]
+                    test_files = annotated[num_train + num_val:]
+                else:
+                    num_train = int(num_annotated * 0.8)
+                    train_files = annotated[:num_train]
+                    val_files = annotated[num_train:]
+                    test_files = []
+
+                # Create subfolders
+                train_folder = os.path.join(export_folder, "train")
+                os.makedirs(os.path.join(train_folder, "images"), exist_ok=True)
+                os.makedirs(os.path.join(train_folder, "labels"), exist_ok=True)
+
+                val_folder = os.path.join(export_folder, "val")
+                os.makedirs(os.path.join(val_folder, "images"), exist_ok=True)
+                os.makedirs(os.path.join(val_folder, "labels"), exist_ok=True)
+
+                data["train"] = train_folder
+                data["val"] = val_folder
+
+                if test_files:
+                    test_folder = os.path.join(export_folder, "test")
+                    os.makedirs(os.path.join(test_folder, "images"), exist_ok=True)
+                    os.makedirs(os.path.join(test_folder, "labels"), exist_ok=True)
+                    data["test"] = test_folder
+                else:
+                    data["test"] = ""
+
+
+            # Write final dataset.yaml
+            export_yaml_path = os.path.join(export_folder, "dataset.yaml")
+            try:
+                with open(export_yaml_path, "w") as f:
+                    yaml.dump(data, f, sort_keys=False)
+            except Exception as e:
+                messagebox.showerror("Error", f"Could not export YAML:\n{e}")
+                return
+
+            # Copy files accordingly
+            if split_option.get() == "in_sample":
+                # Everything goes into 'train'
+                all_labeled = []
+                for relative_image_path in self.image_files:
+                    label_relative_path = os.path.splitext(relative_image_path)[0] + '.txt'
+                    src_label_path = os.path.join(self.label_folder, label_relative_path)
+                    if os.path.exists(src_label_path) and os.path.getsize(src_label_path) > 0:
+                        with open(src_label_path, 'r') as f:
+                            if any(line.strip() for line in f):
+                                all_labeled.append(relative_image_path)
+
+                copy_files_recursive(all_labeled, self.folder_path,
+                           os.path.join(train_folder, "images"),
                            self.label_folder,
-                           os.path.join(test_folder_path, "labels"))
+                           os.path.join(train_folder, "labels"))
+            else:
+                copy_files_recursive(train_files, self.folder_path,
+                           os.path.join(train_folder, "images"),
+                           self.label_folder,
+                           os.path.join(train_folder, "labels"))
+                copy_files_recursive(val_files, self.folder_path,
+                           os.path.join(val_folder, "images"),
+                           self.label_folder,
+                           os.path.join(val_folder, "labels"))
+                if test_files:
+                    test_folder = os.path.join(export_folder, "test")
+                    copy_files_recursive(test_files, self.folder_path,
+                               os.path.join(test_folder, "images"),
+                               self.label_folder,
+                               os.path.join(test_folder, "labels"))
 
-        messagebox.showinfo(
-            "Success",
-            f"YAML Dataset export complete!\nExported to:\n{export_folder}"
-        )
+            messagebox.showinfo(
+                "Success",
+                f"Export complete!\nYAML and annotated images exported to:\n{export_folder}"
+            )
+            export_win.destroy()
 
-    # --------------------------------------------------
+        tk.Button(button_frame, text="Export", command=export_yaml).pack(side=tk.RIGHT, padx=5)
+        tk.Button(button_frame, text="Cancel", command=export_win.destroy).pack(side=tk.RIGHT, padx=5)    # --------------------------------------------------
     # Export Format Conversion Functions
     # --------------------------------------------------
     
@@ -2032,7 +2261,7 @@ class BoundingBoxEditor:
             # Get image dimensions
             full_image_path = os.path.join(base_folder, image_path)
             if os.path.exists(full_image_path):
-                cv2 = lazy_importer.get_cv2()
+                import cv2
                 img = cv2.imread(full_image_path)
                 height, width = img.shape[:2]
             else:
@@ -2368,17 +2597,12 @@ class BoundingBoxEditor:
                     return
 
             if selected_format == "yaml":
-                # Call the refactored YAML export logic
-                self._export_yaml_logic(
-                    base_export_folder,
-                    split_option.get(),
-                    test_data_var.get(),
-                    include_val_var.get()
-                )
+                # Use existing YAML export functionality
                 export_win.destroy()
+                self.export_yaml_window()
             else:
                 # Use new format export functionality
-                self.export_to_other_formats( # Renamed to avoid confusion
+                self.export_to_format(
                     selected_format, base_export_folder, 
                     include_images_var.get(), include_unannotated_var.get()
                 )
@@ -2387,15 +2611,13 @@ class BoundingBoxEditor:
         tk.Button(button_frame, text="Export", command=perform_export).pack(side=tk.RIGHT, padx=5)
         tk.Button(button_frame, text="Cancel", command=export_win.destroy).pack(side=tk.RIGHT, padx=5)
 
-    def export_to_other_formats(self, format_type, base_folder, copy_images, include_unannotated):
+    def export_to_format(self, format, base_folder, copy_images, include_unannotated):
         """
         Exports the annotations to the selected format (COCO, Pascal VOC, CSV, or JSON).
         """
         try:
             # Prepare output directories
-            # Create a subfolder for the specific format to keep things organized
-            export_format_folder = os.path.join(base_folder, f"exported_{format_type}_dataset")
-            os.makedirs(export_format_folder, exist_ok=True)
+            os.makedirs(base_folder, exist_ok=True)
             
             # Collect all annotations from all images
             all_bboxes = {}
@@ -2410,7 +2632,7 @@ class BoundingBoxEditor:
                     # Read annotations from file
                     full_image_path = os.path.join(self.folder_path, image_path)
                     if os.path.exists(full_image_path):
-                        cv2 = lazy_importer.get_cv2()
+                        import cv2
                         img = cv2.imread(full_image_path)
                         if img is not None:
                             height, width = img.shape[:2]
@@ -2424,58 +2646,62 @@ class BoundingBoxEditor:
             # Group images by annotation status
             unannotated_images = set(self.image_files) - set(annotated_images)
 
-            if format_type == "coco":
+            if format == "coco":
                 # Convert annotations to COCO format
                 coco_data = BoundingBoxEditor.convert_to_coco_format(
                     self.image_files, 
                     all_bboxes,
                     all_polygons,
                     self.class_names,
-                    self.folder_path # base_folder for images in COCO should be the original dataset path
+                    self.folder_path
                 )
 
                 # Save COCO JSON file
-                with open(os.path.join(export_format_folder, "annotations.json"), "w") as f:
+                with open(os.path.join(base_folder, "annotations.json"), "w") as f:
                     json.dump(coco_data, f, indent=2)
-                messagebox.showinfo("Export Complete", f"COCO format export successful to:\n{export_format_folder}")
 
+                messagebox.showinfo("Export Complete", "COCO format export successful.")
 
-            elif format_type == "voc":
+            elif format == "voc":
                 # Pascal VOC export: one XML file per image
-                voc_output_dir = os.path.join(export_format_folder, "Annotations")
-                os.makedirs(voc_output_dir, exist_ok=True)
                 for image_path in annotated_images:
                     bboxes = all_bboxes.get(image_path, [])
                     polygons = all_polygons.get(image_path, [])
                     
+                    # Get image dimensions
                     full_image_path = os.path.join(self.folder_path, image_path)
                     if os.path.exists(full_image_path):
-                        cv2 = lazy_importer.get_cv2()
+                        import cv2
                         img = cv2.imread(full_image_path)
                         if img is not None:
                             height, width = img.shape[:2]
                             xml_str = BoundingBoxEditor.convert_to_pascal_voc_format(
                                 image_path, bboxes, polygons, self.class_names, (height, width)
                             )
+
+                            # Save XML file
                             image_name = os.path.splitext(os.path.basename(image_path))[0]
-                            xml_file_path = os.path.join(voc_output_dir, f"{image_name}.xml")
+                            xml_file_path = os.path.join(base_folder, f"{image_name}.xml")
                             with open(xml_file_path, "w") as xml_file:
                                 xml_file.write(xml_str)
-                messagebox.showinfo("Export Complete", f"Pascal VOC format export successful to:\n{voc_output_dir}")
 
-            elif format_type == "csv":
+                messagebox.showinfo("Export Complete", "Pascal VOC format export successful.")
+
+            elif format == "csv":
                 # CSV export: single CSV file for all annotations
                 csv_rows = BoundingBoxEditor.convert_to_csv_format(
                     self.image_files, all_bboxes, all_polygons, self.class_names
                 )
-                csv_file_path = os.path.join(export_format_folder, "annotations.csv")
+
+                # Save CSV file
+                csv_file_path = os.path.join(base_folder, "annotations.csv")
                 with open(csv_file_path, "w", newline="") as csv_file:
                     writer = csv.writer(csv_file)
                     writer.writerows(csv_rows)
-                messagebox.showinfo("Export Complete", f"CSV format export successful to:\n{export_format_folder}")
 
+                messagebox.showinfo("Export Complete", "CSV format export successful.")
 
-            elif format_type == "json":
+            elif format == "json":
                 # Generic JSON export: all annotations in a single JSON file
                 json_data = {
                     "images": [],
@@ -2490,7 +2716,7 @@ class BoundingBoxEditor:
                     full_image_path = os.path.join(self.folder_path, image_path)
                     width, height = 640, 480  # Default
                     if os.path.exists(full_image_path):
-                        cv2 = lazy_importer.get_cv2()
+                        import cv2
                         img = cv2.imread(full_image_path)
                         if img is not None:
                             height, width = img.shape[:2]
@@ -2531,31 +2757,25 @@ class BoundingBoxEditor:
                             annotation_id += 1
 
                 # Save JSON file
-                json_file_path = os.path.join(export_format_folder, "annotations.json")
+                json_file_path = os.path.join(base_folder, "annotations.json")
                 with open(json_file_path, "w") as json_file:
                     json.dump(json_data, json_file, indent=2)
-                messagebox.showinfo("Export Complete", f"JSON format export successful to:\n{export_format_folder}")
 
+                messagebox.showinfo("Export Complete", "JSON format export successful.")
 
-            # Optionally copy images to the specific format's export folder
+            # Optionally copy images to export folder
             if copy_images:
-                images_output_dir = os.path.join(export_format_folder, "images")
-                os.makedirs(images_output_dir, exist_ok=True)
-                
                 images_to_copy = annotated_images
                 if include_unannotated:
-                    images_to_copy = self.image_files # This should be all images in the project
+                    images_to_copy = self.image_files
                 
-                for relative_image_path in images_to_copy:
-                    src_image_path = os.path.join(self.folder_path, relative_image_path)
-                    # Preserve subfolder structure if any, relative to export_format_folder/images
-                    dst_image_path = os.path.join(images_output_dir, relative_image_path)
-                    os.makedirs(os.path.dirname(dst_image_path), exist_ok=True)
+                for image_path in images_to_copy:
+                    src_image_path = os.path.join(self.folder_path, image_path)
+                    dst_image_path = os.path.join(base_folder, os.path.basename(image_path))
                     if os.path.exists(src_image_path):
                         shutil.copy(src_image_path, dst_image_path)
-                        
+
         except Exception as e:
-            logging.exception("Error during export_to_other_formats")
             messagebox.showerror("Export Error", f"An error occurred during export:\n{e}")
 
     def reload_classes_from_yaml(self):
@@ -2591,3 +2811,283 @@ class BoundingBoxEditor:
             
         except Exception as e:
             messagebox.showerror("Error", f"Failed to reload classes from YAML: {str(e)}")
+
+
+# --------------------------------------------------
+# ProjectManager Class
+# --------------------------------------------------
+
+class ProjectManager:
+    """
+    Manages creating, opening, and deleting projects.
+    Displays projects in an integrated panel.
+    """
+
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Project Manager")
+        center_window(self.root, 750, 500)  # Adjusted size
+
+        self.main_container = ttk.Frame(root, padding="10")
+        self.main_container.pack(fill=tk.BOTH, expand=True)
+
+        # PanedWindow for resizable layout
+        self.paned_window = ttk.PanedWindow(self.main_container, orient=tk.HORIZONTAL)
+        self.paned_window.pack(fill=tk.BOTH, expand=True)
+
+        # Left Pane: Action Buttons
+        self.actions_frame = ttk.Labelframe(self.paned_window, text="Actions", padding="10")
+        self.paned_window.add(self.actions_frame, weight=1) # Smaller weight for actions panel
+
+        self.new_project_button = ttk.Button(self.actions_frame, text="New Project", command=self.new_project)
+        self.new_project_button.pack(pady=5, fill=tk.X)
+
+        self.open_selected_button = ttk.Button(self.actions_frame, text="Open Selected", command=self._open_selected_project_action, state=tk.DISABLED)
+        self.open_selected_button.pack(pady=5, fill=tk.X)
+        
+        self.refresh_button = ttk.Button(self.actions_frame, text="Refresh List", command=self._populate_project_list)
+        self.refresh_button.pack(pady=5, fill=tk.X)
+
+        self.delete_selected_button = ttk.Button(self.actions_frame, text="Delete Selected", command=self._delete_selected_project_action, state=tk.DISABLED)
+        self.delete_selected_button.pack(pady=5, fill=tk.X)
+        
+        ttk.Button(self.actions_frame, text="Quit", command=self.root.quit).pack(pady=20, fill=tk.X, side=tk.BOTTOM)
+
+        # Right Pane: Project List
+        self.projects_list_frame = ttk.Labelframe(self.paned_window, text="Existing Projects", padding="10")
+        self.paned_window.add(self.projects_list_frame, weight=3) # Larger weight for project list
+
+        columns = ("project_name", "dataset_path", "last_modified_date")
+        self.project_tree = ttk.Treeview(
+            self.projects_list_frame,
+            columns=columns,
+            show="headings",
+            selectmode="browse"
+        )
+        self.project_tree.heading("project_name", text="Project Name")
+        self.project_tree.column("project_name", anchor=tk.W, width=200, stretch=tk.NO)
+        self.project_tree.heading("dataset_path", text="Dataset Path")
+        self.project_tree.column("dataset_path", anchor=tk.W, width=300) # Allow dataset_path to expand
+        self.project_tree.heading("last_modified_date", text="Last Modified Date")
+        self.project_tree.column("last_modified_date", anchor=tk.W, width=150, stretch=tk.NO)
+        
+        self.project_tree_scrollbar = ttk.Scrollbar(self.projects_list_frame, orient="vertical", command=self.project_tree.yview)
+        self.project_tree.configure(yscrollcommand=self.project_tree_scrollbar.set)
+        
+        self.project_tree_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.project_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        self.project_tree.bind("<<TreeviewSelect>>", self._on_project_select)
+        self.project_tree.bind("<Double-1>", self._open_selected_project_action)
+
+        self._populate_project_list()
+
+    def _populate_project_list(self):
+        """Populates the project treeview with projects from PROJECTS_DIR."""
+        for item in self.project_tree.get_children():
+            self.project_tree.delete(item)
+
+        project_files = [f for f in os.listdir(PROJECTS_DIR) if f.endswith(".json")]
+        if not project_files:
+            self.project_tree.insert("", tk.END, iid="no_projects_placeholder", values=("No projects found.", "", ""), tags=("placeholder",))
+            self._on_project_select() # Ensure buttons are disabled
+            return
+
+        for f_name in sorted(project_files):
+            project_name_display = os.path.splitext(f_name)[0]
+            dataset_path_display = "N/A"
+            full_path = os.path.join(PROJECTS_DIR, f_name)
+            try:
+                last_modified_display = datetime.fromtimestamp(os.path.getmtime(full_path)).strftime("%Y-%m-%d %H:%M:%S")
+            except Exception as e:
+                logging.error(f"Error getting last modified time for project file {f_name}", exc_info=True)
+                last_modified_display = ""
+            try:
+                with open(full_path, "r") as f:
+                    project_data = json.load(f)
+                    dataset_path_display = project_data.get("dataset_path", "N/A")
+            except Exception as e:
+                logging.error(f"Error reading project file {f_name}", exc_info=True)
+                messagebox.showerror(
+                    "Error Reading Project",
+                    f"Error reading project file {f_name}:\n{e}"
+                )
+
+            self.project_tree.insert("", tk.END, iid=f_name, values=(project_name_display, dataset_path_display, last_modified_display))
+        self._on_project_select() 
+
+    def _on_project_select(self, event=None):
+        """Handles selection changes in the project treeview."""
+        selected_item_ids = self.project_tree.selection()
+        if selected_item_ids:
+            # Check if the selected item is not the placeholder
+            first_selected_iid = selected_item_ids[0]
+            if first_selected_iid != "no_projects_placeholder":
+                self.open_selected_button.config(state=tk.NORMAL)
+                self.delete_selected_button.config(state=tk.NORMAL)
+                return
+        
+        self.open_selected_button.config(state=tk.DISABLED)
+        self.delete_selected_button.config(state=tk.DISABLED)
+
+    def _open_selected_project_action(self, event=None):
+        """Loads the selected project and opens the editor."""
+        selected_item_ids = self.project_tree.selection()
+        if not selected_item_ids:
+            messagebox.showwarning("No Project Selected", "Please select a project from the list to open.")
+            return
+        
+        project_file_iid = selected_item_ids[0]
+        if project_file_iid == "no_projects_placeholder":
+             messagebox.showwarning("No Project Selected", "Please create or select a valid project.")
+             return
+
+        full_path = os.path.join(PROJECTS_DIR, project_file_iid)
+        try:
+            with open(full_path, "r") as f:
+                project = json.load(f)
+            
+            self.root.destroy() 
+            self.open_editor(project) 
+        except Exception as e:
+            messagebox.showerror("Error Opening Project", f"Could not load project '{project_file_iid}':\n{e}")
+            self._populate_project_list()
+
+    def _delete_selected_project_action(self):
+        """Deletes the selected project's .json file."""
+        selected_item_ids = self.project_tree.selection()
+        if not selected_item_ids:
+            messagebox.showwarning("No Project Selected", "Please select a project to delete.")
+            return
+
+        project_file_iid = selected_item_ids[0]
+        if project_file_iid == "no_projects_placeholder":
+             messagebox.showwarning("No Project Selected", "Cannot delete placeholder item.")
+             return
+             
+        project_name_display = self.project_tree.item(project_file_iid)['values'][0]
+
+        if messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete project '{project_name_display}'?\nThis will delete the project file ({project_file_iid}) but NOT the dataset itself."):
+            full_path = os.path.join(PROJECTS_DIR, project_file_iid)
+            try:
+                os.remove(full_path)
+                messagebox.showinfo("Project Deleted", f"Project '{project_name_display}' deleted successfully.")
+            except Exception as e:
+                messagebox.showerror("Error Deleting Project", f"Could not delete project file '{project_file_iid}':\n{e}")
+            finally:
+                self._populate_project_list() 
+
+    def new_project(self):
+        """
+        Opens a dialog to create a new project: user specifies project name + dataset path.
+        """
+        new_win = tk.Toplevel(self.root)
+        new_win.transient(self.root)
+        new_win.grab_set()
+        new_win.title("New Project")
+
+        # Use ttk style for consistency
+        form_frame = ttk.Frame(new_win, padding="10")
+        form_frame.pack(expand=True, fill=tk.BOTH)
+
+        ttk.Label(form_frame, text="Project Name:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
+        name_entry = ttk.Entry(form_frame, width=40)
+        name_entry.grid(row=0, column=1, columnspan=2, padx=5, pady=5, sticky=tk.EW)
+
+        ttk.Label(form_frame, text="Dataset Path:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.W)
+        dataset_entry = ttk.Entry(form_frame, width=40)
+        dataset_entry.grid(row=1, column=1, padx=5, pady=5, sticky=tk.EW)
+
+        def browse_dataset():
+            folder = filedialog.askdirectory(title="Select Dataset Folder")
+            if folder:
+                dataset_entry.delete(0, tk.END)
+                dataset_entry.insert(0, folder)
+
+        ttk.Button(form_frame, text="Browse", command=browse_dataset).grid(row=1, column=2, padx=5, pady=5)
+
+        buttons_frame = ttk.Frame(form_frame)
+        buttons_frame.grid(row=2, column=0, columnspan=3, pady=10)
+        
+        def create_project_action():
+            project_name = name_entry.get().strip()
+            dataset_path = dataset_entry.get().strip()
+            if not project_name or not dataset_path:
+                messagebox.showerror("Error", "Project name and dataset path are required.", parent=new_win)
+                return
+            
+            if not os.path.isdir(dataset_path):
+                messagebox.showerror("Error", "Dataset path must be a valid directory.", parent=new_win)
+                return
+
+            project = {
+                "project_name": project_name,
+                "dataset_path": dataset_path,
+                "label_path": os.path.join(dataset_path, "labels") # Consistent with BoundingBoxEditor
+            }
+            # Sanitize project_name for use as a filename
+            safe_project_filename = "".join(c if c.isalnum() or c in (' ', '_', '-') else '_' for c in project_name).rstrip()
+            if not safe_project_filename:
+                safe_project_filename = "Untitled_Project"
+            project_file = os.path.join(PROJECTS_DIR, f"{safe_project_filename}.json")
+
+            if os.path.exists(project_file):
+                if not messagebox.askyesno("Overwrite Project?", f"Project '{safe_project_filename}.json' already exists. Overwrite?", parent=new_win):
+                    return
+
+            try:
+                with open(project_file, "w") as f:
+                    json.dump(project, f, indent=4)
+                messagebox.showinfo("Project Created", f"Project '{project_name}' created successfully as '{safe_project_filename}.json'.", parent=new_win)
+                new_win.destroy()
+                self._populate_project_list() # Refresh the list in ProjectManager
+                # Do not automatically open the editor, let user open from the list
+                # self.root.destroy() 
+                # self.open_editor(project)
+            except Exception as e:
+                messagebox.showerror("Error Creating Project", f"Could not save project file:\n{e}", parent=new_win)
+
+
+        ttk.Button(buttons_frame, text="Create Project", command=create_project_action).pack(side=tk.LEFT, padx=5)
+        ttk.Button(buttons_frame, text="Cancel", command=new_win.destroy).pack(side=tk.LEFT, padx=5)
+        
+        form_frame.columnconfigure(1, weight=1) # Make entry expand
+        center_window(new_win, 500, 150) # Adjusted size for new project dialog
+        name_entry.focus_set()
+
+
+    def open_editor(self, project):
+        """
+        Launches the BoundingBoxEditor in a new Tk window with the chosen project loaded.
+        """
+        editor_root = tk.Tk()
+        BoundingBoxEditor(editor_root, project)
+        editor_root.mainloop()
+
+# --------------------------------------------------
+# Main Execution
+# --------------------------------------------------
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    # Global exception handler for Tkinter callbacks
+    def report_callback_exception(self, exc, val, tb):
+        logging.error("Exception in Tkinter callback", exc_info=(exc, val, tb))
+        messagebox.showerror("Error", f"An unexpected error occurred:\n{val}")
+    tk.Tk.report_callback_exception = report_callback_exception
+    # Apply a theme
+    style = ttk.Style(root)
+    available_themes = style.theme_names()
+    # print(f"Available themes: {available_themes}") # For debugging
+    if "clam" in available_themes: # 'clam', 'alt', 'default', 'classic' are common
+        style.theme_use("clam")
+    elif "vista" in available_themes and os.name == 'nt': # Good for Windows
+         style.theme_use("vista")
+    # else, it will use the default system theme
+
+    try:
+        pm = ProjectManager(root)
+        root.mainloop()
+    except Exception as e:
+        logging.exception("Fatal error during application initialization")
+        messagebox.showerror("Fatal Error", f"A fatal error occurred:\n{e}")

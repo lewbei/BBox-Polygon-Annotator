@@ -107,7 +107,7 @@ class ProjectManager:
                 )
 
             self.project_tree.insert("", tk.END, iid=f_name, values=(project_name_display, dataset_path_display, last_modified_display))
-        self._on_project_select() 
+        self._on_project_select()
 
     def _on_project_select(self, event=None):
         """Handles selection changes in the project treeview."""
@@ -140,11 +140,26 @@ class ProjectManager:
             with open(full_path, "r") as f:
                 project = json.load(f)
             
+            # Destroy ProjectManager window first
             self.root.destroy() 
-            self.open_editor(project) 
+            # Then open the editor, which will start its own mainloop
+            self.open_editor(project)
         except Exception as e:
-            messagebox.showerror("Error Opening Project", f"Could not load project '{project_file_iid}':\n{e}")
-            self._populate_project_list()
+            logging.exception(f"Error opening project {project_file_iid}")
+            # Since self.root is destroyed, we can't use it as a parent for messagebox.
+            # This error might not be visible if it happens after self.root.destroy().
+            # Consider logging to a file or a more robust error display if this becomes an issue.
+            # For now, we'll try to show it without a parent, or it will go to console/log.
+            try:
+                messagebox.showerror("Error Opening Project", f"Could not load project '{project_file_iid}':\n{e}")
+            except tk.TclError: # If Tkinter is in a bad state
+                 print(f"ERROR: Could not load project '{project_file_iid}':\n{e}")
+            # Only refresh project list if window still exists
+            try:
+                self._populate_project_list()
+            except tk.TclError:
+                # Window was destroyed, ignore
+                pass
 
     def _delete_selected_project_action(self):
         """Deletes the selected project's .json file."""
@@ -244,17 +259,51 @@ class ProjectManager:
         ttk.Button(buttons_frame, text="Create Project", command=create_project_action).pack(side=tk.LEFT, padx=5)
         ttk.Button(buttons_frame, text="Cancel", command=new_win.destroy).pack(side=tk.LEFT, padx=5)
         
-        form_frame.columnconfigure(1, weight=1) # Make entry expand
-        center_window(new_win, 500, 150) # Adjusted size for new project dialog
+        form_frame.columnconfigure(1, weight=1) # Make entry expand        center_window(new_win, 500, 150) # Adjusted size for new project dialog
         name_entry.focus_set()
-
-
+    
     def open_editor(self, project):
         """
         Launches the BoundingBoxEditor in a new Tk window with the chosen project loaded.
+        Returns True if editor starts, False otherwise (though return value isn't used by caller anymore).
         """
-        editor_root = tk.Tk()
-        splash = SplashScreen(subtitle="Loading dataset...")
-        BoundingBoxEditor(editor_root, project, splash=splash)
-        editor_root.mainloop()
-
+        editor_root = None # Initialize to None
+        splash = None      # Initialize to None
+        try:
+            editor_root = tk.Tk() # This is now the main Tk root for the editor
+            editor_root.withdraw() # Hide main window initially
+            
+            splash = SplashScreen(editor_root, subtitle="Loading dataset...")
+            editor_root.update_idletasks() # Process pending events for splash screen
+            
+            # Try to create the editor
+            # This is where BoundingBoxEditor.__init__ will run
+            editor = BoundingBoxEditor(editor_root, project) 
+            
+            # If BoundingBoxEditor initialization is successful
+            if splash:
+                splash.destroy()
+                splash = None # Ensure it's not destroyed again in finally
+            
+            editor_root.deiconify() # Show main window
+            editor_root.mainloop() # Start the editor's main event loop
+            # Mainloop blocks, so code here won't run until editor closes.
+            
+        except Exception as e:
+            logging.exception("Failed to create or run BoundingBoxEditor")
+            if splash:
+                try:
+                    splash.destroy()
+                except tk.TclError: 
+                    pass
+            if editor_root:
+                try:
+                    editor_root.destroy()
+                except tk.TclError: 
+                    pass
+            # Show error without a parent if the original root is gone.
+            try:
+                messagebox.showerror("Editor Error", f"Failed to open editor:\n{e}")
+            except tk.TclError:
+                 print(f"EDITOR ERROR: Failed to open editor:\n{e}")
+            # No return True/False needed as the caller doesn't use it anymore.

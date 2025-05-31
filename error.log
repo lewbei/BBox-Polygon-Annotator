@@ -40,3 +40,2330 @@ Traceback (most recent call last):
     arr = obj.__array_interface__
           ^^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'NoneType' object has no attribute '__array_interface__'
+2025-05-30 21:27:14,752 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 930, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1015, in load_image
+    self.update_status_labels()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 676, in update_status_labels
+    self.status_labels[display_name].config(text=f"{display_name}: {counts[display_name]}")
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1722, in configure
+    return self._configure('configure', cnf, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1712, in _configure
+    self.tk.call(_flatten((self._w, cmd)) + self._options(cnf))
+KeyboardInterrupt
+2025-05-30 21:27:14,937 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 930, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1015, in load_image
+    self.update_status_labels()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 676, in update_status_labels
+    self.status_labels[display_name].config(text=f"{display_name}: {counts[display_name]}")
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1722, in configure
+    return self._configure('configure', cnf, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1712, in _configure
+    self.tk.call(_flatten((self._w, cmd)) + self._options(cnf))
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 930, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1006, in load_image
+    self.display_annotations()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1367, in display_annotations
+    widget.destroy()
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2668, in destroy
+    for c in list(self.children.values()): c.destroy()
+                                           ^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2669, in destroy
+    self.tk.call('destroy', self._w)
+KeyboardInterrupt
+2025-05-30 21:51:19,461 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 144, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 258, in open_editor
+    BoundingBoxEditor(editor_root, project, splash=splash)
+TypeError: BoundingBoxEditor.__init__() got an unexpected keyword argument 'splash'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 147, in _open_selected_project_action
+    self._populate_project_list()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 80, in _populate_project_list
+    for item in self.project_tree.get_children():
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1198, in get_children
+    self.tk.call(self._w, "children", item or '') or ())
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid command name ".!frame.!panedwindow.!labelframe2.!treeview"
+2025-05-30 21:58:54,418 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 144, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 259, in open_editor
+    editor_root.mainloop()
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-05-31 09:06:47,688 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 144, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 259, in open_editor
+    editor_root.mainloop()
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-05-31 09:07:08,761 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1191, in display_image
+    self.tk_image = ImageTk.PhotoImage(image=Image.fromarray(self.image))
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\Image.py", line 3338, in fromarray
+    return frombuffer(mode, size, obj, "raw", rawmode, 0, 1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\Image.py", line 3240, in frombuffer
+    return frombytes(mode, size, data, decoder_name, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\Image.py", line 3177, in frombytes
+    im.frombytes(data, decoder_name, decoder_args)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\Image.py", line 873, in frombytes
+    s = d.decode(data)
+        ^^^^^^^^^^^^^^
+KeyboardInterrupt
+2025-05-31 09:07:11,225 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1191, in display_image
+    self.tk_image = ImageTk.PhotoImage(image=Image.fromarray(self.image))
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\Image.py", line 3338, in fromarray
+    return frombuffer(mode, size, obj, "raw", rawmode, 0, 1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\Image.py", line 3240, in frombuffer
+    return frombytes(mode, size, data, decoder_name, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\Image.py", line 3177, in frombytes
+    im.frombytes(data, decoder_name, decoder_args)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\Image.py", line 873, in frombytes
+    s = d.decode(data)
+        ^^^^^^^^^^^^^^
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+KeyboardInterrupt
+2025-05-31 09:07:15,733 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 144, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 259, in open_editor
+    editor_root.mainloop()
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-05-31 09:07:43,016 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+KeyboardInterrupt
+2025-05-31 09:07:45,924 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+KeyboardInterrupt
+2025-05-31 09:08:22,976 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 144, in _open_selected_project_action
+    self.root.after_idle(self._destroy_root_and_open_editor, project)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 259, in open_editor
+    except Exception as e:
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-05-31 09:08:54,288 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+KeyboardInterrupt
+2025-05-31 09:08:54,516 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1173, in display_image
+    def display_image(self):
+    
+KeyboardInterrupt
+2025-05-31 09:09:23,454 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 166, in _destroy_root_and_open_editor
+    messagebox.showerror("Error Opening Project", f"Could not load project \'{project_file_iid}\':\\n{e}")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 278, in open_editor
+    """
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-05-31 09:09:34,607 ERROR Error opening project 'authentic logo.json'
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 09:09:34,616 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+2025-05-31 09:09:34,705 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1631, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+2025-05-31 09:09:49,432 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1631, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage5" doesn't exist
+2025-05-31 09:17:22,511 ERROR Error opening project 'authentic logo.json'
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 09:17:22,520 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+2025-05-31 09:17:22,595 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1631, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+2025-05-31 09:17:48,884 ERROR Error opening project 'authentic logo.json'
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 09:17:48,896 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+2025-05-31 09:17:48,989 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1631, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1192, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+2025-05-31 09:27:08,663 ERROR Error opening project 'authentic logo.json'
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 09:27:08,672 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+2025-05-31 09:27:08,763 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1614, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+2025-05-31 09:27:27,072 ERROR Error opening project 'authentic logo.json'
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 09:27:27,082 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+2025-05-31 09:27:27,168 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1614, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+2025-05-31 09:27:30,105 ERROR Error opening project 'authentic logo.json'
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage5" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage6" doesn't exist
+2025-05-31 09:27:30,111 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage5" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage6" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage7" doesn't exist
+2025-05-31 09:27:30,166 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage5" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage6" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage7" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1614, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage8" doesn't exist
+2025-05-31 09:27:34,492 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1614, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1174, in display_image
+    self.tk_image = ImageTk.PhotoImage(image=Image.fromarray(self.image))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\site-packages\PIL\ImageTk.py", line 128, in __init__
+    self.__photo = tkinter.PhotoImage(**kw)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 4164, in __init__
+    Image.__init__(self, 'photo', name, cnf, master, **kw)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 4101, in __init__
+    master = _get_default_root('create image')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 323, in _get_default_root
+    raise RuntimeError(f"Too early to {what}: no default root window")
+RuntimeError: Too early to create image: no default root window
+2025-05-31 09:36:28,501 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 2809, in _load_initial_image
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1071, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1152, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 2816, in _load_initial_image
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1071, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1152, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 09:36:28,509 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 2809, in _load_initial_image
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1071, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1152, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 2816, in _load_initial_image
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1071, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1152, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1024, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1071, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1152, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+2025-05-31 09:36:28,632 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 2809, in _load_initial_image
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1071, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1152, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 2816, in _load_initial_image
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1071, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1152, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1024, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1071, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1152, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1591, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1152, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+2025-05-31 09:36:31,813 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1024, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1071, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1152, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage5" doesn't exist
+2025-05-31 09:36:32,774 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1024, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1071, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1152, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage6" doesn't exist
+2025-05-31 09:37:15,219 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 284, in open_editor
+    editor_root.mainloop()
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-05-31 09:40:29,146 ERROR Error opening project 'authentic logo.json'
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 09:40:29,156 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+2025-05-31 09:40:29,252 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1614, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+2025-05-31 09:41:40,748 ERROR Error opening project 'authentic logo.json'
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 09:41:40,756 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+2025-05-31 09:41:40,828 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 149, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 283, in open_editor
+    BoundingBoxEditor(editor_root, project) # Removed splash=splash
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1047, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1614, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+2025-05-31 09:52:09,504 ERROR Failed to create BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 268, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 09:52:26,955 ERROR Failed to create BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 297, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 268, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 303, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1094, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1175, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 18:49:58,680 ERROR Failed to create BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 152, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 950, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1033, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 268, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 158, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 950, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1033, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 18:50:01,959 ERROR Failed to create BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 152, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 950, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1033, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 268, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 158, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 950, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1033, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+2025-05-31 18:51:58,202 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 152, in __init__
+    self.load_image(last_image_full_path)                   # Load the image
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 950, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1033, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage1" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 274, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 158, in __init__
+    self.load_image(os.path.join(self.folder_path, self.image_files[0]))
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 950, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1033, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage2" doesn't exist
+2025-05-31 18:55:46,786 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 920, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 968, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1051, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+2025-05-31 18:55:46,796 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 920, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 968, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1051, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 920, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 968, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1051, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+2025-05-31 18:55:46,866 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 920, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 968, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1051, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage3" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 920, in on_image_select
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 968, in load_image
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1051, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage4" doesn't exist
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1491, in on_canvas_resize
+    self.display_image()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1051, in display_image
+    self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2877, in create_image
+    return self._create('image', args, kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2863, in _create
+    return self.tk.getint(self.tk.call(
+                          ^^^^^^^^^^^^^
+_tkinter.TclError: image "pyimage5" doesn't exist
+2025-05-31 18:56:10,535 ERROR Error opening project authentic logo.json
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 146, in _open_selected_project_action
+    self.root.destroy()
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 2390, in destroy
+    self.tk.call('destroy', self._w)
+_tkinter.TclError: can't invoke "destroy" command: application has been destroyed
