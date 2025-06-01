@@ -203,13 +203,27 @@ class BoundingBoxEditor(tk.Frame):
             messagebox.showerror("Import Error", f"Failed to import auto-annotation modules: {e}")
             return
         
-        try:
-            # Analyze the loaded model
+        try:            # Analyze the loaded model
             analyzer = ModelAnalyzer()
             model_analysis = analyzer.analyze_model(
                 getattr(self.model, 'model_path', 'Unknown'), 
                 self.model
             )
+            
+            # Debug log setup
+            debug_log_path = os.path.join(os.path.dirname(__file__), 'debug_auto_annotation.log')
+            
+            def debug_log(message):
+                with open(debug_log_path, 'a', encoding='utf-8') as f:
+                    f.write(f"{message}\n")
+                print(message)  # Also print to console
+            
+            # Clear previous log and start fresh
+            with open(debug_log_path, 'w', encoding='utf-8') as f:
+                f.write("=== AUTO-ANNOTATION DEBUG LOG ===\n")
+            
+            debug_log(f"DEBUG MODEL ANALYSIS: {model_analysis}")
+            debug_log(f"DEBUG MODEL ANALYSIS available_options: {model_analysis.get('available_options', 'NOT_FOUND')}")
             
             # Show configuration dialog
             dialog = AutoAnnotationDialog(
@@ -1670,13 +1684,26 @@ class BoundingBoxEditor(tk.Frame):
             self.progress_var.set(percent)
             if hasattr(self, 'progress_label') and self.progress_label.winfo_exists():
                 self.progress_label.config(text=f"{current}/{total} images processed")
-            self.progress_win.update_idletasks()
-
+            self.progress_win.update_idletasks()      
     def auto_annotate_dataset(self):
         """Auto-annotate dataset based on configuration from dialog."""
+        # Initialize debug log file (overwrite each time)
+        debug_log_path = os.path.join(os.path.dirname(__file__), 'debug_auto_annotation.log')
+        
+        def debug_log(message):
+            with open(debug_log_path, 'a', encoding='utf-8') as f:
+                f.write(f"{message}\n")
+            print(message)  # Also print to console
+        
+        # Clear previous log
+        with open(debug_log_path, 'w', encoding='utf-8') as f:
+            f.write("=== AUTO-ANNOTATION DEBUG LOG ===\n")
+        
         # Get configuration from the stored config
         config = getattr(self, 'annotation_config', {})
         annotation_type = config.get('annotation_type', 'bounding_boxes')
+        debug_log(f"DEBUG AUTO-ANNOTATE: annotation_type = '{annotation_type}'")
+        debug_log(f"DEBUG AUTO-ANNOTATE: config = {config}")
         conf_threshold = config.get('confidence_threshold', self.confidence_threshold.get())
         selected_files = config.get('selected_files', list(self.image_files))
         
@@ -1729,8 +1756,7 @@ class BoundingBoxEditor(tk.Frame):
         finally:
             self.save_statuses()
             self.root.after(0, self.update_status_labels)
-            
-            # Update image tree tags
+              # Update image tree tags
             for relative_image_path in selected_files:
                 if self.image_tree.exists(relative_image_path):
                     status = self.image_status.get(relative_image_path, "not_viewed")
@@ -1739,6 +1765,12 @@ class BoundingBoxEditor(tk.Frame):
             if hasattr(self, 'progress_win') and self.progress_win.winfo_exists(): 
                 self.root.after(0, self.progress_win.destroy)
             self.root.after(0, lambda: self.auto_annotate_button.config(state=tk.NORMAL))
+            
+            # Refresh the current image if it was part of the auto-annotation
+            if self.image_path and selected_files:
+                current_relative_path = os.path.relpath(self.image_path, self.folder_path)
+                if current_relative_path in selected_files:
+                    self.root.after(0, lambda: self.load_image(self.image_path))
             
             # Show completion message
             if self.cancel_event and self.cancel_event.is_set():
@@ -1797,6 +1829,21 @@ class BoundingBoxEditor(tk.Frame):
     
     def _process_segmentation_results(self, results, label_path, image_file, conf_threshold):
         """Process segmentation results for polygon annotations."""
+        # Debug log setup
+        debug_log_path = os.path.join(os.path.dirname(__file__), 'debug_auto_annotation.log')
+        
+        def debug_log(message):
+            with open(debug_log_path, 'a', encoding='utf-8') as f:
+                f.write(f"{message}\n")
+            print(message)  # Also print to console
+        
+        debug_log(f"DEBUG SEGMENTATION: Processing {image_file}")
+        debug_log(f"DEBUG SEGMENTATION: results[0] type: {type(results[0])}")
+        debug_log(f"DEBUG SEGMENTATION: hasattr(results[0], 'masks'): {hasattr(results[0], 'masks')}")
+        if hasattr(results[0], 'masks'):
+            debug_log(f"DEBUG SEGMENTATION: results[0].masks: {results[0].masks}")
+            debug_log(f"DEBUG SEGMENTATION: results[0].masks is None: {results[0].masks is None}")
+        
         # Check if model supports segmentation
         if not hasattr(results[0], 'masks') or results[0].masks is None:
             # Fall back to bounding boxes if no masks available
@@ -1809,65 +1856,76 @@ class BoundingBoxEditor(tk.Frame):
         img_h, img_w = None, None
         
         if not detections:
+            debug_log(f"DEBUG SEGMENTATION: No detections found")
             return {"has_annotations": False, "uncertain": False}
         
-        for i, (box, mask) in enumerate(zip(detections, masks)):
-            if self.cancel_event and self.cancel_event.is_set(): 
-                break
-                
-            conf_score = box.conf[0].item()
-            class_id = int(box.cls[0])
+        debug_log(f"DEBUG SEGMENTATION: Starting polygon conversion for {len(detections)} detections")
+        
+        # YOLOv8 provides polygon coordinates directly in masks.xy
+        if hasattr(masks, 'xy') and masks.xy is not None:
+            debug_log(f"DEBUG SEGMENTATION: Using pre-computed polygon coordinates from masks.xy")
+            debug_log(f"DEBUG SEGMENTATION: masks.xy has {len(masks.xy)} polygon sets")
             
-            if img_h is None or img_w is None: 
-                img_h, img_w = results[0].orig_shape[:2]
-            
-            if class_id >= len(self.class_names): 
-                continue
-            
-            # Convert mask to polygon
-            try:
-                np_module = lazy_importer.get_numpy()
-                cv2_module = lazy_importer.get_opencv()
-                
-                # Get mask as numpy array
-                mask_array = mask.data[0].cpu().numpy()
-                mask_resized = cv2_module.resize(mask_array, (img_w, img_h))
-                mask_binary = (mask_resized > 0.5).astype(np_module.uint8) * 255
-                
-                # Find contours
-                contours, _ = cv2_module.findContours(mask_binary, cv2_module.RETR_EXTERNAL, cv2_module.CHAIN_APPROX_SIMPLE)
-                
-                if contours:
-                    # Get the largest contour
-                    largest_contour = max(contours, key=cv2_module.contourArea)
+            for i, (box, polygon_coords) in enumerate(zip(detections, masks.xy)):
+                if self.cancel_event and self.cancel_event.is_set(): 
+                    break
                     
-                    # Simplify polygon
-                    epsilon = 0.02 * cv2_module.arcLength(largest_contour, True)
-                    simplified = cv2_module.approxPolyDP(largest_contour, epsilon, True)
+                conf_score = box.conf[0].item()
+                class_id = int(box.cls[0])
+                
+                debug_log(f"DEBUG SEGMENTATION: Processing detection {i}: class_id={class_id}, conf_score={conf_score}")
+                
+                if img_h is None or img_w is None: 
+                    img_h, img_w = results[0].orig_shape[:2]
+                
+                if class_id >= len(self.class_names): 
+                    debug_log(f"DEBUG SEGMENTATION: Skipping invalid class_id {class_id} (max: {len(self.class_names)-1})")
+                    continue
+                
+                # Convert numpy array to list of (x, y) tuples
+                try:
+                    debug_log(f"DEBUG SEGMENTATION: Converting polygon coordinates for detection {i}")
+                    debug_log(f"DEBUG SEGMENTATION: polygon_coords shape: {polygon_coords.shape}")
+                    debug_log(f"DEBUG SEGMENTATION: First few coordinates: {polygon_coords[:5] if len(polygon_coords) > 5 else polygon_coords}")
                     
-                    if len(simplified) >= 3:
-                        # Convert to relative coordinates
-                        polygon_points = []
-                        for point in simplified:
-                            x, y = point[0]
-                            rel_x = x / img_w
-                            rel_y = y / img_h
-                            polygon_points.extend([rel_x, rel_y])
-                        
+                    # Convert to integer pixel coordinates
+                    polygon_points = []
+                    for coord_pair in polygon_coords:
+                        x, y = coord_pair
+                        polygon_points.append((int(x), int(y)))
+                    
+                    if len(polygon_points) >= 3:  # Valid polygon needs at least 3 points
+                        debug_log(f"DEBUG SEGMENTATION: Created polygon with {len(polygon_points)} points: {polygon_points[:5]}...")
                         polygons.append((polygon_points, class_id, conf_score))
                         
                         if conf_score < conf_threshold * 1.2:  # Mark uncertain if close to threshold
                             uncertain = True
-                            
-            except Exception as e:
-                # If polygon conversion fails, skip this detection
-                continue
+                    else:
+                        debug_log(f"DEBUG SEGMENTATION: Polygon has too few points ({len(polygon_points)}), skipping")
+                        
+                except Exception as e:
+                    debug_log(f"DEBUG SEGMENTATION: Exception during polygon conversion for detection {i}: {e}")
+                    continue
+        else:
+            debug_log(f"DEBUG SEGMENTATION: masks.xy not available, falling back to bounding boxes")
+            return self._process_detection_results(results, label_path, image_file, conf_threshold)
+        
+        debug_log(f"DEBUG SEGMENTATION: Generated {len(polygons)} polygons total")
         
         if polygons:
             # Create directory structure for label file if it doesn't exist
             os.makedirs(os.path.dirname(label_path), exist_ok=True)
             existing_bboxes, existing_polygons = read_annotations_from_file(label_path, (img_h, img_w))
-            new_polygons_for_file = [(points, cid) for (points, cid, _) in polygons]
+            
+            # Convert polygons to the correct format for write_annotations_to_file
+            new_polygons_for_file = []
+            for (points, cid, _) in polygons:
+                new_polygons_for_file.append({
+                    'class_id': cid,
+                    'points': points
+                })
+            
+            debug_log(f"DEBUG SEGMENTATION: Writing {len(new_polygons_for_file)} polygons to label file")
             write_annotations_to_file(label_path, existing_bboxes, new_polygons_for_file, (img_h, img_w))
             return {"has_annotations": True, "uncertain": uncertain}
         

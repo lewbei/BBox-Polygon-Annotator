@@ -1,4 +1,4 @@
-# Image Labelling Tool
+# BBox-Polygon-Annotator
 *Computer Vision Annotation Tool for Bounding Boxes and Polygons*
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
