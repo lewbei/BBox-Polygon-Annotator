@@ -177,9 +177,9 @@ class BoundingBoxEditor(tk.Frame):
                             self.load_image(last_image_full_path)
                             loaded_an_image = True
                         else:
-                            print(f"Info: Last opened image '{last_image_relative_path}' not found in tree. Tree items: {self.image_tree.get_children()}")
+                            pass  # Last opened image not found in tree
                     except tk.TclError as e:
-                        print(f"Info: TclError while trying to select last opened image '{last_image_relative_path}': {e}")
+                        pass  # TclError while trying to select last opened image
                         
         if not loaded_an_image and self.image_files:
             first_image_relative_path = self.image_files[0]
@@ -191,9 +191,9 @@ class BoundingBoxEditor(tk.Frame):
                     self.image_tree.see(first_image_relative_path)
                     self.load_image(first_image_full_path)
                 else:
-                     print(f"Info: First image '{first_image_relative_path}' not found in tree during fallback.")
+                    pass  # First image not found in tree during fallback
             except tk.TclError as e:
-                print(f"Info: TclError while trying to select first image '{first_image_relative_path}': {e}")
+                pass  # TclError while trying to select first image
 
     # --------------------------------------------------
     # Setup / Layout Methods
@@ -461,7 +461,7 @@ class BoundingBoxEditor(tk.Frame):
                 if 0 <= self.drag_polygon_index < len(self.polygons) and \
                    0 <= self.drag_point_index < len(self.polygons[self.drag_polygon_index]['points']):
                     
-                    print(f"DEBUG: Dragging polygon {self.drag_polygon_index}, point {self.drag_point_index} to ({image_x_current}, {image_y_current})")
+
                     
                     # Update the specific point being dragged
                     self.polygons[self.drag_polygon_index]['points'][self.drag_point_index] = (image_x_current, image_y_current)
@@ -472,7 +472,7 @@ class BoundingBoxEditor(tk.Frame):
                     if len(self.polygons[self.drag_polygon_index]['points']) > 1 and \
                        self.polygons[self.drag_polygon_index]['points'][0] == self.polygons[self.drag_polygon_index]['points'][-1]:
                         if self.drag_point_index == 0:
-                             self.polygons[self.drag_polygon_index]['points'][-1] = (image_x_current, image_y_current)
+                             self.polygons[self.drag_polygon_index]['points'][-1] = (image_x_current, image_y_current)                   
                         elif self.drag_point_index == len(self.polygons[self.drag_polygon_index]['points']) -1:
                              self.polygons[self.drag_polygon_index]['points'][0] = (image_x_current, image_y_current)
 
@@ -494,8 +494,6 @@ class BoundingBoxEditor(tk.Frame):
         elif self.dragging_point and self.annotation_mode == 'polygon':
             # 1. Set self.dragging_point = False.
             self.dragging_point = False
-            # 2. Keep the print statement for debugging.
-            print(f"DEBUG: Ending point drag for polygon {self.drag_polygon_index}, point {self.drag_point_index}")
             # 3. Reset self.drag_polygon_index and self.drag_point_index to -1.
             self.drag_polygon_index = -1
             self.drag_point_index = -1
@@ -510,6 +508,26 @@ class BoundingBoxEditor(tk.Frame):
             self.display_annotations() 
             # 7. Reset the canvas cursor.
             self.canvas.config(cursor="")
+        
+        # For polygon mode, check if we should clear hover state on mouse button release
+        # when clicking away from polygon vertices (moved from on_click to on_pan_release)
+        elif self.annotation_mode == 'polygon' and not self.polygon_drawing_active and not self.dragging_point:
+            # If user released mouse button away from polygon vertices, clear hover state
+            found_hover = False
+            for poly_idx, poly_data in enumerate(self.polygons):
+                points_orig = poly_data['points']
+                for point_idx, (px_orig, py_orig) in enumerate(points_orig):
+                    canvas_px, canvas_py = self.image_to_canvas_coords(px_orig, py_orig)
+                    if canvas_px is not None and canvas_py is not None:
+                        distance = ((event.x - canvas_px) ** 2 + (event.y - canvas_py) ** 2) ** 0.5
+                        if distance <= 8: # Hover radius
+                            found_hover = True
+                            break
+                if found_hover:
+                    break
+              # If releasing mouse button away from any polygon vertex, clear hover state
+            if not found_hover and (self.hover_polygon_index != -1 or self.hover_point_index != -1):
+                self.clear_polygon_hover_state()
         
         # General cursor reset if not panning and not dragging a point
         if not self.panning and not self.dragging_point:
@@ -680,7 +698,7 @@ class BoundingBoxEditor(tk.Frame):
                 self.class_listbox.delete(index); self.class_listbox.insert(index, new_val)
                 self.class_names[index] = new_val
                 self.update_class_colors(); self.update_yaml_classes(); self.class_entry.delete(0, tk.END)
-
+    
     def remove_class(self):
         selection = self.class_listbox.curselection()
         if selection:
@@ -688,12 +706,23 @@ class BoundingBoxEditor(tk.Frame):
             index = selection[0]
             self.class_listbox.delete(index); self.class_names.pop(index)
             self.update_class_colors(); self.update_yaml_classes()
+            
+            # Update bounding box class IDs
             updated_bboxes = []
             max_idx = len(self.class_names) - 1
             for x, y, w, h, class_id in self.bboxes:
                 if class_id > max_idx: class_id = 0
                 updated_bboxes.append((x, y, w, h, class_id))
             self.bboxes = updated_bboxes
+            
+            # Update polygon class IDs (CRITICAL FIX)
+            updated_polygons = []
+            for poly_data in self.polygons:
+                class_id = poly_data['class_id']
+                if class_id > max_idx: class_id = 0
+                updated_polygons.append({'class_id': class_id, 'points': poly_data['points']})
+            self.polygons = updated_polygons
+            
             self.display_annotations()
 
     def update_yaml_classes(self):
@@ -727,10 +756,22 @@ class BoundingBoxEditor(tk.Frame):
 
     def redo(self):
         if self.history_index < len(self.history) - 1: self.history_index += 1; self.restore_from_history()
-
+    
     def restore_from_history(self):
         if 0 <= self.history_index < len(self.history):
             state = self.history[self.history_index]
+            
+            # Check if we need to load a different image
+            if 'image_index' in state and state['image_index'] != self.current_image_index:
+                # Load the image that was active when this state was saved
+                if 0 <= state['image_index'] < len(self.image_files):
+                    target_image_path = os.path.join(self.folder_path, self.image_files[state['image_index']])
+                    self.load_image(target_image_path)
+                    # Update tree selection to match the loaded image
+                    self.image_tree.selection_set(self.image_files[state['image_index']])
+                    self.image_tree.focus(self.image_files[state['image_index']])
+            
+            # Restore annotations
             self.bboxes = [bbox[:] for bbox in state['bboxes']]
             self.polygons = [{'class_id': p['class_id'], 'points': p['points'][:]} for p in state['polygons']]
             self.display_annotations()
@@ -801,14 +842,15 @@ class BoundingBoxEditor(tk.Frame):
 
     def _save_project_config(self):
         if not hasattr(self, 'project') or 'project_name' not in self.project:
-            print("Error: Project name not found, cannot save project config."); return
+            return  # Project name not found, cannot save project config
         project_name = self.project['project_name']
         safe_project_filename = "".join(c if c.isalnum() or c in (' ', '_', '-') else '_' for c in project_name).rstrip()
         if not safe_project_filename: safe_project_filename = "Untitled_Project"
         project_file_path = os.path.join(PROJECTS_DIR, f"{safe_project_filename}.json")
         try:
             with open(project_file_path, "w") as f: json.dump(self.project, f, indent=4)
-        except Exception as e: print(f"Error saving project configuration to {project_file_path}: {e}")
+        except Exception as e: 
+            pass  # Error saving project configuration
 
     def display_image(self):
         if self.original_image is None: return
@@ -974,35 +1016,16 @@ class BoundingBoxEditor(tk.Frame):
                         dist = min(dist_to_p1, dist_to_p2)
                 
                 if dist < threshold:
-                    # For debugging: print(f"DEBUG: Click near edge of polygon {self.polygons.index(poly_data)}, segment {i}, dist: {dist}")
-                    return True # Click is close to this segment
+                    # Click is close to this segment
+                    return True
         
-        return False # Click is not close to any polygon edge    # --------------------------------------------------
+        return False  # Click is not close to any polygon edge
+    
+    # --------------------------------------------------
     # Event Handlers
     # --------------------------------------------------
     
     def on_click(self, event):
-        # For polygon mode, check if we should clear hover state on empty canvas clicks
-        if self.annotation_mode == 'polygon' and not self.polygon_drawing_active:
-            # If user clicks on empty space (not near any polygon vertex), clear hover state
-            found_hover = False
-            for poly_idx, poly_data in enumerate(self.polygons):
-                points_orig = poly_data['points']
-                for point_idx, (px_orig, py_orig) in enumerate(points_orig):
-                    canvas_px, canvas_py = self.image_to_canvas_coords(px_orig, py_orig)
-                    if canvas_px is not None and canvas_py is not None:
-                        distance = ((event.x - canvas_px) ** 2 + (event.y - canvas_py) ** 2) ** 0.5
-                        if distance <= 8: # Hover radius
-                            found_hover = True
-                            break
-                if found_hover:
-                    break
-            
-            # If clicking away from any polygon vertex, clear hover state
-            if not found_hover and (self.hover_polygon_index != -1 or self.hover_point_index != -1):
-                print("DEBUG: Clicking away from polygon vertices, clearing hover state")
-                self.clear_polygon_hover_state()
-                return  # Don't process further if we're just clearing selection
         
         if self.annotation_mode == 'box' and not self.polygon_drawing_active:
             if self.selected_class_index is None:
@@ -1024,7 +1047,7 @@ class BoundingBoxEditor(tk.Frame):
                     if self.hover_polygon_index != -1 and self.hover_point_index != -1 and \
                        0 <= self.hover_polygon_index < len(self.polygons) and \
                        0 <= self.hover_point_index < len(self.polygons[self.hover_polygon_index]['points']):
-                        print(f"DEBUG: Starting point drag for polygon {self.hover_polygon_index}, point {self.hover_point_index}")
+
                         # i. Set self.dragging_point = True.
                         self.dragging_point = True
                         # ii. Set self.drag_polygon_index = self.hover_polygon_index.
@@ -1036,23 +1059,15 @@ class BoundingBoxEditor(tk.Frame):
                         # v. return to avoid other actions.
                         return                    # 1.b. If no point is hovered (self.hover_polygon_index == -1):
                     elif self.hover_polygon_index == -1: # self.hover_point_index will also be -1
-                        # i. Call self.clear_polygon_hover_state() to ensure any visual selection cues are removed.
-                        self.clear_polygon_hover_state()
+                        # Don't clear hover state here - let on_pan_release handle it
                         # ii. Set self.dragging_point = False.
-                        self.dragging_point = False # Ensure not in dragging state
-                        
-                        # iii. If self.polygon_just_completed is True, print a debug message and return.
-                        if self.polygon_just_completed:
-                            print("DEBUG: Ignoring click immediately after polygon completion due to polygon_just_completed flag.")
-                            return
+                        self.dragging_point = False # Ensure not in dragging state                        return
                         
                         # Check if the click is on an existing polygon edge
                         if self.is_click_on_polygon_edge(event.x, event.y):
-                            print("DEBUG: Clicked on an edge, doing nothing.")
-                            return
-
+                            return  # Clicked on an edge, do nothing
+                        
                         # iv. Proceed to start a new polygon:
-                        print(f"DEBUG: Starting new polygon at ({image_x}, {image_y})")
                         # - Check for class selection.
                         current_selection_tuple = self.class_listbox.curselection()
                         if not current_selection_tuple:
@@ -1063,14 +1078,12 @@ class BoundingBoxEditor(tk.Frame):
                         # - Set self.current_polygon_points.
                         self.current_polygon_points = [(image_x, image_y)]
                         # - Set self.polygon_drawing_active = True.
-                        self.polygon_drawing_active = True
-                        # - Call self.draw_current_polygon_drawing().
+                        self.polygon_drawing_active = True                        # - Call self.draw_current_polygon_drawing().
                         self.draw_current_polygon_drawing() # Draw the first point
                     # 1.c. If a polygon is hovered but not a specific point (polygon interior)
                     else:
-                        # Clear hover state since user clicked inside polygon but not on a vertex
-                        print("DEBUG: Clicked inside polygon but not on a vertex, clearing hover state")
-                        self.clear_polygon_hover_state()
+                        # User clicked inside polygon but not on a vertex
+                        # Don't clear hover state immediately - let on_pan_release handle it
                         return
                 # 2. If in 'polygon' mode and polygon_drawing_active (adding points to a new polygon):
                 else: 
@@ -1224,20 +1237,9 @@ class BoundingBoxEditor(tk.Frame):
         # However, if double-click is only for polygon completion, this call might be too broad.
         # For now, keeping it to ensure display is up-to-date after any double-click attempt.
         # self.display_annotations() # Re-evaluate if this is needed here or only after successful polygon completion.
-                                   # display_annotations is called within cancel_current_polygon if that path is taken.
-
-    def _reset_polygon_completion_flag(self):
+                                   # display_annotations is called within cancel_current_polygon if that path is taken.    def _reset_polygon_completion_flag(self):
         """Reset the polygon completion flag to allow new polygon creation."""
         self.polygon_just_completed = False
-
-    def on_pan_release(self, event):
-        if self.panning:
-            self.panning = False; self.canvas.config(cursor="")
-        elif self.annotation_mode == 'box' and self.current_bbox and self.rect:
-            self.canvas.delete(self.rect); self.rect = None
-            self.current_bbox_orig_start = None; self.rect_start_canvas = None
-            self.display_annotations(); self.save_history()
-        if not self.panning: self.canvas.config(cursor="")
 
     def on_mouse_wheel(self, event):
         if not self.image_files: return
@@ -1289,16 +1291,15 @@ class BoundingBoxEditor(tk.Frame):
         label_path = os.path.join(self.label_folder, label_relative_path)
         os.makedirs(os.path.dirname(label_path), exist_ok=True)
         if self.original_image:
-            original_shape = (self.original_image.height, self.original_image.width)
+            original_shape = (self.original_image.height, self.original_image.width)            
             write_annotations_to_file(label_path, self.bboxes, self.polygons, original_shape)
         else:
-            print(f"Warning: Original image not available for saving labels for {self.image_path}. Annotations might be incorrect.")
+            # Original image not available for saving labels
             fallback_shape = (480, 640) # Default fallback
             if hasattr(self, 'image') and self.image is not None and hasattr(self.image, 'shape'): # Check if self.image (numpy array) exists
                  pil_image_from_numpy = Image.fromarray(self.image)
                  fallback_shape = (pil_image_from_numpy.height, pil_image_from_numpy.width)
             write_annotations_to_file(label_path, self.bboxes, self.polygons, fallback_shape)
-        print(f"Saved labels for {self.image_path}")
         new_status = "edited" if (self.bboxes or self.polygons) else "viewed"
         self.image_status[relative_image_path] = new_status
         self.image_tree.item(relative_image_path, tags=(new_status,))
