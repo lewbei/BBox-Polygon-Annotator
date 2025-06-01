@@ -3000,3 +3000,37 @@ Traceback (most recent call last):
     tk.Button(bbox_info_row, text="Delete", command=lambda i=i, type='bbox': self.delete_annotation(i, type), font=("Arial",8)).grid(row=1,column=1,padx=2,sticky="e")
                                                                              ^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'BoundingBoxEditor' object has no attribute 'delete_annotation'. Did you mean: 'cancel_annotation'?
+2025-06-01 10:11:59,770 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 91, in __init__
+    self.setup_canvas()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 232, in setup_canvas
+    self.canvas.bind("<Button-1>", self.on_click)
+                                   ^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'on_click'
+2025-06-01 10:13:37,092 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 91, in __init__
+    self.setup_canvas()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 232, in setup_canvas
+    self.canvas.bind("<Button-1>", self.on_click)
+                                   ^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'on_click'
+2025-06-01 10:13:42,552 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 91, in __init__
+    self.setup_canvas()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 232, in setup_canvas
+    self.canvas.bind("<Button-1>", self.on_click)
+                                   ^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'on_click'
+v

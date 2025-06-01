@@ -7,6 +7,7 @@ import threading
 import csv
 import xml.etree.ElementTree as ET
 from datetime import datetime
+import time
 
 import tkinter as tk
 from tkinter import ttk # Import ttk
@@ -228,13 +229,13 @@ class BoundingBoxEditor(tk.Frame):
         self.canvas.bind("<MouseWheel>", self.on_mouse_wheel)
         self.canvas.bind("<Button-4>", self.on_mouse_wheel) 
         self.canvas.bind("<Button-5>", self.on_mouse_wheel)  
-        
         self.canvas.bind("<Button-1>", self.on_click)
         self.canvas.bind("<B1-Motion>", self.on_pan_drag) 
         self.canvas.bind("<ButtonRelease-1>", self.on_pan_release) 
         self.canvas.bind("<Motion>", self.on_motion) 
         self.canvas.bind("<Double-Button-1>", self.on_double_click) 
         self.canvas.bind("<Button-3>", self.on_right_click) 
+        self.canvas.bind("<Leave>", self._on_canvas_leave)
 
     def setup_info_panel(self):
         self.info_frame = tk.Frame(self.content_frame, width=300)
@@ -489,19 +490,26 @@ class BoundingBoxEditor(tk.Frame):
             self.current_bbox_orig_start = None
             self.rect_start_canvas = None
             self.display_annotations()
-            self.save_history()
-        # Polygon point dragging release (Left mouse / B1)
+            self.save_history()        # Polygon point dragging release (Left mouse / B1)
         elif self.dragging_point and self.annotation_mode == 'polygon':
-            print(f"DEBUG: Ending point drag for polygon {self.drag_polygon_index}, point {self.drag_point_index}")
+            # 1. Set self.dragging_point = False.
             self.dragging_point = False
+            # 2. Keep the print statement for debugging.
+            print(f"DEBUG: Ending point drag for polygon {self.drag_polygon_index}, point {self.drag_point_index}")
+            # 3. Reset self.drag_polygon_index and self.drag_point_index to -1.
             self.drag_polygon_index = -1
             self.drag_point_index = -1
-            # Clear hover state to allow deselection
-            self.hover_polygon_index = -1
-            self.hover_point_index = -1
+            self.hover_polygon_index = -1 # New line
+            self.hover_point_index = -1 # New line
+              # Temporarily ignore hover detection to prevent immediate re-selection
+            self._ignore_hover_until = time.perf_counter() + 0.15  # 150ms delay
+            
+            # 5. Call self.save_history().
             self.save_history()
-            self.display_annotations() # Redraw to update final state and clear hover if any
-            self.canvas.config(cursor="") # Reset cursor
+            # 6. Call self.display_annotations() to redraw.
+            self.display_annotations() 
+            # 7. Reset the canvas cursor.
+            self.canvas.config(cursor="")
         
         # General cursor reset if not panning and not dragging a point
         if not self.panning and not self.dragging_point:
@@ -512,7 +520,7 @@ class BoundingBoxEditor(tk.Frame):
         self.canvas.delete("polygon_drawing") 
         self.canvas.delete("polygon_hover_point") 
         # self.polygon_line_ids = [] # Not used with current drawing logic
-
+    
     def cancel_current_polygon(self):
         """Cancels the current in-progress polygon drawing."""
         self.clear_current_polygon_drawing()
@@ -529,6 +537,9 @@ class BoundingBoxEditor(tk.Frame):
             self.hover_polygon_index = -1
             self.hover_point_index = -1
             self.canvas.config(cursor="")
+              # Temporarily ignore hover detection to prevent immediate re-selection
+            self._ignore_hover_until = time.perf_counter() + 0.1  # 100ms delay
+            
             self.display_annotations()
             return True
         return False
@@ -867,14 +878,22 @@ class BoundingBoxEditor(tk.Frame):
                 if len(canvas_coords_flat) >= 4:
                     self.canvas.create_polygon(canvas_coords_flat, outline=color, fill="", width=2, tags="polygon")
                     if canvas_coords_flat: self.canvas.create_text(canvas_coords_flat[0], canvas_coords_flat[1] - 10, text=self.class_names[class_id], fill=color, anchor=tk.NW, tags="polygon", font=("Arial", 8, "bold"))
-                for point_idx, (px_orig, py_orig) in enumerate(points_orig):
+                
+                # Draw regular vertices first
+                for point_idx, (px_orig, py_orig) in self._iter_poly_vertices(points_orig):
                     canvas_px, canvas_py = self.image_to_canvas_coords(px_orig, py_orig)
                     if canvas_px is not None and canvas_py is not None:
                         is_hovered = (i == self.hover_polygon_index and point_idx == self.hover_point_index)
-                        if is_hovered:
-                            self.canvas.create_oval(canvas_px-5, canvas_py-5, canvas_px+5, canvas_py+5, fill="yellow", outline="orange", width=2, tags="polygon")
-                        else:
+                        if not is_hovered:  # Draw regular vertices first
                             self.canvas.create_oval(canvas_px-3, canvas_py-3, canvas_px+3, canvas_py+3, fill=color, outline="white", width=1, tags="polygon")
+                
+                # Draw hovered vertex on top (after all regular vertices)
+                for point_idx, (px_orig, py_orig) in self._iter_poly_vertices(points_orig):
+                    canvas_px, canvas_py = self.image_to_canvas_coords(px_orig, py_orig)
+                    if canvas_px is not None and canvas_py is not None:
+                        is_hovered = (i == self.hover_polygon_index and point_idx == self.hover_point_index)
+                        if is_hovered:  # Draw hovered vertex on top
+                            self.canvas.create_oval(canvas_px-5, canvas_py-5, canvas_px+5, canvas_py+5, fill="yellow", outline="orange", width=2, tags="polygon")
             poly_info_row = tk.Frame(self.bbox_info_frame, bd=1, relief="solid", padx=2, pady=2); poly_info_row.pack(fill=tk.X, pady=2)
             tk.Label(poly_info_row, text=f"Poly: {self.class_names[class_id]}", font=("Arial",9)).grid(row=0,column=0,sticky="w")
             tk.Label(poly_info_row, text=f"Points: {len(points_orig)}", font=("Arial",8)).grid(row=1,column=0,sticky="w")
@@ -900,11 +919,91 @@ class BoundingBoxEditor(tk.Frame):
         canvas_x = panned_x + self.image_offset_x; canvas_y = panned_y + self.image_offset_y
         return canvas_x, canvas_y
 
-    # --------------------------------------------------
+    def is_click_on_polygon_edge(self, click_x, click_y):
+        """
+        Checks if a click (in canvas coordinates) is close to any polygon edge.
+        """
+        threshold = 5.0  # pixels, distance threshold
+
+        for poly_data in self.polygons:
+            points_orig = poly_data['points']
+            if len(points_orig) < 2:
+                continue
+
+            canvas_points = []
+            for px_orig, py_orig in points_orig:
+                c_x, c_y = self.image_to_canvas_coords(px_orig, py_orig)
+                if c_x is None or c_y is None: 
+                    # If any point of the polygon is not on canvas, skip this polygon for edge detection.
+                    # A more sophisticated approach might try to check visible segments, 
+                    # but this is simpler and safer.
+                    break 
+                canvas_points.append((c_x, c_y))
+            
+            if len(canvas_points) < len(points_orig): # Means a point was not convertible
+                continue
+
+            # Polygons are stored closed (first point == last point)
+            # So iterate through segments: (p0,p1), (p1,p2), ..., (pn-1, p0=pn)
+            # This means iterating len(canvas_points) - 1 times.
+            for i in range(len(canvas_points) - 1):
+                p1 = canvas_points[i]
+                p2 = canvas_points[i+1]
+                x1, y1 = p1
+                x2, y2 = p2
+
+                # Calculate the length of the segment squared
+                L2 = (x2 - x1)**2 + (y2 - y1)**2
+                
+                if L2 == 0: # p1 and p2 are the same point
+                    dist = ((click_x - x1)**2 + (click_y - y1)**2)**0.5
+                else:
+                    # Calculate the projection parameter t
+                    # t = ((click_x - x1) * (x2 - x1) + (click_y - y1) * (y2 - y1)) / L2
+                    # Using np.dot for potentially cleaner look, but direct math is fine
+                    dot_product = (click_x - x1) * (x2 - x1) + (click_y - y1) * (y2 - y1)
+                    t = dot_product / L2
+
+                    if 0 <= t <= 1: # Projection falls within the segment
+                        proj_x = x1 + t * (x2 - x1)
+                        proj_y = y1 + t * (y2 - y1)
+                        dist = ((click_x - proj_x)**2 + (click_y - proj_y)**2)**0.5
+                    else: # Projection is outside the segment, calculate distance to the closer endpoint
+                        dist_to_p1 = ((click_x - x1)**2 + (click_y - y1)**2)**0.5
+                        dist_to_p2 = ((click_x - x2)**2 + (click_y - y2)**2)**0.5
+                        dist = min(dist_to_p1, dist_to_p2)
+                
+                if dist < threshold:
+                    # For debugging: print(f"DEBUG: Click near edge of polygon {self.polygons.index(poly_data)}, segment {i}, dist: {dist}")
+                    return True # Click is close to this segment
+        
+        return False # Click is not close to any polygon edge    # --------------------------------------------------
     # Event Handlers
     # --------------------------------------------------
-
+    
     def on_click(self, event):
+        # For polygon mode, check if we should clear hover state on empty canvas clicks
+        if self.annotation_mode == 'polygon' and not self.polygon_drawing_active:
+            # If user clicks on empty space (not near any polygon vertex), clear hover state
+            found_hover = False
+            for poly_idx, poly_data in enumerate(self.polygons):
+                points_orig = poly_data['points']
+                for point_idx, (px_orig, py_orig) in enumerate(points_orig):
+                    canvas_px, canvas_py = self.image_to_canvas_coords(px_orig, py_orig)
+                    if canvas_px is not None and canvas_py is not None:
+                        distance = ((event.x - canvas_px) ** 2 + (event.y - canvas_py) ** 2) ** 0.5
+                        if distance <= 8: # Hover radius
+                            found_hover = True
+                            break
+                if found_hover:
+                    break
+            
+            # If clicking away from any polygon vertex, clear hover state
+            if not found_hover and (self.hover_polygon_index != -1 or self.hover_point_index != -1):
+                print("DEBUG: Clicking away from polygon vertices, clearing hover state")
+                self.clear_polygon_hover_state()
+                return  # Don't process further if we're just clearing selection
+        
         if self.annotation_mode == 'box' and not self.polygon_drawing_active:
             if self.selected_class_index is None:
                 messagebox.showwarning("No Class Selected", "Please select a class from the list before drawing a bounding box.", parent=self.root); return
@@ -921,51 +1020,103 @@ class BoundingBoxEditor(tk.Frame):
             image_x, image_y = self.canvas_to_image_coords(event.x, event.y)
             if image_x is not None and image_y is not None:
                 if not self.polygon_drawing_active:
-                    # Check if clicking on an existing vertex to start dragging
-                    if self.hover_polygon_index != -1 and self.hover_point_index != -1:
-                        # Ensure the hover indices are valid for the polygons list
-                        if 0 <= self.hover_polygon_index < len(self.polygons) and \
-                           0 <= self.hover_point_index < len(self.polygons[self.hover_polygon_index]['points']):
-                            print(f"DEBUG: Starting point drag for polygon {self.hover_polygon_index}, point {self.hover_point_index}")
-                            self.dragging_point = True
-                            self.drag_polygon_index = self.hover_polygon_index
-                            self.drag_point_index = self.hover_point_index
-                            self.canvas.config(cursor="fleur")
-                            # Do not start a new polygon, just set flags for dragging
-                            return
-                        else:
-                            # Reset hover indices if they became invalid (e.g., polygon deleted)
-                            self.hover_polygon_index = -1
-                            self.hover_point_index = -1
-
-                    # If not dragging a point, check if clicking on empty area to deselect
-                    if self.hover_polygon_index == -1 and self.hover_point_index == -1:
-                        # Clicking on empty area - this can be used to deselect or start new polygon
-                        # But first check if we just completed a polygon to avoid immediate new polygon creation
-                        if self.polygon_just_completed:
-                            print("DEBUG: Ignoring click immediately after polygon completion")
-                            return
-                        
-                        # Clear any existing hover state (deselection)
+                    # 1.a. If self.hover_polygon_index and self.hover_point_index are valid (a point is hovered):
+                    if self.hover_polygon_index != -1 and self.hover_point_index != -1 and \
+                       0 <= self.hover_polygon_index < len(self.polygons) and \
+                       0 <= self.hover_point_index < len(self.polygons[self.hover_polygon_index]['points']):
+                        print(f"DEBUG: Starting point drag for polygon {self.hover_polygon_index}, point {self.hover_point_index}")
+                        # i. Set self.dragging_point = True.
+                        self.dragging_point = True
+                        # ii. Set self.drag_polygon_index = self.hover_polygon_index.
+                        self.drag_polygon_index = self.hover_polygon_index
+                        # iii. Set self.drag_point_index = self.hover_point_index.
+                        self.drag_point_index = self.hover_point_index
+                        # iv. Change cursor to "fleur".
+                        self.canvas.config(cursor="fleur")
+                        # v. return to avoid other actions.
+                        return                    # 1.b. If no point is hovered (self.hover_polygon_index == -1):
+                    elif self.hover_polygon_index == -1: # self.hover_point_index will also be -1
+                        # i. Call self.clear_polygon_hover_state() to ensure any visual selection cues are removed.
                         self.clear_polygon_hover_state()
+                        # ii. Set self.dragging_point = False.
+                        self.dragging_point = False # Ensure not in dragging state
                         
-                        # If nothing was selected, proceed to start a new polygon
+                        # iii. If self.polygon_just_completed is True, print a debug message and return.
+                        if self.polygon_just_completed:
+                            print("DEBUG: Ignoring click immediately after polygon completion due to polygon_just_completed flag.")
+                            return
+                        
+                        # Check if the click is on an existing polygon edge
+                        if self.is_click_on_polygon_edge(event.x, event.y):
+                            print("DEBUG: Clicked on an edge, doing nothing.")
+                            return
+
+                        # iv. Proceed to start a new polygon:
                         print(f"DEBUG: Starting new polygon at ({image_x}, {image_y})")
+                        # - Check for class selection.
                         current_selection_tuple = self.class_listbox.curselection()
                         if not current_selection_tuple:
                             messagebox.showwarning("No Class Selected", "Please select a class before drawing a polygon.", parent=self.root)
                             return
                         self.selected_class_index = current_selection_tuple[0]
                         
+                        # - Set self.current_polygon_points.
                         self.current_polygon_points = [(image_x, image_y)]
+                        # - Set self.polygon_drawing_active = True.
                         self.polygon_drawing_active = True
+                        # - Call self.draw_current_polygon_drawing().
                         self.draw_current_polygon_drawing() # Draw the first point
-                else: # Polygon drawing is active, add a new point
-                    print(f"DEBUG: Adding point to existing polygon at ({image_x}, {image_y})")
-                    self.current_polygon_points.append((image_x, image_y))
+                    # 1.c. If a polygon is hovered but not a specific point (polygon interior)
+                    else:
+                        # Clear hover state since user clicked inside polygon but not on a vertex
+                        print("DEBUG: Clicked inside polygon but not on a vertex, clearing hover state")
+                        self.clear_polygon_hover_state()
+                        return
+                # 2. If in 'polygon' mode and polygon_drawing_active (adding points to a new polygon):
+                else: 
+                    # a. Add the new point to self.current_polygon_points.                    self.current_polygon_points.append((image_x, image_y))
+                    # b. Call self.draw_current_polygon_drawing().
                     self.draw_current_polygon_drawing()
         # self.display_annotations() # Called by draw_current_polygon_drawing if needed, or when finalizing
+    
+    def _iter_poly_vertices(self, points):
+        """Helper that returns an iterator that skips the duplicated last point"""
+        if len(points) > 1 and points[0] == points[-1]:
+            return enumerate(points[:-1])          # drop last
+        return enumerate(points)                   # nothing to drop
+    
+    def _update_hover_state(self, canvas_x: int, canvas_y: int) -> None:
+        """Optimized hover state detection with early exit and distance-squared comparison"""
+        if (hasattr(self, "_ignore_hover_until") and
+            self._ignore_hover_until > time.perf_counter()):
+            return
 
+        thresh_sq = 8 ** 2
+        new_poly = new_point = -1
+
+        for poly_idx, poly in enumerate(self.polygons):
+            for pt_idx, (px, py) in self._iter_poly_vertices(poly["points"]):
+                cx, cy = self.image_to_canvas_coords(px, py)
+                if cx is None:
+                    continue
+                if (canvas_x - cx) ** 2 + (canvas_y - cy) ** 2 <= thresh_sq:
+                    new_poly, new_point = poly_idx, pt_idx
+                    break        # ← early exit
+            if new_poly != -1:
+                break
+
+        if (new_poly, new_point) != (self.hover_polygon_index, self.hover_point_index):
+            self.hover_polygon_index, self.hover_point_index = new_poly, new_point
+            self.canvas.config(cursor="hand2" if new_poly != -1 else "")
+            self.display_annotations()              # redraw just once
+    
+    def _on_canvas_leave(self, event):
+        """Clean cursor and hover state when mouse leaves canvas"""
+        if self.hover_polygon_index != -1:
+            self.hover_polygon_index = self.hover_point_index = -1
+            self.canvas.config(cursor="")
+            self.display_annotations()
+    
     def on_motion(self, event):
         """
         Handles mouse motion events.
@@ -975,39 +1126,8 @@ class BoundingBoxEditor(tk.Frame):
         if self.annotation_mode == 'polygon' and self.polygon_drawing_active and self.current_polygon_points:
             # Provide live feedback for the next segment and closing line to current mouse cursor
             self.draw_current_polygon_drawing(live_canvas_x=event.x, live_canvas_y=event.y)
-        elif self.annotation_mode == 'polygon' and not self.dragging_point and not self.dragging_whole_polygon:
-            # Hover detection for completed polygons (when not actively drawing or dragging)
-            prev_hover_polygon = self.hover_polygon_index
-            prev_hover_point = self.hover_point_index
-            self.hover_polygon_index = -1
-            self.hover_point_index = -1
-            
-            for poly_idx, poly_data in enumerate(self.polygons):
-                points_orig = poly_data['points']
-                for point_idx, (px_orig, py_orig) in enumerate(points_orig):
-                    canvas_px, canvas_py = self.image_to_canvas_coords(px_orig, py_orig)
-                    if canvas_px is not None and canvas_py is not None:
-                        distance = ((event.x - canvas_px) ** 2 + (event.y - canvas_py) ** 2) ** 0.5
-                        if distance <= 8: # Hover radius
-                            self.hover_polygon_index = poly_idx
-                            self.hover_point_index = point_idx
-                            if prev_hover_polygon != poly_idx or prev_hover_point != point_idx:
-                                print(f"DEBUG: Hovering over polygon {poly_idx}, point {point_idx}")
-                            break
-                if self.hover_polygon_index != -1:
-                    break
-            
-            if self.hover_polygon_index != -1:
-                self.canvas.config(cursor="hand2")
-            else:
-                self.canvas.config(cursor="")
-            
-            if (prev_hover_polygon != self.hover_polygon_index or 
-                prev_hover_point != self.hover_point_index):
-                self.display_annotations() # Redraw completed polygons with hover highlights
-        # else:
-            # Other cases (e.g., box mode, or already dragging a polygon/point)
-            # pass # No specific action needed for these cases in on_motion by default
+        elif self.annotation_mode == "polygon" and not self.dragging_point:
+            self._update_hover_state(event.x, event.y)
 
     def draw_current_polygon_drawing(self, live_canvas_x=None, live_canvas_y=None):
         """
@@ -1414,7 +1534,7 @@ class BoundingBoxEditor(tk.Frame):
             if os.path.exists(full_image_path):
                 cv2_module = lazy_importer.get_cv2(); img = cv2_module.imread(full_image_path) 
                 height, width = img.shape[:2]
-            else: width, height = 640, 480
+            else: width, height = 640,480
             coco_data["images"].append({"id": img_idx, "width": width, "height": height, "file_name": os.path.basename(image_path)})
             if image_path in all_bboxes:
                 for bbox in all_bboxes[image_path]:
@@ -1424,8 +1544,7 @@ class BoundingBoxEditor(tk.Frame):
                 for polygon in all_polygons[image_path]:
                     class_id = polygon['class_id']; points = polygon['points']; segmentation = []
                     for x,y in points: segmentation.extend([float(x), float(y)])
-                    xs = [p[0] for p in points]; ys = [p[1] for p in points]
-                    x_min, x_max = min(xs), max(xs); y_min, y_max = min(ys), max(ys)
+                    xs = [p[0] for p in points]; ys = [p[1] for p in points]; x_min, x_max = min(xs), max(xs); y_min, y_max = min(ys), max(ys)
                     bbox_w, bbox_h = x_max - x_min, y_max - y_min; area = bbox_w * bbox_h
                     coco_data["annotations"].append({"id": annotation_id, "image_id": img_idx, "category_id": class_id, "segmentation": [segmentation], "bbox": [x_min,y_min,bbox_w,bbox_h], "area": area, "iscrowd": 0}); annotation_id += 1
         return coco_data
