@@ -276,9 +276,9 @@ class ProjectManager:
             splash = SplashScreen(editor_root, subtitle="Loading dataset...")
             editor_root.update_idletasks() # Process pending events for splash screen
             
-            # Try to create the editor
+            # Try to create the editor instance
             # This is where BoundingBoxEditor.__init__ will run
-            editor = BoundingBoxEditor(editor_root, project) 
+            editor = BoundingBoxEditor(editor_root, project)
             
             # If BoundingBoxEditor initialization is successful
             if splash:
@@ -294,12 +294,12 @@ class ProjectManager:
             if splash:
                 try:
                     splash.destroy()
-                except tk.TclError: 
+                except tk.TclError:
                     pass
             if editor_root:
                 try:
                     editor_root.destroy()
-                except tk.TclError: 
+                except tk.TclError:
                     pass
             # Show error without a parent if the original root is gone.
             try:

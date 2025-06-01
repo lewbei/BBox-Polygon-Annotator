@@ -9,3 +9,91 @@ Traceback (most recent call last):
     except Exception as e: self.root.after(0, lambda: messagebox.showerror("Error", f"Annotation failed: {str(e)}"))
                                                                                                               ^
 NameError: cannot access free variable 'e' where it is not associated with a value in enclosing scope
+2025-06-01 19:45:29,420 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 79, in __init__
+    self.setup_top_bar()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 329, in setup_top_bar
+    self.load_model_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['load_model']} Load Model", command=self.load_model)
+                                                                                                               ^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'load_model'
+2025-06-01 19:48:41,603 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 79, in __init__
+    self.setup_top_bar()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 329, in setup_top_bar
+    self.load_model_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['load_model']} Load Model", command=self.load_model)
+                                                                                                               ^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'load_model'
+2025-06-01 19:50:35,364 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 76, in __init__
+    self.setup_top_bar()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 326, in setup_top_bar
+    self.load_model_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['load_model']} Load Model", command=self.load_model)
+                                                                                                               ^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'load_model'
+2025-06-01 19:53:55,416 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 76, in __init__
+    self.setup_top_bar()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 322, in setup_top_bar
+    self.auto_annotate_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['auto_annotate']} Auto Annotate", command=self.auto_annotate_dataset_threaded)
+                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'auto_annotate_dataset_threaded'
+2025-06-01 19:54:41,445 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 76, in __init__
+    self.setup_top_bar()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 322, in setup_top_bar
+    self.auto_annotate_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['auto_annotate']} Auto Annotate", command=self.auto_annotate_dataset_threaded)
+                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'auto_annotate_dataset_threaded'
+2025-06-01 19:55:30,833 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 76, in __init__
+    self.setup_top_bar()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 322, in setup_top_bar
+    self.auto_annotate_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['auto_annotate']} Auto Annotate", command=self.auto_annotate_dataset_threaded)
+                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'auto_annotate_dataset_threaded'
+2025-06-01 19:56:47,211 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 76, in __init__
+    self.setup_top_bar()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 322, in setup_top_bar
+    self.auto_annotate_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['auto_annotate']} Auto Annotate", command=self.auto_annotate_dataset_threaded)
+                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'auto_annotate_dataset_threaded'
+2025-06-01 20:07:49,753 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 76, in __init__
+    self.setup_top_bar()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 346, in setup_top_bar
+    self.load_model_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['load_model']} Load Model", command=self.load_model)
+                                                                                                               ^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'load_model'
