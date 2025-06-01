@@ -197,28 +197,52 @@ class BoundingBoxEditor(tk.Frame):
 
     # --------------------------------------------------
     # Setup / Layout Methods
-    # --------------------------------------------------
-
+    # --------------------------------------------------    
     def setup_image_list_panel_widgets(self): 
+        # Header frame for controls
+        header_frame = tk.Frame(self.image_list_frame)
+        header_frame.pack(fill=tk.X, padx=2, pady=2)
+        
+        # Expand/Collapse buttons
+        btn_frame = tk.Frame(header_frame)
+        btn_frame.pack(side=tk.LEFT)
+        
+        expand_all_btn = tk.Button(btn_frame, text="⊞", command=self.expand_all_folders, width=3)
+        expand_all_btn.pack(side=tk.LEFT, padx=1)
+        
+        collapse_all_btn = tk.Button(btn_frame, text="⊟", command=self.collapse_all_folders, width=3)
+        collapse_all_btn.pack(side=tk.LEFT, padx=1)
+        
+        # Label
+        tk.Label(header_frame, text="Images", font=("Arial", 10, "bold")).pack(side=tk.LEFT, padx=(10, 0))
+        
         self.image_tree = ttk.Treeview(
             self.image_list_frame,
             columns=("filename",),
-            show="headings",
+            show="tree headings",
             selectmode="browse"
         )
-        self.image_tree.heading("filename", text="Images")
-        self.image_tree.column("filename", anchor=tk.W)
+        self.image_tree.heading("#0", text="Folder Structure")
+        self.image_tree.heading("filename", text="File Info")
+        self.image_tree.column("#0", width=200, anchor=tk.W)
+        self.image_tree.column("filename", width=100, anchor=tk.W)
         self.image_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
+        # Status-based color tags for images
         self.image_tree.tag_configure("edited", background="lightgreen")
         self.image_tree.tag_configure("viewed", background="lightblue")
         self.image_tree.tag_configure("not_viewed", background="white")
         self.image_tree.tag_configure("review_needed", background="red")
+        
+        # Folder tags
+        self.image_tree.tag_configure("folder", background="lightgray", font=("Arial", 9, "bold"))
 
         scrollbar = tk.Scrollbar(self.image_list_frame, orient="vertical", command=self.image_tree.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.image_tree.configure(yscrollcommand=scrollbar.set)
         self.image_tree.bind("<<TreeviewSelect>>", self.on_image_select)
+        self.image_tree.bind("<<TreeviewOpen>>", self.on_folder_expand)
+        self.image_tree.bind("<<TreeviewClose>>", self.on_folder_collapse)
 
     def setup_canvas(self):
         self.canvas = tk.Canvas(self.content_frame, width=500, height=720)
@@ -621,25 +645,177 @@ class BoundingBoxEditor(tk.Frame):
                 "nc": 1, "names": ["person"], "auto_save_interval": 120
             }
             with open(self.yaml_path, "w") as f: yaml.dump(default_yaml, f, sort_keys=False)
-
+    
     def load_dataset(self):
-        if not self.folder_path: messagebox.showerror("Error", "Dataset folder not set."); return
-        for item in self.image_tree.get_children(): self.image_tree.delete(item)
+        if not self.folder_path: 
+            messagebox.showerror("Error", "Dataset folder not set.")
+            return
+            
+        # Clear existing items in the tree
+        for item in self.image_tree.get_children(): 
+            self.image_tree.delete(item)
+            
         self.image_files = []
+        folder_structure = {}  # Dictionary to organize files by directory
+        
+        # Collect all image files and organize by directory
         for root_dir, _, files in os.walk(self.folder_path):
             for file in files:
                 if file.lower().endswith(('.jpg', '.png', '.jpeg')):
                     relative_path = os.path.relpath(os.path.join(root_dir, file), self.folder_path)
                     self.image_files.append(relative_path)
+                    
+                    # Get the directory part of the relative path
+                    dir_part = os.path.dirname(relative_path)
+                    if dir_part == "":  # File is in root directory
+                        dir_part = "/"
+                    
+                    if dir_part not in folder_structure:
+                        folder_structure[dir_part] = []
+                    folder_structure[dir_part].append(relative_path)
+        
         self.image_files.sort()
-        if not self.image_files: messagebox.showinfo("No Images", "No images found in the selected folder."); return
+        if not self.image_files: 
+            messagebox.showinfo("No Images", "No images found in the selected folder.")
+            return
+            
         self.load_statuses()
-        for relative_image_path in self.image_files:
-            status = self.image_status.get(relative_image_path, "not_viewed")
-            self.image_tree.insert("", tk.END, iid=relative_image_path, values=(relative_image_path,), tags=(status,))
+        
+        # Sort folders to ensure consistent order
+        sorted_folders = sorted(folder_structure.keys())
+        
+        # Create the hierarchical structure
+        folder_nodes = {}  # Keep track of folder node IDs
+        
+        for folder_path in sorted_folders:
+            if folder_path == "/":
+                # Files in root directory - add directly
+                for relative_image_path in sorted(folder_structure[folder_path]):
+                    status = self.image_status.get(relative_image_path, "not_viewed")
+                    self.image_tree.insert("", tk.END, iid=relative_image_path, 
+                                         text=os.path.basename(relative_image_path), 
+                                         values=(f"Status: {status}",), tags=(status,))
+            else:
+                # Create folder node if it doesn't exist
+                folder_id = f"folder_{folder_path}"
+                if folder_id not in folder_nodes:
+                    # Count total files and status summary for folder
+                    files_in_folder = folder_structure[folder_path]
+                    total_files = len(files_in_folder)
+                    status_counts = {"not_viewed": 0, "viewed": 0, "edited": 0, "review_needed": 0}
+                    
+                    for file_path in files_in_folder:
+                        status = self.image_status.get(file_path, "not_viewed")
+                        status_counts[status] += 1
+                    
+                    # Create status summary text
+                    status_text = f"{total_files} files"
+                    if status_counts["edited"] > 0:
+                        status_text += f" ({status_counts['edited']} labeled)"
+                    
+                    # Determine parent folder for nested directories
+                    parent_dir = os.path.dirname(folder_path)
+                    parent_id = ""
+                    if parent_dir and parent_dir != ".":
+                        parent_id = f"folder_{parent_dir}"
+                        if parent_id not in folder_nodes:
+                            # Create parent folder first
+                            folder_nodes[parent_id] = self.image_tree.insert("", tk.END, iid=parent_id,
+                                                                           text=f"📁 {os.path.basename(parent_dir)}", 
+                                                                           values=("",), tags=("folder",))
+                    
+                    folder_nodes[folder_id] = self.image_tree.insert(parent_id, tk.END, iid=folder_id,
+                                                                   text=f"📁 {os.path.basename(folder_path)}", 
+                                                                   values=(status_text,), tags=("folder",))
+                
+                # Add files to the folder
+                for relative_image_path in sorted(folder_structure[folder_path]):
+                    status = self.image_status.get(relative_image_path, "not_viewed")
+                    self.image_tree.insert(folder_id, tk.END, iid=relative_image_path, 
+                                         text=os.path.basename(relative_image_path), 
+                                         values=(f"Status: {status}",), tags=(status,))
+        
+        # Expand root level folders by default
+        for child in self.image_tree.get_children():
+            if self.image_tree.item(child)["tags"] and "folder" in self.image_tree.item(child)["tags"]:
+                self.image_tree.item(child, open=True)
+        
         self.save_statuses()
         self.update_status_labels()
 
+    # --------------------------------------------------
+    # Folder Management for Hierarchical Image List
+    # --------------------------------------------------
+    
+    def expand_all_folders(self):
+        """Expand all folder nodes in the image tree."""
+        def expand_recursive(item):
+            if self.image_tree.item(item)["tags"] and "folder" in self.image_tree.item(item)["tags"]:
+                self.image_tree.item(item, open=True)
+            for child in self.image_tree.get_children(item):
+                expand_recursive(child)
+        
+        for child in self.image_tree.get_children():
+            expand_recursive(child)
+    
+    def collapse_all_folders(self):
+        """Collapse all folder nodes in the image tree."""
+        def collapse_recursive(item):
+            if self.image_tree.item(item)["tags"] and "folder" in self.image_tree.item(item)["tags"]:
+                self.image_tree.item(item, open=False)
+            for child in self.image_tree.get_children(item):
+                collapse_recursive(child)
+        
+        for child in self.image_tree.get_children():
+            collapse_recursive(child)
+    
+    def on_folder_expand(self, event):
+        """Handle folder expansion events."""
+        # Update folder icon or status if needed
+        pass
+    
+    def on_folder_collapse(self, event):
+        """Handle folder collapse events."""
+        # Update folder icon or status if needed
+        pass
+    
+    def update_folder_status_display(self):
+        """Update the status display for all folders based on their children."""
+        def update_folder_recursive(folder_id):
+            children = self.image_tree.get_children(folder_id)
+            if not children:
+                return
+            
+            total_files = 0
+            status_counts = {"not_viewed": 0, "viewed": 0, "edited": 0, "review_needed": 0}
+            
+            for child in children:
+                if self.image_tree.item(child)["tags"] and "folder" in self.image_tree.item(child)["tags"]:
+                    # Recursively update child folders first
+                    update_folder_recursive(child)
+                else:
+                    # This is an image file
+                    total_files += 1
+                    child_tags = self.image_tree.item(child)["tags"]
+                    if child_tags:
+                        status = child_tags[0]
+                        if status in status_counts:
+                            status_counts[status] += 1
+            
+            # Update folder display text
+            if total_files > 0:
+                status_text = f"{total_files} files"
+                if status_counts["edited"] > 0:
+                    status_text += f" ({status_counts['edited']} labeled)"
+                
+                current_values = self.image_tree.item(folder_id)["values"]
+                self.image_tree.item(folder_id, values=(status_text,))
+        
+        # Update all folders
+        for child in self.image_tree.get_children():
+            if self.image_tree.item(child)["tags"] and "folder" in self.image_tree.item(child)["tags"]:
+                update_folder_recursive(child)
+    
     # --------------------------------------------------
     # Status Persistence
     # --------------------------------------------------
@@ -748,12 +924,14 @@ class BoundingBoxEditor(tk.Frame):
         if self.history_index < len(self.history) - 1: self.history = self.history[:self.history_index + 1]
         self.history.append(current_state)
         self.history_index = len(self.history) - 1
-        if len(self.history) > self.max_history_size: self.history.pop(0); self.history_index -= 1
+        if len(self.history) > self.max_history_size: 
+            self.history.pop(0)
+            self.history_index -= 1
         self.update_undo_redo_buttons()
-
+    
     def undo(self):
         if self.history_index > 0: self.history_index -= 1; self.restore_from_history()
-
+    
     def redo(self):
         if self.history_index < len(self.history) - 1: self.history_index += 1; self.restore_from_history()
     
@@ -768,8 +946,14 @@ class BoundingBoxEditor(tk.Frame):
                     target_image_path = os.path.join(self.folder_path, self.image_files[state['image_index']])
                     self.load_image(target_image_path)
                     # Update tree selection to match the loaded image
-                    self.image_tree.selection_set(self.image_files[state['image_index']])
-                    self.image_tree.focus(self.image_files[state['image_index']])
+                    relative_image_path = self.image_files[state['image_index']]
+                    try:
+                        if self.image_tree.exists(relative_image_path):
+                            self.image_tree.selection_set(relative_image_path)
+                            self.image_tree.focus(relative_image_path)
+                            self.image_tree.see(relative_image_path)
+                    except tk.TclError:
+                        pass  # Handle any tree selection errors
             
             # Restore annotations
             self.bboxes = [bbox[:] for bbox in state['bboxes']]
@@ -783,14 +967,33 @@ class BoundingBoxEditor(tk.Frame):
 
     # --------------------------------------------------
     # Image Navigation / Display
-    # --------------------------------------------------
-
+    # --------------------------------------------------    
     def on_image_select(self, event):
         selected = self.image_tree.selection()
         if selected:
-            relative_image_path = selected[0]
+            selected_item = selected[0]
+            item_tags = self.image_tree.item(selected_item)["tags"]
+            
+            # Check if the selected item is a folder
+            if item_tags and "folder" in item_tags:
+                # Toggle folder expand/collapse
+                if self.image_tree.item(selected_item, "open"):
+                    self.image_tree.item(selected_item, open=False)
+                else:
+                    self.image_tree.item(selected_item, open=True)
+                return
+            
+            # Handle image selection (not a folder)
+            # Ensure the selected item is actually an image file
+            if selected_item.startswith("folder_"):
+                return  # Skip if it's a folder ID that somehow got through
+                
+            relative_image_path = selected_item
             image_path = os.path.join(self.folder_path, relative_image_path)
-            self.load_image(image_path)
+            
+            # Verify the file exists and is an image
+            if os.path.exists(image_path) and relative_image_path in self.image_files:
+                self.load_image(image_path)
 
     def load_image(self, image_path=None):
         if image_path:
@@ -815,15 +1018,35 @@ class BoundingBoxEditor(tk.Frame):
         original_image_cv = cv2_module.cvtColor(original_image_cv, cv2_module.COLOR_BGR2RGB)
         self.original_image = Image.fromarray(original_image_cv)
         
+        # Calculate initial zoom level to fit image to canvas
+        canvas_width = self.canvas.winfo_width()
+        canvas_height = self.canvas.winfo_height()
+        if canvas_width <= 1 or canvas_height <= 1:
+            canvas_width, canvas_height = self.canvas_width, self.canvas_height # Use default if not yet configured
+
+        # Calculate scale factors to fit image within canvas
+        width_scale = canvas_width / self.original_image.width
+        height_scale = canvas_height / self.original_image.height
+        
+        # Use the smaller scale factor to ensure the entire image fits
+        initial_fit_zoom = min(width_scale, height_scale)
+        
+        # Set zoom_level, ensuring it's not excessively small or large
+        # Cap at 1.0 to avoid upscaling small images initially, unless they are smaller than canvas
+        self.zoom_level = max(0.1, initial_fit_zoom)
+        if self.zoom_level > 1.0: # If image is smaller than canvas, set zoom to 1.0
+            self.zoom_level = 1.0
+        
         self.image_view_offset_x = 0; self.image_view_offset_y = 0
         
-        self.display_image() 
+        self.display_image()
 
         relative_image_path_for_label = os.path.relpath(self.image_path, self.folder_path)
         label_relative_path = os.path.splitext(relative_image_path_for_label)[0] + '.txt'
         label_path = os.path.join(self.label_folder, label_relative_path)
         os.makedirs(os.path.dirname(label_path), exist_ok=True)
 
+        print(f"DEBUG: load_image calling read_annotations_from_file for: {label_path}")
         self.bboxes, self.polygons = read_annotations_from_file(label_path, (self.original_image.height, self.original_image.width))
         self.display_annotations()
 
@@ -1058,39 +1281,25 @@ class BoundingBoxEditor(tk.Frame):
                         self.canvas.config(cursor="fleur")
                         # v. return to avoid other actions.
                         return                    # 1.b. If no point is hovered (self.hover_polygon_index == -1):
-                    elif self.hover_polygon_index == -1: # self.hover_point_index will also be -1
-                        # Don't clear hover state here - let on_pan_release handle it
-                        # ii. Set self.dragging_point = False.
-                        self.dragging_point = False # Ensure not in dragging state                        return
-                        
-                        # Check if the click is on an existing polygon edge
-                        if self.is_click_on_polygon_edge(event.x, event.y):
-                            return  # Clicked on an edge, do nothing
-                        
-                        # iv. Proceed to start a new polygon:
-                        # - Check for class selection.
-                        current_selection_tuple = self.class_listbox.curselection()
-                        if not current_selection_tuple:
-                            messagebox.showwarning("No Class Selected", "Please select a class before drawing a polygon.", parent=self.root)
-                            return
-                        self.selected_class_index = current_selection_tuple[0]
-                        
-                        # - Set self.current_polygon_points.
-                        self.current_polygon_points = [(image_x, image_y)]
-                        # - Set self.polygon_drawing_active = True.
-                        self.polygon_drawing_active = True                        # - Call self.draw_current_polygon_drawing().
-                        self.draw_current_polygon_drawing() # Draw the first point
-                    # 1.c. If a polygon is hovered but not a specific point (polygon interior)
-                    else:
-                        # User clicked inside polygon but not on a vertex
-                        # Don't clear hover state immediately - let on_pan_release handle it
+                    # If not hovering over a point, check if clicking on an existing polygon edge/interior.
+                    # If so, do nothing (don't start a new polygon).
+                    if self.is_click_on_polygon_edge(event.x, event.y):
                         return
-                # 2. If in 'polygon' mode and polygon_drawing_active (adding points to a new polygon):
+                    
+                    # If not dragging a point and not on an existing edge, proceed to start a new polygon.
+                    current_selection_tuple = self.class_listbox.curselection()
+                    if not current_selection_tuple:
+                        messagebox.showwarning("No Class Selected", "Please select a class before drawing a polygon.", parent=self.root)
+                        return
+                    self.selected_class_index = current_selection_tuple[0]
+                    
+                    self.current_polygon_points = [(image_x, image_y)]
+                    self.polygon_drawing_active = True
+                    self.draw_current_polygon_drawing() # Draw the first point
+                # If in 'polygon' mode and polygon_drawing_active (adding points to a new polygon):
                 else: 
-                    # a. Add the new point to self.current_polygon_points.                    self.current_polygon_points.append((image_x, image_y))
-                    # b. Call self.draw_current_polygon_drawing().
+                    self.current_polygon_points.append((image_x, image_y))
                     self.draw_current_polygon_drawing()
-        # self.display_annotations() # Called by draw_current_polygon_drawing if needed, or when finalizing
     
     def _iter_poly_vertices(self, points):
         """Helper that returns an iterator that skips the duplicated last point"""
@@ -1237,27 +1446,44 @@ class BoundingBoxEditor(tk.Frame):
         # However, if double-click is only for polygon completion, this call might be too broad.
         # For now, keeping it to ensure display is up-to-date after any double-click attempt.
         # self.display_annotations() # Re-evaluate if this is needed here or only after successful polygon completion.
-                                   # display_annotations is called within cancel_current_polygon if that path is taken.    def _reset_polygon_completion_flag(self):
+                                   # display_annotations is called within cancel_current_polygon if that path is taken.
+    def _reset_polygon_completion_flag(self):
         """Reset the polygon completion flag to allow new polygon creation."""
         self.polygon_just_completed = False
 
     def on_mouse_wheel(self, event):
         if not self.image_files: return
+        
         if hasattr(event, 'delta'): delta = event.delta
         elif event.num == 4: delta = 120
         elif event.num == 5: delta = -120
         else: return
+        
         if delta > 0: self.navigate_image(-1)
         elif delta < 0: self.navigate_image(1)
         self.display_image()
-
+    
     def navigate_image(self, direction):
-        if not self.image_files: return
+        if not self.image_files: 
+            return
         self.save_history()
         self.current_image_index += direction
         if self.current_image_index < 0: self.current_image_index = 0
         elif self.current_image_index >= len(self.image_files): self.current_image_index = len(self.image_files) - 1
-        self.load_image(os.path.join(self.folder_path, self.image_files[self.current_image_index]))
+        
+        # Load the image
+        image_path = os.path.join(self.folder_path, self.image_files[self.current_image_index])
+        self.load_image(image_path)
+        
+        # Update tree selection to show current image
+        relative_image_path = self.image_files[self.current_image_index]
+        try:
+            if self.image_tree.exists(relative_image_path):
+                self.image_tree.selection_set(relative_image_path)
+                self.image_tree.focus(relative_image_path)
+                self.image_tree.see(relative_image_path)
+        except tk.TclError:
+            pass  # Handle any tree selection errors
 
     # --------------------------------------------------
     # Copy/Paste Features

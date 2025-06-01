@@ -23,6 +23,9 @@ def write_annotations_to_file(label_path, bboxes, polygons, image_shape):
     :param image_shape: (height, width) of the image used for normalization.
     """
     img_h, img_w = image_shape[:2]
+    print(f"DEBUG: Writing to label file: {label_path}")
+    print(f"DEBUG: BBoxes to write: {bboxes}")
+    print(f"DEBUG: Polygons to write: {polygons}")
     with open(label_path, 'w') as label_file:
         # Write bounding boxes
         for x, y, w, h, class_id in bboxes:
@@ -41,6 +44,7 @@ def write_annotations_to_file(label_path, bboxes, polygons, image_shape):
                 normalized_points.append(px / img_w)
                 normalized_points.append(py / img_h)
             label_file.write(f"{class_id} {' '.join(map(str, normalized_points))}\n")
+    print(f"DEBUG: Finished writing to {label_path}")
 
 def read_annotations_from_file(label_path, image_shape):
     """
@@ -55,7 +59,9 @@ def read_annotations_from_file(label_path, image_shape):
     """
     bboxes = []
     polygons = []
+    print(f"DEBUG: Attempting to read from label file: {label_path}")
     if not os.path.exists(label_path):
+        print(f"DEBUG: Label file not found: {label_path}")
         return bboxes, polygons
 
     img_h, img_w = image_shape[:2]
@@ -64,7 +70,6 @@ def read_annotations_from_file(label_path, image_shape):
             parts = list(map(float, line.strip().split()))
             class_id = int(parts[0])
             coords = parts[1:]
-
             if len(coords) == 4:
                 x_center, y_center, width, height = coords
                 x_center_abs = x_center * img_w
@@ -81,6 +86,9 @@ def read_annotations_from_file(label_path, image_shape):
                     py_norm = coords[i+1]
                     points.append((int(px_norm * img_w), int(py_norm * img_h)))
                 polygons.append({'class_id': class_id, 'points': points})
+    print(f"DEBUG: Finished reading from {label_path}")
+    print(f"DEBUG: BBoxes read: {bboxes}")
+    print(f"DEBUG: Polygons read: {polygons}")
     return bboxes, polygons
 
 def copy_files_recursive(file_list_relative_paths, base_images_src_dir, images_dst_base,

@@ -1,6 +1,6 @@
 projects/authentic logo.json
 __pycache__/
 image_labelling/__pycache__/
-archive/__pycache__/
-error.log
+archive/
 .gitignore
+error.log
