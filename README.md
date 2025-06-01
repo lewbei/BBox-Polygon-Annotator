@@ -1,37 +1,51 @@
 # BBox & Polygon Annotator
+*Designed for Solo Researchers & Private Use*
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)](https://github.com/lewbei/BBox-Polygon-Annotator)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)]()
+[![Usage](https://img.shields.io/badge/usage-Solo%20Research-green)]()
 
-A **production-ready**, comprehensive image annotation tool designed for computer vision dataset creation. Built with Python and Tkinter, this professional-grade application supports both bounding box and polygon annotations with advanced features including AI-powered auto-annotation, comprehensive export formats, robust project management, and an intuitive user interface.
+A **private research tool** specifically designed for solo computer vision researchers and individual dataset creation. Built with Python and Tkinter, this personal-use application is perfect for researchers working independently on computer vision projects, offering both bounding box and polygon annotations with advanced features including AI-powered auto-annotation, comprehensive export formats, robust project management, and an intuitive user interface.
 
-![Application Screenshot](assets/screenshot.png) <!-- Add a screenshot when available -->
+**✨ Perfect for Solo Researchers**: This tool is specifically designed for individual researchers, PhD students, and private research projects where you need a lightweight, easy-to-use annotation tool without the complexity of enterprise solutions.
 
-## 🚀 Key Highlights
 
-- **🎯 Dual Annotation Support**: Complete bounding box and polygon annotation capabilities with advanced editing
+## 🚀 Key Highlights - Perfect for Solo Research
+
+- **👤 Solo Researcher Focused**: Designed specifically for individual researchers, PhD students, and private projects
+- **🎯 Dual Annotation Support**: Complete bounding box and polygon annotation capabilities with advanced editing  
 - **🤖 AI-Powered Workflow**: YOLO integration for intelligent auto-annotation with confidence filtering
-- **📊 Professional Project Management**: Integrated project system with status tracking and progress monitoring
+- **📊 Personal Project Management**: Lightweight project system ideal for organizing individual research datasets
 - **🔄 Comprehensive Export Suite**: 5 industry-standard formats (YOLO, COCO, Pascal VOC, CSV, JSON)
-- **⚡ Advanced User Experience**: Modern UI with icons, zoom/pan, keyboard shortcuts, auto-save, undo/redo
-- **🏗️ Production Architecture**: Modular codebase with proper error handling, logging, and background processing
+- **⚡ User-Friendly Experience**: Simple, intuitive UI perfect for researchers who want to focus on their data, not the tool
+- **🏠 Private & Secure**: Run entirely on your local machine - no cloud dependencies or data sharing concerns
 
 ## 📋 Table of Contents
 
+- [Why Choose This for Solo Research](#-why-choose-this-for-solo-research)
 - [Features](#-features)
 - [Installation](#-installation)
-- [Quick Start](#-quick-start)
-- [Project Management](#-project-management)
+- [Quick Start](#-quick-start---get-annotating-in-minutes)
+- [Project Management](#-project-management---organized-for-solo-research)
 - [Annotation Workflow](#-annotation-workflow)
 - [Export Formats](#-export-formats)
 - [Advanced Features](#-advanced-features)
 - [Keyboard Shortcuts](#-keyboard-shortcuts)
 - [Configuration](#-configuration)
 - [Troubleshooting](#-troubleshooting)
-- [Development & Contributing](#-development--contributing)
-- [Roadmap](#-roadmap)
-- [License](#-license)
+
+## 🎯 Why Choose This for Solo Research
+
+**Perfect for Individual Researchers** who need:
+- ✅ **Quick Setup**: Get started in minutes, not hours
+- ✅ **No Learning Curve**: Intuitive interface designed for researchers, not enterprise teams
+- ✅ **Complete Privacy**: All data stays on your machine - no cloud, no sharing, no accounts
+- ✅ **Lightweight**: Runs on any machine with Python - no heavy infrastructure required
+- ✅ **Flexible Export**: Works with all major ML frameworks (YOLO, COCO, etc.)
+- ✅ **AI-Assisted**: Speed up annotation with YOLO auto-annotation
+- ✅ **Research-Focused**: Built by researchers, for researchers
+
+**Not Suitable For**: Large teams, enterprise deployments, or collaborative annotation projects.
 
 ## ✨ Features
 
@@ -88,10 +102,12 @@ ultralytics     # For YOLO auto-annotation (install if needed)
 
 ### Installation Steps
 
-1. **Clone the Repository**
+**Perfect for Solo Researchers**: Simple, straightforward installation with minimal dependencies.
+
+1. **Setup Project Directory**
    ```bash
-   git clone https://github.com/lewbei/BBox-Polygon-Annotator.git
-   cd BBox-Polygon-Annotator
+   # Navigate to your project directory
+   cd path/to/your/image_labelling_project
    ```
 
 2. **Install Dependencies**
@@ -107,46 +123,48 @@ ultralytics     # For YOLO auto-annotation (install if needed)
    python -m image_labelling.main
    ```
 
-## 🚀 Quick Start
+**Solo Researcher Tip**: This tool runs entirely on your local machine - perfect for maintaining privacy and control over your research data.
+
+## 🚀 Quick Start - Get Annotating in Minutes
 
 ### 1. Launch the Application
 ```bash
 python -m image_labelling.main
 ```
 
-### 2. Create Your First Project
+### 2. Create Your First Research Project
 - Click **"New Project"** in the Project Manager
 - Enter a project name and select your dataset folder
-- The tool will automatically create the necessary folder structure
+- The tool will automatically create the necessary folder structure - perfect for organizing your research data
 
-### 3. Start Annotating
+### 3. Start Annotating (Solo Researcher Workflow)
 - **Select Images**: Navigate through your dataset using the image list
 - **Choose Annotation Mode**: Use toolbar buttons to switch between bounding boxes (⬜) and polygons (🔷)
 - **Draw Annotations**: Click and drag to create bounding boxes, or click multiple points for polygons
 - **Assign Classes**: Select object classes from the class list or use number keys (1-9)
-- **Save Progress**: Use Ctrl+S or enable auto-save for automatic progress saving
+- **Save Progress**: Use Ctrl+S or enable auto-save - no need to worry about losing your work
 
-## 🗂️ Project Management
+## 🗂️ Project Management - Organized for Solo Research
 
-### Project Structure
+### Project Structure (Perfect for Individual Researchers)
 ```
-YourProject/
+YourResearchProject/
 ├── dataset.yaml          # Project configuration
 ├── images/              # Source images
 ├── labels/              # YOLO format annotations
 └── status.json          # Image status tracking
 ```
 
-### Project Manager Features
+### Project Manager Features (Solo-Friendly)
 - **Create Projects**: Set up new annotation projects with custom names and dataset paths
-- **Open Projects**: Resume work on existing projects with preserved state
+- **Open Projects**: Resume work on existing projects with preserved state - perfect for long-term research
 - **Delete Projects**: Remove project metadata (datasets remain intact)
-- **Status Overview**: View project statistics and last modified dates
+- **Status Overview**: View project statistics and last modified dates - track your research progress
 
-### Image Status System
+### Image Status System (Track Your Progress)
 - **Not Viewed** (🔴): Images not yet opened
-- **Viewed** (🟡): Images opened but not annotated
-- **Labeled** (🟢): Images with annotations
+- **Viewed** (🟡): Images opened but not annotated  
+- **Labeled** (🟢): Images with annotations - your completed work
 - **Review Needed** (🟠): Auto-annotated images requiring manual review
 
 ## 🎨 Annotation Workflow
@@ -294,7 +312,9 @@ If you encounter bugs:
 3. Provide steps to reproduce the issue
 4. Include relevant log messages
 
-## 👥 Development & Contributing
+## 👥 Development & Research Notes
+
+**Important**: This is a private research tool developed for solo use. The following information is provided for documentation purposes.
 
 ### Project Architecture
 ```
@@ -310,30 +330,25 @@ image_labelling/
 └── startup_optimizer.py # Performance optimizations
 ```
 
-### Contributing Guidelines
-We welcome contributions! Please follow these guidelines:
+### Research Development Notes
+**Note**: This section is for personal documentation and research reference only.
 
-1. **Fork the repository** and create a feature branch
-2. **Follow PEP 8** style guidelines
-3. **Add tests** for new functionality
-4. **Update documentation** for API changes
-5. **Submit a pull request** with a clear description
+The codebase follows these principles for solo research efficiency:
 
-### Development Setup
+1. **Focus on functionality** over public API design
+2. **Rapid prototyping** with comprehensive features
+3. **Personal workflow optimization** for research tasks
+4. **Documentation for future reference** and tool improvement
+
+### Development Setup (Personal Reference)
 ```bash
-# Clone your fork
-git clone https://github.com/yourusername/BBox-Polygon-Annotator.git
-cd BBox-Polygon-Annotator
+# Using the specified Python environment
+"C:/Users/lewka/miniconda3/envs/deep_learning/python.exe" -m image_labelling.main
 
-# Create a development environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run in development mode
-python -m image_labelling.main
+# Development environment
+# - Python 3.12+ (Deep Learning environment)
+# - Windows-based development
+# - Private repository (no public contributions)
 ```
 
 ### Code Quality
@@ -417,43 +432,48 @@ This tool was developed to address the need for a comprehensive, open-source ann
 
 ## 📜 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under a **Private Research Software License** - see the [LICENSE](LICENSE) file for details.
+
+**Key Points for Solo Researchers:**
+- ✅ **Private research use**: Completely free for your personal research
+- ✅ **Strong protection**: Comprehensive liability limitations and disclaimers
+- ❌ **No commercial use**: Commercial use requires separate permission
+- ❌ **No redistribution**: Cannot be shared publicly without permission
+- 🛡️ **Research focus**: Specific protections for research use cases
+
+**Summary**: This license is designed specifically for private research tools, providing strong legal protection while allowing free use for legitimate research purposes.
 
 ```
-MIT License
+PRIVATE RESEARCH SOFTWARE LICENSE
 
-Copyright (c) 2025 BBox & Polygon Annotator Contributors
+Copyright (c) 2025 [Your Name]
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+IMPORTANT: This software is developed for private research purposes only.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Key protections include:
+• No warranty or guarantee of results
+• Comprehensive liability limitations  
+• Research-specific disclaimers
+• Data responsibility clarifications
+• No commercial use without permission
 ```
+
+For the complete license terms, see the [LICENSE](LICENSE) file.
 
 ---
 
-## 🔗 Links
+## 📞 Contact & Support
 
-- **GitHub Repository**: [https://github.com/lewbei/BBox-Polygon-Annotator](https://github.com/lewbei/BBox-Polygon-Annotator)
-- **Issues & Bug Reports**: [GitHub Issues](https://github.com/lewbei/BBox-Polygon-Annotator/issues)
-- **Documentation**: [Project Wiki](https://github.com/lewbei/BBox-Polygon-Annotator/wiki)
-- **Releases**: [GitHub Releases](https://github.com/lewbei/BBox-Polygon-Annotator/releases)
+**Important**: This is a private research tool. Support is provided on a best-effort basis.
+
+- **Questions**: Contact the author for research-related inquiries
+- **Bug Reports**: Document issues in your local error.log files
+- **Feature Requests**: Consider implementing yourself or contacting the author
+
+**Remember**: You're using this tool at your own risk for research purposes. Always validate your annotations and back up your data!
 
 ---
 
-**Built with ❤️ for the Computer Vision Community**
+**Built with ❤️ for Solo Computer Vision Researchers**
 
-*Star ⭐ this repository if you find it useful!*
+*A private tool designed to accelerate your research workflow while protecting your work.*
