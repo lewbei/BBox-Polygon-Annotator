@@ -17,16 +17,13 @@ if __name__ == "__main__":
 
 from .project_manager import ProjectManager
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for the application."""
     # Configure signal handling for graceful shutdown
     import signal
     def signal_handler(signum, frame):
-        logging.error(f"Received signal {signum}. Shutting down gracefully...")
-        try:
-            root.quit()
-        except:
-            pass
-        sys.exit(1)
+        logging.info(f"Received signal {signum}, shutting down gracefully...")
+        sys.exit(0)
     
     # Handle common signals that might cause segmentation faults
     signal.signal(signal.SIGINT, signal_handler)
@@ -37,7 +34,7 @@ if __name__ == "__main__":
     log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'error.log')
     logging.basicConfig(
         level=logging.ERROR,
-        format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
             logging.handlers.RotatingFileHandler(log_file_path, maxBytes=1024*1024, backupCount=5), # 1MB per file, 5 backups
             logging.StreamHandler() # Also log to console
@@ -63,3 +60,6 @@ if __name__ == "__main__":
     except Exception as e:
         logging.exception("Fatal error during application initialization")
         messagebox.showerror("Fatal Error", f"A fatal error occurred:\n{e}")
+
+if __name__ == "__main__":
+    main()
