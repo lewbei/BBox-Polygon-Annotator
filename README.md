@@ -1,51 +1,58 @@
 # BBox & Polygon Annotator
-*Designed for Solo Researchers & Private Use*
+*Open Source Tool for Computer Vision Research & Private Projects*
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)]()
-[![Usage](https://img.shields.io/badge/usage-Solo%20Research-green)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Usage](https://img.shields.io/badge/usage-Research%20%7C%20Private%20Projects-green)]()
 
-A **private research tool** specifically designed for solo computer vision researchers and individual dataset creation. Built with Python and Tkinter, this personal-use application is perfect for researchers working independently on computer vision projects, offering both bounding box and polygon annotations with advanced features including AI-powered auto-annotation, comprehensive export formats, robust project management, and an intuitive user interface.
+A **free and open-source research tool** specifically designed for computer vision researchers, students, and individual dataset creation. Built with Python and Tkinter, this MIT-licensed application is perfect for researchers working on computer vision projects, offering both bounding box and polygon annotations with advanced features including AI-powered auto-annotation, comprehensive export formats, robust project management, and an intuitive user interface.
 
-**✨ Perfect for Solo Researchers**: This tool is specifically designed for individual researchers, PhD students, and private research projects where you need a lightweight, easy-to-use annotation tool without the complexity of enterprise solutions.
+**✨ Open Source & Free**: This tool is released under the MIT license, making it freely available for research, education, and private projects. Share, modify, and distribute as needed for your research endeavors.
 
 
-## 🚀 Key Highlights - Perfect for Solo Research
+## 🚀 Key Highlights - Perfect for Research & Education
 
-- **👤 Solo Researcher Focused**: Designed specifically for individual researchers, PhD students, and private projects
+- **📖 Open Source & MIT Licensed**: Freely available for research, education, and private projects
+- **👥 Research Community Focused**: Designed for researchers, PhD students, educators, and private projects  
 - **🎯 Dual Annotation Support**: Complete bounding box and polygon annotation capabilities with advanced editing  
 - **🤖 AI-Powered Workflow**: YOLO integration for intelligent auto-annotation with confidence filtering
-- **📊 Personal Project Management**: Lightweight project system ideal for organizing individual research datasets
+- **📊 Project Management**: Lightweight project system ideal for organizing research datasets
 - **🔄 Comprehensive Export Suite**: 5 industry-standard formats (YOLO, COCO, Pascal VOC, CSV, JSON)
 - **⚡ User-Friendly Experience**: Simple, intuitive UI perfect for researchers who want to focus on their data, not the tool
-- **🏠 Private & Secure**: Run entirely on your local machine - no cloud dependencies or data sharing concerns
+- **🏠 Privacy Focused**: Run entirely on your local machine - no cloud dependencies or data sharing requirements
+- **🔗 Share & Collaborate**: MIT license allows easy sharing and modification for research collaboration
 
 ## 📋 Table of Contents
 
-- [Why Choose This for Solo Research](#-why-choose-this-for-solo-research)
+- [Why Choose This for Research](#-why-choose-this-for-research)
 - [Features](#-features)
 - [Installation](#-installation)
 - [Quick Start](#-quick-start---get-annotating-in-minutes)
-- [Project Management](#-project-management---organized-for-solo-research)
+- [Project Management](#-project-management---organized-for-research)
 - [Annotation Workflow](#-annotation-workflow)
 - [Export Formats](#-export-formats)
 - [Advanced Features](#-advanced-features)
 - [Keyboard Shortcuts](#-keyboard-shortcuts)
 - [Configuration](#-configuration)
+- [License](#-license)
+- [Contributing](#-contributing)
 - [Troubleshooting](#-troubleshooting)
 
-## 🎯 Why Choose This for Solo Research
+## 🎯 Why Choose This for Research
 
-**Perfect for Individual Researchers** who need:
+**Perfect for Researchers & Educators** who need:
+- ✅ **Free & Open Source**: MIT licensed - use, modify, and share freely
 - ✅ **Quick Setup**: Get started in minutes, not hours
 - ✅ **No Learning Curve**: Intuitive interface designed for researchers, not enterprise teams
-- ✅ **Complete Privacy**: All data stays on your machine - no cloud, no sharing, no accounts
+- ✅ **Complete Privacy**: All data stays on your machine - no cloud, no sharing requirements
 - ✅ **Lightweight**: Runs on any machine with Python - no heavy infrastructure required
 - ✅ **Flexible Export**: Works with all major ML frameworks (YOLO, COCO, etc.)
 - ✅ **AI-Assisted**: Speed up annotation with YOLO auto-annotation
-- ✅ **Research-Focused**: Built by researchers, for researchers
+- ✅ **Research-Focused**: Built by researchers, for the research community
+- ✅ **Share & Collaborate**: Easy to share and modify for research collaboration
 
-**Not Suitable For**: Large teams, enterprise deployments, or collaborative annotation projects.
+**Great For**: Individual researchers, PhD students, educators, private projects, research collaboration, and open science initiatives.
 
 ## ✨ Features
 
@@ -144,7 +151,7 @@ python -m image_labelling.main
 - **Assign Classes**: Select object classes from the class list or use number keys (1-9)
 - **Save Progress**: Use Ctrl+S or enable auto-save - no need to worry about losing your work
 
-## 🗂️ Project Management - Organized for Solo Research
+## 🗂️ Project Management - Organized for Research
 
 ### Project Structure (Perfect for Individual Researchers)
 ```
@@ -441,39 +448,55 @@ This project is licensed under a **Private Research Software License** - see the
 - ❌ **No redistribution**: Cannot be shared publicly without permission
 - 🛡️ **Research focus**: Specific protections for research use cases
 
-**Summary**: This license is designed specifically for private research tools, providing strong legal protection while allowing free use for legitimate research purposes.
+## 📄 License
 
-```
-PRIVATE RESEARCH SOFTWARE LICENSE
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Copyright (c) 2025 [Your Name]
+### What this means:
+- ✅ **Free to use** for any purpose (commercial, research, education, private)
+- ✅ **Free to modify** and create derivative works
+- ✅ **Free to distribute** original or modified versions
+- ✅ **Free to sell** or include in commercial products
+- ✅ **No warranty** - software provided "as is"
+- ⚠️ **Attribution required** - must include original copyright notice
 
-IMPORTANT: This software is developed for private research purposes only.
+## 🤝 Contributing
 
-Key protections include:
-• No warranty or guarantee of results
-• Comprehensive liability limitations  
-• Research-specific disclaimers
-• Data responsibility clarifications
-• No commercial use without permission
-```
+We welcome contributions from the research community! This project is designed to help researchers, and community input makes it better.
 
-For the complete license terms, see the [LICENSE](LICENSE) file.
+### How to Contribute:
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Areas where help is needed:
+- 🐛 Bug fixes and stability improvements
+- ✨ New annotation features
+- 🎨 UI/UX improvements
+- 📚 Documentation and tutorials
+- 🧪 Testing on different platforms
+- 🚀 Performance optimizations
+
+### Reporting Issues:
+- Use GitHub Issues for bug reports
+- Include detailed steps to reproduce
+- Attach relevant error logs
+- Specify your OS and Python version
 
 ---
 
 ## 📞 Contact & Support
 
-**Important**: This is a private research tool. Support is provided on a best-effort basis.
+- **Issues**: Please use GitHub Issues for bug reports and feature requests
+- **Discussions**: GitHub Discussions for questions and community support
+- **Email**: For private inquiries related to research collaboration
 
-- **Questions**: Contact the author for research-related inquiries
-- **Bug Reports**: Document issues in your local error.log files
-- **Feature Requests**: Consider implementing yourself or contacting the author
-
-**Remember**: You're using this tool at your own risk for research purposes. Always validate your annotations and back up your data!
+**Contributing**: We encourage the research community to contribute improvements and fixes!
 
 ---
 
-**Built with ❤️ for Solo Computer Vision Researchers**
+**Built with ❤️ for the Computer Vision Research Community**
 
-*A private tool designed to accelerate your research workflow while protecting your work.*
+*An open-source tool designed to accelerate research workflows while respecting your data privacy.*

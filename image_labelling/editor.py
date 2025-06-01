@@ -1444,6 +1444,7 @@ class BoundingBoxEditor(tk.Frame):
                 self.cancel_current_polygon()
         # If not in polygon drawing mode, or not enough points, display_annotations might still be needed
        
+       
 
         # self.display_annotations() # Re-evaluate if this is needed here or only after successful polygon completion.
                                    # display_annotations is called within cancel_current_polygon if that path is taken.
@@ -1619,7 +1620,7 @@ class BoundingBoxEditor(tk.Frame):
         self.progress_win.transient(self.root); self.progress_win.grab_set()
         self.progress_var = tk.DoubleVar()
         self.progress_bar = ttk.Progressbar(self.progress_win, variable=self.progress_var, maximum=100)
-        self.progress_bar.pack(padx=20, pady=10)
+        self.progress_bar.pack(padx=20, pady=10, fill=tk.X, expand=True) # Make progress bar fill horizontally
         self.progress_label = tk.Label(self.progress_win, text="0/0 images processed"); self.progress_label.pack(pady=5)
         self.cancel_button = tk.Button(self.progress_win, text="Cancel", command=self.cancel_annotation); self.cancel_button.pack(pady=5)
         self.progress_win.update_idletasks()
@@ -1680,7 +1681,9 @@ class BoundingBoxEditor(tk.Frame):
                 progress_percent = (processed_count / total_images) * 100
                 self.root.after(0, self.update_progress, progress_percent, processed_count, total_images)
                 if self.cancel_event.is_set(): break
-        except Exception as e: self.root.after(0, lambda: messagebox.showerror("Error", f"Annotation failed: {str(e)}"))
+        except Exception as e:
+            error_message = str(e) # Capture the error message
+            self.root.after(0, lambda err_msg=error_message: messagebox.showerror("Error", f"Annotation failed: {err_msg}"))
         finally:
             self.save_statuses(); self.root.after(0, self.update_status_labels)
             if hasattr(self, 'progress_win') and self.progress_win.winfo_exists(): self.root.after(0, self.progress_win.destroy)
@@ -1727,7 +1730,7 @@ class BoundingBoxEditor(tk.Frame):
         train_win.title("Train YOLO Model")
         train_win.transient(self.root)
         train_win.grab_set()
-        train_win.geometry("700x750") # Increased height
+        train_win.geometry("700x900") # Increased height
           # Model selection
         model_frame = tk.LabelFrame(train_win, text="🎯 Training Mode Selection")
         model_frame.pack(fill=tk.X, padx=10, pady=5)
@@ -1780,6 +1783,68 @@ class BoundingBoxEditor(tk.Frame):
         lr_var = tk.StringVar(value="0.01")
         tk.Entry(params_frame, textvariable=lr_var, width=10).grid(row=1, column=3, sticky="w", padx=5, pady=2)
         
+        # Device selection
+        device_frame = tk.LabelFrame(train_win, text="⚡ Device Selection")
+        device_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        def detect_available_devices():
+            """Detect available training devices"""
+            devices = ["cpu"]
+            gpu_info = ""
+            
+            try:
+                import torch
+                if torch.cuda.is_available():
+                    gpu_count = torch.cuda.device_count()
+                    for i in range(gpu_count):
+                        devices.append(f"cuda:{i}")
+                        gpu_name = torch.cuda.get_device_name(i)
+                        gpu_memory = torch.cuda.get_device_properties(i).total_memory / (1024**3)
+                        gpu_info += f"GPU {i}: {gpu_name} ({gpu_memory:.1f} GB)\n"
+                        
+                    if gpu_count > 0:
+                        devices.append("cuda")  # Add generic cuda option
+                else:
+                    gpu_info = "No CUDA-compatible GPU detected"
+            except ImportError:
+                gpu_info = "PyTorch not available for GPU detection"
+            except Exception as e:
+                gpu_info = f"GPU detection failed: {e}"
+                
+            return devices, gpu_info
+        
+        available_devices, gpu_info = detect_available_devices()
+        
+        # Determine default device: prioritize GPU if available
+        default_device = "cpu"
+        if "cuda" in available_devices:
+            default_device = "cuda"
+        elif any(dev.startswith("cuda:") for dev in available_devices):
+            default_device = next(dev for dev in available_devices if dev.startswith("cuda:"))
+            
+        tk.Label(device_frame, text="Training Device:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
+        device_var = tk.StringVar(value=default_device) # Default to GPU if available, else CPU
+        device_combo = ttk.Combobox(device_frame, textvariable=device_var, values=available_devices, state="readonly", width=15)
+        device_combo.grid(row=0, column=1, sticky="w", padx=5, pady=2)
+        
+        # GPU info display
+        if gpu_info:
+            gpu_info_label = tk.Label(device_frame, text=gpu_info, font=("TkDefaultFont", 8), fg="darkblue", justify="left")
+            gpu_info_label.grid(row=1, column=0, columnspan=2, sticky="w", padx=5, pady=2)
+        
+        # Device recommendations
+        device_tips_frame = tk.Frame(device_frame)
+        device_tips_frame.grid(row=2, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
+        
+        tk.Label(device_tips_frame, text="💡 Device Tips:", 
+                font=("TkDefaultFont", 9, "bold"), fg="darkorange").pack(anchor="w")
+        tk.Label(device_tips_frame, text="   • CPU: Stable but slower, good for small datasets", 
+                font=("TkDefaultFont", 8), fg="darkorange").pack(anchor="w")
+        tk.Label(device_tips_frame, text="   • GPU: Faster training, requires sufficient VRAM (8GB+ recommended)", 
+                font=("TkDefaultFont", 8), fg="darkorange").pack(anchor="w")
+        tk.Label(device_tips_frame, text="   • If training crashes, try CPU or reduce batch size", 
+                font=("TkDefaultFont", 8), fg="darkorange").pack(anchor="w")
+        
         # Data splitting
         data_frame = tk.LabelFrame(train_win, text="Data Configuration")
         data_frame.pack(fill=tk.X, padx=10, pady=5)
@@ -1830,6 +1895,7 @@ class BoundingBoxEditor(tk.Frame):
             batch = int(batch_var.get())
             lr = float(lr_var.get())
             output_dir = output_var.get()
+            device = device_var.get()
             
             # Start training in a separate thread
             import threading
@@ -1840,7 +1906,7 @@ class BoundingBoxEditor(tk.Frame):
             training_thread = threading.Thread(
                 target=self.execute_training,
                 args=(model, epochs, imgsz, batch, lr, output_dir, auto_export_var.get(), 
-                      split_var.get(), start_btn, train_win, self.training_stop_flag)
+                      split_var.get(), start_btn, train_win, device, self.training_stop_flag)
             )
             # DO NOT set daemon=True as it causes segmentation faults
             # training_thread.daemon = True  # REMOVED - causes crashes
@@ -2119,7 +2185,7 @@ names: [8 star, latin_halal, arabic_halal, arabic_malaysia, star]
             messagebox.showerror("Dataset YAML Error", f"Failed to write dataset.yaml:\n{e}", parent=self.root)
             return None
 
-    def execute_training(self, model, epochs, imgsz, batch, lr, output_dir, auto_export, split_type, start_btn, train_win, stop_flag=None):
+    def execute_training(self, model, epochs, imgsz, batch, lr, output_dir, auto_export, split_type, start_btn, train_win, device, stop_flag=None):
         """Execute the YOLO training in a separate thread"""
         def log_message(msg):
             """Helper function to log messages to the training progress window"""
@@ -2148,6 +2214,7 @@ names: [8 star, latin_halal, arabic_halal, arabic_malaysia, star]
             log_message("🚀 Starting YOLO training...")
             log_message(f"Model: {model}")
             log_message(f"Epochs: {epochs}, Image Size: {imgsz}, Batch: {batch}, LR: {lr}")
+            log_message(f"Device: {device}")
             
             # System resource check to prevent segmentation faults
             try:
@@ -2246,7 +2313,9 @@ names: [8 star, latin_halal, arabic_halal, arabic_malaysia, star]
                             log_message("❌ No datasets found. Please enable auto-export or create datasets first.")
                             messagebox.showerror("Dataset Error", 
                                 "No datasets found for segmentation training.\n\n" +
-                                "Solutions:\n1. Enable 'Auto-export dataset' option\n2. Create datasets manually", parent=train_win)
+                                "Solutions:\n" +
+                                "1. Enable 'Auto-export dataset' option\n" +
+                                "2. Create datasets manually", parent=train_win)
                             start_btn.config(state=tk.NORMAL)
                             return
                           # Convert existing detection dataset to segmentation
@@ -2383,25 +2452,108 @@ names: [8 star, latin_halal, arabic_halal, arabic_malaysia, star]
                     start_btn.config(state=tk.NORMAL)
                     return
                 
-                # Custom callback class to handle interruption
+                # Custom callback class to handle interruption and provide progress
                 class TrainingCallback:
-                    def __init__(self, stop_flag, log_func):
+                    def __init__(self, stop_flag, log_func, total_epochs_for_training):
                         self.stop_flag = stop_flag
                         self.log_func = log_func
-                        
+                        self.train_start_time = None
+                        self.total_epochs = total_epochs_for_training
+                        self.epoch_count_for_avg = 0 # Used to ensure avg time is based on completed epochs
+
+                    def on_train_epoch_start(self, trainer):
+                        """Called at the start of each training epoch."""
+                        # trainer.epoch is 0-indexed
+                        if trainer.epoch == 0 and self.train_start_time is None:
+                            self.train_start_time = time.time()
+                            self.log_func(f"🚀 Training initiated for {self.total_epochs} epochs...")
+                            self.log_func(f"   Device: {trainer.device}") # Log the device being used by the trainer
+
                     def on_train_epoch_end(self, trainer):
-                        """Called at the end of each training epoch"""
+                        """Called at the end of each training epoch."""
                         if self.stop_flag and self.stop_flag.is_set():
-                            self.log_func("🛑 Training stopped by user")
+                            self.log_func("🛑 Training stopped by user.")
                             trainer.stop = True  # Signal trainer to stop
-                            return True
-                        return False
+                            return True # Stop training
+
+                        current_epoch_num = trainer.epoch + 1  # trainer.epoch is 0-indexed
+                        self.epoch_count_for_avg = current_epoch_num
+
+                        # Ensure train_start_time is set (e.g., if on_train_epoch_start was missed for epoch 0)
+                        if self.train_start_time is None:
+                            if current_epoch_num == 1: # If it's the end of the very first epoch
+                                self.train_start_time = time.time() - (trainer.times.get('epoch', 60.0)) # Approx epoch duration
+                                self.log_func(f"🚀 Training started (approximated at end of epoch 1) for {self.total_epochs} epochs...")
+                            else: # Cannot reliably calculate ETA if start time is unknown beyond first epoch
+                                self.log_func(f"Epoch {current_epoch_num}/{self.total_epochs} completed. (ETA unavailable - start time not precisely captured)")
+                                return False # Continue training
+
+                        time_now = time.time()
+                        time_elapsed_total_seconds = time_now - self.train_start_time
+                        
+                        avg_time_per_epoch_seconds = time_elapsed_total_seconds / self.epoch_count_for_avg if self.epoch_count_for_avg > 0 else 0
+                        
+                        epochs_remaining = self.total_epochs - current_epoch_num
+                        estimated_time_remaining_seconds = epochs_remaining * avg_time_per_epoch_seconds if avg_time_per_epoch_seconds > 0 else 0
+
+                        def format_seconds_to_hms(seconds):
+                            if seconds < 0: seconds = 0
+                            h = int(seconds // 3600)
+                            m = int((seconds % 3600) // 60)
+                            s = int(seconds % 60)
+                            return f"{h:02d}:{m:02d}:{s:02d}"
+
+                        log_lines = [
+                            f"✅ Epoch {current_epoch_num}/{self.total_epochs} Completed",
+                            f"   Total Time Elapsed: {format_seconds_to_hms(time_elapsed_total_seconds)}",
+                        ]
+                        if avg_time_per_epoch_seconds > 0:
+                             log_lines.append(f"   Avg. Time/Epoch: {avg_time_per_epoch_seconds:.2f}s")
+                        
+                        if epochs_remaining > 0 and avg_time_per_epoch_seconds > 0 :
+                            log_lines.append(f"   Est. Time Remaining: {format_seconds_to_hms(estimated_time_remaining_seconds)}")
+                        elif current_epoch_num == self.total_epochs:
+                            log_lines.append("   🏁 Training complete!")
+                        else:
+                            log_lines.append("   Est. Time Remaining: Calculating...")
+
+
+                        # Add key metrics
+                        metrics_to_log = {}
+                        if hasattr(trainer, 'metrics') and trainer.metrics:
+                            # General loss
+                            if 'loss' in trainer.metrics: metrics_to_log['Loss'] = f"{trainer.metrics['loss']:.4f}"
+                            
+                            # Detection specific metrics (Box losses and mAP)
+                            for metric_key, display_name in [
+                                ('box_loss', 'BoxLoss'), ('cls_loss', 'ClsLoss'), ('dfl_loss', 'DFLLoss'),
+                                ('metrics/precision(B)', 'Precision(B)'), ('metrics/recall(B)', 'Recall(B)'),
+                                ('metrics/mAP50(B)', 'mAP50(B)'), ('metrics/mAP50-95(B)', 'mAP50-95(B)')
+                            ]:
+                                if metric_key in trainer.metrics: metrics_to_log[display_name] = f"{trainer.metrics[metric_key]:.4f}"
+
+                            # Segmentation specific metrics (Seg losses and mAP)
+                            for metric_key, display_name in [
+                                ('seg_loss', 'SegLoss'), ('metrics/precision(M)', 'Precision(M)'),
+                                ('metrics/recall(M)', 'Recall(M)'), ('metrics/mAP50(M)', 'mAP50(M)'),
+                                ('metrics/mAP50-95(M)', 'mAP50-95(M)')
+                            ]:
+                                if metric_key in trainer.metrics: metrics_to_log[display_name] = f"{trainer.metrics[metric_key]:.4f}"
+                        
+                        if metrics_to_log:
+                            metrics_summary = ", ".join([f"{name}: {val}" for name, val in metrics_to_log.items()])
+                            log_lines.append(f"   Metrics: {metrics_summary}")
+                        
+                        self.log_func("\n".join(log_lines))
+                        return False # Continue training
                 
                 # Create callback instance
-                callback = TrainingCallback(stop_flag, log_message)
+                # `epochs` variable is defined earlier in execute_training
+                callback = TrainingCallback(stop_flag, log_message, epochs)
                 
-                # Add the callback to the model
+                # Add the callbacks to the model
                 if hasattr(model_instance, 'add_callback'):
+                    model_instance.add_callback('on_train_epoch_start', callback.on_train_epoch_start)
                     model_instance.add_callback('on_train_epoch_end', callback.on_train_epoch_end)
                 
                 # Train the model with ultra-safe parameters to prevent segmentation faults
@@ -2413,7 +2565,7 @@ names: [8 star, latin_halal, arabic_halal, arabic_malaysia, star]
                     batch=safe_batch,
                     lr0=lr,
                     project=output_dir,
-                    device='cpu',        # Force CPU to avoid GPU memory issues
+                    device=device,        # Use selected device
                     workers=safe_workers, # Disable multiprocessing to prevent crashes
                     patience=20,         # Shorter patience to prevent extremely long training
                     save_period=5,       # Save more frequently in case of crashes
@@ -2424,17 +2576,22 @@ names: [8 star, latin_halal, arabic_halal, arabic_malaysia, star]
                 )
                 
                 log_message("✅ Training completed successfully!")
-                log_message(f"📁 Results saved to: {results.save_dir}")
-                
+                save_dir_path = "Unknown" # Default in case results object is not as expected
+                if hasattr(results, 'save_dir'):
+                    save_dir_path = results.save_dir
+                    log_message(f"📁 Results saved to: {save_dir_path}")
+                else:
+                    log_message(f"📁 Results object does not have 'save_dir' attribute. Full results object: {results}")
+
                 # Clean up memory after training
                 del model_instance
-                del results
+                del results # Now 'results' is no longer in locals() for the messagebox
                 gc.collect()
                 if hasattr(torch.cuda, 'empty_cache'):
                     torch.cuda.empty_cache()
                 log_message("🧹 Memory cleanup completed")
                 
-                messagebox.showinfo("Training Complete", f"Training completed successfully!\nResults saved to: {results.save_dir if 'results' in locals() else 'Unknown'}", parent=train_win)
+                messagebox.showinfo("Training Complete", f"Training completed successfully!\nResults saved to: {save_dir_path}", parent=train_win)
                 
             except KeyboardInterrupt:
                 log_message("⏹️ Training interrupted by user")

@@ -1,58 +1,22 @@
-PRIVATE RESEARCH SOFTWARE LICENSE
+MIT License
 
-Copyright (c) 2025 [Lew Bei]
+Copyright (c) 2025 Lew Bei
 
-IMPORTANT: This software is developed for private research purposes only.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-TERMS AND CONDITIONS:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-1. PRIVATE USE ONLY
-   This software is intended for private, non-commercial research use only.
-   Any commercial use, redistribution, or public deployment is strictly prohibited
-   without explicit written permission from the copyright holder.
-
-2. NO WARRANTY
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. THE AUTHOR MAKES NO
-   WARRANTIES ABOUT THE ACCURACY, RELIABILITY, COMPLETENESS, OR TIMELINESS OF
-   THE SOFTWARE OR ITS RESULTS.
-
-3. LIMITATION OF LIABILITY
-   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-   ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE. THIS INCLUDES BUT IS NOT LIMITED TO:
-   - DATA LOSS OR CORRUPTION
-   - RESEARCH DELAYS OR FAILURES
-   - HARDWARE OR SOFTWARE DAMAGE
-   - LOSS OF PROFITS OR BUSINESS INTERRUPTION
-   - ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES
-
-4. RESEARCH DISCLAIMER
-   This software is experimental and designed for research purposes. Users are
-   responsible for validating all results and annotations. The software may
-   contain bugs, errors, or limitations that could affect research outcomes.
-
-5. DATA RESPONSIBILITY
-   Users are solely responsible for:
-   - Backing up their data and annotations
-   - Ensuring compliance with data privacy regulations
-   - Validating the accuracy of exported annotations
-   - Proper handling of sensitive or confidential datasets
-
-6. NO SUPPORT
-   This software is provided without technical support, maintenance, or updates.
-   The author is under no obligation to fix bugs, add features, or provide assistance.
-
-7. TERMINATION
-   This license is effective until terminated. The author reserves the right to
-   terminate this license at any time for any reason.
-
-8. GOVERNING LAW
-   This license shall be governed by and construed in accordance with the laws
-   of [Your Country/State], without regard to its conflict of law provisions.
-
-BY USING THIS SOFTWARE, YOU ACKNOWLEDGE THAT YOU HAVE READ THIS LICENSE,
-UNDERSTAND IT, AND AGREE TO BE BOUND BY ITS TERMS AND CONDITIONS.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 

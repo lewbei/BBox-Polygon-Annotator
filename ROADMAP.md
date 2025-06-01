@@ -1,105 +1,145 @@
 # Project Roadmap: BBox & Polygon Annotator
+*Private Research Tool Development Roadmap*
 
-This document outlines the development roadmap and to-do list for the BBox & Polygon Annotator application, based on its current state (v10+) and planned enhancements.
+This document outlines the development roadmap for the BBox & Polygon Annotator - a **private research tool designed specifically for solo researchers and individual computer vision projects**.
 
-## I. Current Status (as of May 2025)
+**Important**: This is a private research tool. Development priorities focus on solo researcher needs, not enterprise or collaborative features.
 
-The application (v10+) is a mature, feature-rich annotation tool with:
+## I. Current Status (as of June 2025)
+
+The application (v10+) is a **mature, feature-complete annotation tool** specifically optimized for solo research use:
 - **Complete Dual Annotation**: Full bounding box & polygon support with advanced editing
-- **Professional Project Manager**: Integrated project management with status tracking, last-modified dates
-- **AI-Powered Annotation**: YOLO auto-annotation with confidence filtering and progress tracking
-- **Comprehensive Export Suite**: 5 export formats (YOLO YAML, COCO JSON, Pascal VOC XML, CSV, Generic JSON)
-- **Advanced User Experience**: Icons, zoom/pan, keyboard shortcuts, auto-save, undo/redo
-- **Robust Architecture**: Modular codebase with proper separation of concerns
-- **Production-Ready Features**: Error handling, logging, responsive UI, background processing
+- **Solo-Friendly Project Manager**: Lightweight project management perfect for individual research workflows
+- **AI-Powered Research Workflow**: YOLO auto-annotation designed for rapid dataset creation
+- **Research-Standard Exports**: 5 export formats (YOLO YAML, COCO JSON, Pascal VOC XML, CSV, Generic JSON)
+- **Researcher-Focused UX**: Simple, intuitive interface designed for researchers who want to focus on data, not tools
+- **Private & Secure**: Runs entirely locally with no cloud dependencies or data sharing concerns
+- **Research-Ready Architecture**: Robust error handling, logging, and data protection features
 
-## II. Overall Vision
+## II. Vision: Perfect Tool for Solo Computer Vision Research
 
-To evolve the BBox & Polygon Annotator into a best-in-class, highly performant, user-friendly, and extensible tool for computer vision dataset creation, potentially migrating to a more robust UI framework for advanced capabilities and cross-platform support.
+**Core Philosophy**: Build the ideal annotation tool for individual researchers - simple, powerful, private, and focused on accelerating research without complexity.
 
-## III. Development Roadmap
+**Target User**: PhD students, independent researchers, and private research projects requiring high-quality dataset annotation.
 
-### A. Short-Term Goals (Next 1-3 Months - Q2/Q3 2025)
+## III. Development Roadmap - Solo Research Focus
 
-Focus: UI/UX Polish, Core Stability, Completing "In Progress" items.
+### A. Current Version: v10+ (Production Ready for Solo Research)
+**Status**: Mature, feature-complete annotation tool perfect for individual researchers
 
-1.  **Visual Enhancements & Core UX:**
-    *   **Button Icons**: Integrate intuitive icons for all toolbar and major action buttons.
-    *   **Responsive Canvas**: Implement dynamic sizing for the annotation canvas, allowing it to adapt to window size.
-    *   **Zoom & Pan Controls**: Add zoom (mouse wheel, buttons) and pan functionality to the canvas for detailed annotation work.
-    *   **Keyboard Shortcut Display**: Create a help dialog or easily accessible list of keyboard shortcuts.
-2.  **Performance & Stability:**
-    *   **Finalize Polygon Editing**: Complete "Advanced Polygon Editing" features (vertex deletion, polygon movement if not fully stable).
-    *   **Error Handling**: Implement more robust error handling and user feedback mechanisms throughout the application.
-    *   **Auto-Save System**: Introduce configurable auto-save intervals to prevent data loss.
-3.  **Code Quality & Minor Refinements:**
-    *   Address minor "In Progress" items from `README.md` if any are still pending beyond polygon editing.
-    *   Begin tackling high-priority technical debt items (e.g., start breaking down monolithic `__init__` methods).
+✅ **Completed Research-Ready Features:**
+- Dual annotation modes (bounding box + polygon) 
+- AI-powered YOLO auto-annotation
+- 5 industry-standard export formats
+- Local project management system
+- Privacy-focused (no cloud dependencies)
+- Researcher-friendly UI with keyboard shortcuts
+- Comprehensive error handling and data protection
 
-### B. Mid-Term Goals (Next 3-6 Months - Q3/Q4 2025)
+### B. Short-Term Goals (Q3-Q4 2025) - Research Workflow Optimization
 
-Focus: Advanced Features, Deeper Performance Optimization, Significant Refactoring.
+**Focus**: Enhancing the solo research experience and workflow efficiency
 
-1.  **Layout & Navigation Overhaul:**
-    *   **Resizable Panels/Splitters**: Implement draggable dividers between UI panels (Image List, Canvas/Info, Class Panel) for flexible layout.
-    *   **Image List Enhancements**: Add image thumbnail previews and search/filter functionality for large datasets.
-2.  **Performance Optimization:**
-    *   **Image Caching System**: Implement caching for recently accessed images to speed up navigation.
-    *   **Lazy Loading**: Optimize loading for very large datasets.
-    *   **Background Processing**: Ensure all potentially long operations (model loading, extensive auto-annotation) are threaded with clear progress indicators.
-3.  **Advanced Annotation Features:**
-    *   **Batch Operations**: Allow users to perform actions (e.g., delete, change status) on multiple selected images or annotations.
-4.  **Technical Debt Reduction:**
-    *   Continue refactoring: Focus on separating UI and business logic (MVC-like pattern), improving state management.
-    *   Improve test coverage (Unit, Integration tests).
+1. **🎨 UI/UX Enhancements for Researchers**
+   - ✅ Button icons implementation (completed)
+   - ✅ Responsive canvas with zoom/pan (completed) 
+   - ✅ Keyboard shortcuts dialog (completed)
+   - ✅ Auto-save mechanism (completed)
+   - ⏳ **In Progress**: Image caching system for faster dataset navigation
+   - ⏳ **Planned**: Lazy loading for large research datasets
+   - ⏳ **Planned**: Background processing improvements
 
-### C. Long-Term Vision (6+ Months - 2026 and beyond)
+2. **🔧 Research-Specific Performance Optimization**
+   - **Target**: Handle typical research datasets (1K-10K images) efficiently
+   - **Focus**: Single-user performance, not concurrent access
+   - **Priority**: Minimize interruptions to research workflow
 
-Focus: Platform Enhancement, Broader AI Integration, Extensibility.
+### C. Mid-Term Goals (2025-2026) - Advanced Research Features
 
-1.  **Platform & Framework:**
-    *   **UI Framework Evaluation**: Seriously evaluate and potentially migrate to a more modern UI framework like PyQt6/PySide6 for richer features, better styling, and performance.
-    *   **Cross-Platform Compatibility**: Thorough testing and refinement for macOS and Linux.
-2.  **Advanced Features & AI:**
-    *   **Annotation Analytics**: Provide users with insights into their annotation progress and dataset statistics.
-    *   **Plugin Architecture**: Design a system to allow for extensions and custom tools.
-    *   **Advanced UI Themes**: Implement dark mode and further UI customization options.
-    *   **Deeper AI Integration**:
-        *   AI-powered annotation suggestions.
-        *   Automated annotation quality validation.
-        *   Active learning loop integration.
-        *   Direct model training pipeline connection.
-3.  **Collaboration & Scalability:**
-    *   **Cloud Integration**: Explore options for remote project storage and basic collaboration features.
+**Focus**: Features specifically valuable for solo computer vision research
 
-## IV. Actionable To-Do List (Immediate - Short Term)
+1. **📊 Research Productivity Features**
+   - **Batch operations**: Process multiple images for status changes
+   - **Annotation analytics**: Dataset composition insights and progress tracking  
+   - **Advanced polygon tools**: Research-grade precision editing
+   - **Image list thumbnails**: Quick visual dataset overview
+   - **Search functionality**: Find specific images in large research datasets
 
-### Core UX & Visual Polish
--   [x] **Task 1**: Selected simple Unicode glyphs for toolbar icons; mapping defined in `ICON_UNICODE` dictionary.
--   [x] **Task 2**: Implement icon display on the respective toolbar buttons using Unicode glyphs.
--   [x] **Task 3**: Modify `BoundingBoxEditor.setup_canvas` and related image display logic to allow the canvas to resize with the window, ensuring annotation coordinates correctly scale/translate with canvas resize.
--   [x] **Task 4**: Implement zoom functionality on the canvas (Ctrl+MouseWheel + toolbar buttons); annotations now scale correctly with zoom.
--   [x] **Task 5**: Implement pan functionality on the canvas (middle-mouse drag).
--   [x] **Task 6**: Design and implement a modal dialog or a dedicated section to display all available keyboard shortcuts.
+2. **🏗️ Research-Focused Architecture Improvements**
+   - **Resizable panel layouts**: Customize workspace for different research tasks
+   - **Enhanced project templates**: Quick setup for common CV research scenarios
+   - **Improved state management**: Better handling of research session interruptions
+   - **Local backup systems**: Protect valuable research data
 
-### Stability & Polygon Enhancements
-   -   [x] **Task 7**: Review and complete any pending "Advanced Polygon Editing" features:
-    -   [x] Vertex deletion (Delete key).
-    -   [x] Polygon movement/dragging (click-and-drag interior).
-   [x] **Task 8**: Implement a configurable auto-save mechanism:
-    -   [x] Add a setting (`auto_save_interval` in dataset YAML) for auto-save interval (seconds).
-    -   [x] Implement a timer in `BoundingBoxEditor` to trigger `save_labels` and `save_statuses`.
--   [x] **Task 9**: Enhance global error handling:
-    -   [x] Wrap critical operations in try-except blocks.
-    -   [x] Use `messagebox.showerror` for user-facing errors instead of just print statements where appropriate.
+### D. Long-Term Vision (2026+) - Platform Enhancement for Research
 
-### Project Manager Refinements (Post-Upgrade)
--   [x] **Task 10**: (Low Priority) Add "Last Modified Date" column to the Project Manager's Treeview using file system metadata for project JSON files.
+**Focus**: Advanced capabilities while maintaining solo research focus
 
-### Code Quality
--   [ ] **Task 11**: Begin refactoring `BoundingBoxEditor.__init__`:
-    -   [ ] Identify logical blocks of UI setup (e.g., `_setup_main_layout`, `_init_variables`, `_load_initial_data`).
-    -   [ ] Move these blocks into separate private helper methods called from `__init__`.
--   [ ] **Task 12**: Review all `print()` statements used for debugging and replace them with a proper logging mechanism (e.g., Python's `logging` module) or remove if no longer needed.
+1. **🚀 Platform Enhancement (Research-Focused)**
+   - **PyQt6/PySide6 evaluation**: Consider migration for better research UI capabilities
+   - **Dark mode**: Reduce eye strain during long annotation sessions
+   - **Cross-platform optimization**: Ensure consistent experience across research environments
+   - **Advanced theming**: Customizable interface for different research preferences
 
-This roadmap and to-do list should provide a good guide for future development.
+2. **🤖 Advanced AI Integration (Research Applications)**
+   - **Custom model integration**: Support for researcher's own trained models
+   - **Active learning workflows**: Intelligent annotation prioritization for research
+   - **Quality validation**: Automated detection of annotation inconsistencies
+   - **Research pipeline integration**: Connect with common ML research workflows
+
+**Note**: Enterprise features like collaboration, cloud storage, or team management are explicitly **NOT** planned - this tool remains focused on solo research use.
+    ## IV. Actionable To-Do List - Solo Researcher Priorities
+
+### ✅ Completed (Research-Ready Features)
+- [x] **Unicode icon integration** - Simple, cross-platform toolbar icons
+- [x] **Responsive canvas with zoom/pan** - Essential for detailed annotation work
+- [x] **Keyboard shortcuts dialog** - Quick reference for efficient workflow
+- [x] **Auto-save mechanism** - Protect valuable research data
+- [x] **Advanced polygon editing** - Research-grade annotation precision
+- [x] **Project management system** - Organize individual research datasets
+- [x] **Error handling and logging** - Robust data protection for research
+
+### ⏳ In Progress (Q3-Q4 2025)
+- [ ] **Image caching system** - Speed up navigation in large research datasets
+- [ ] **Lazy loading optimization** - Handle very large datasets efficiently
+- [ ] **Background processing improvements** - Non-blocking operations during research sessions
+
+### 📋 Planned (2025-2026)
+- [ ] **Batch operations** - Process multiple images for status/annotation changes
+- [ ] **Image list thumbnails** - Quick visual dataset overview for researchers
+- [ ] **Search/filter functionality** - Find specific images in research datasets
+- [ ] **Resizable panels** - Customize workspace layout for different research tasks
+- [ ] **Annotation analytics** - Dataset insights and progress tracking for research
+
+### 🔧 Code Quality (Lower Priority)
+- [ ] **Refactor BoundingBoxEditor.__init__** - Break into logical setup methods
+- [ ] **Replace debug print statements** - Use proper logging throughout
+- [ ] **Improve test coverage** - Add unit tests for core functionality
+- [ ] **Documentation updates** - Keep inline documentation current
+
+### 🚫 Explicitly NOT Planned (Outside Solo Research Scope)
+- ❌ **Multi-user collaboration features** - Not needed for solo research
+- ❌ **Cloud storage integration** - Privacy-focused tool stays local
+- ❌ **Team management features** - Individual researcher focus
+- ❌ **Enterprise authentication** - Unnecessary complexity for research use
+- ❌ **Real-time collaboration** - Solo tool by design
+
+## V. Success Metrics for Solo Research Tool
+
+**Primary Goals:**
+- ✅ **Quick Setup**: Researchers can start annotating within 5 minutes
+- ✅ **Data Security**: All research data stays local and private
+- ✅ **Workflow Efficiency**: Minimal interruptions during annotation sessions
+- ✅ **Export Compatibility**: Works with all major ML research frameworks
+- ✅ **Research Focus**: Tool complexity doesn't distract from research goals
+
+**Target Performance:**
+- Handle 1K-10K image datasets smoothly
+- < 3 second startup time
+- < 1 second image switching
+- Stable for multi-hour annotation sessions
+- Zero data loss with auto-save
+
+---
+
+**Development Philosophy**: *Keep it simple, keep it private, keep it focused on solo research needs.*
