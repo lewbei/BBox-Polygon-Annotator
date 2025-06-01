@@ -1444,9 +1444,7 @@ class BoundingBoxEditor(tk.Frame):
                 self.cancel_current_polygon()
         # If not in polygon drawing mode, or not enough points, display_annotations might still be needed
        
-        # if other actions (like clearing selection) should refresh the main annotation display.
-        # However, if double-click is only for polygon completion, this call might be too broad.
-        # For now, keeping it to ensure display is up-to-date after any double-click attempt.
+
         # self.display_annotations() # Re-evaluate if this is needed here or only after successful polygon completion.
                                    # display_annotations is called within cancel_current_polygon if that path is taken.
     def _reset_polygon_completion_flag(self):
@@ -1728,12 +1726,8 @@ class BoundingBoxEditor(tk.Frame):
         train_win = tk.Toplevel(self.root)
         train_win.title("Train YOLO Model")
         train_win.transient(self.root)
-        # Note: Removed grab_set() to prevent window closing when focus is lost during training
+        train_win.grab_set()
         train_win.geometry("700x750") # Increased height
-        
-        # Make window stay on top during training but allow focus to other apps
-        train_win.attributes('-topmost', False)  # Don't force always on top
-        train_win.focus_force()  # Give initial focus but don't grab it
           # Model selection
         model_frame = tk.LabelFrame(train_win, text="🎯 Training Mode Selection")
         model_frame.pack(fill=tk.X, padx=10, pady=5)
@@ -1815,8 +1809,7 @@ class BoundingBoxEditor(tk.Frame):
         self.train_progress.configure(yscrollcommand=scrollbar.set)
         self.train_progress.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        # Buttons
+          # Buttons
         button_frame = tk.Frame(train_win)
         button_frame.pack(fill=tk.X, padx=10, pady=10)
         
@@ -1826,7 +1819,7 @@ class BoundingBoxEditor(tk.Frame):
             
             # Get parameters
             model = model_var.get()
-              # Validate model selection (prevent header selection)
+            # Validate model selection (prevent header selection)
             if model.startswith("🎯"):
                 messagebox.showerror("Invalid Selection", "Please select an actual model, not a category header.", parent=train_win)
                 start_btn.config(state=tk.NORMAL)
@@ -1837,37 +1830,163 @@ class BoundingBoxEditor(tk.Frame):
             batch = int(batch_var.get())
             lr = float(lr_var.get())
             output_dir = output_var.get()
-              # Start training in a separate thread
+            
+            # Start training in a separate thread
             import threading
+            
+            # Create a flag to signal training to stop
+            self.training_stop_flag = threading.Event()
+            
             training_thread = threading.Thread(
                 target=self.execute_training,
                 args=(model, epochs, imgsz, batch, lr, output_dir, auto_export_var.get(), 
-                      split_var.get(), start_btn, train_win)
+                      split_var.get(), start_btn, train_win, self.training_stop_flag)
             )
-            training_thread.daemon = True
+            # DO NOT set daemon=True as it causes segmentation faults
+            # training_thread.daemon = True  # REMOVED - causes crashes
             training_thread.start()
+            
+            # Store thread reference for cleanup
+            self.current_training_thread = training_thread
+        
+        def safe_cancel():
+            """Safely cancel training and close window"""
+            if hasattr(self, 'training_stop_flag'):
+                self.training_stop_flag.set()
+            if hasattr(self, 'current_training_thread') and self.current_training_thread.is_alive():
+                # Give training thread time to cleanup
+                import time
+                time.sleep(0.5)
+            train_win.destroy()
         
         start_btn = tk.Button(button_frame, text="🚀 Start Training", command=start_training)
         start_btn.pack(side=tk.LEFT, padx=5)
         
-        def safe_close():
-            """Safely close the training window with confirmation if training is in progress"""
-            # Check if training is currently running by checking button state
-            if start_btn['state'] == 'disabled':
-                import tkinter.messagebox as mb
-                if mb.askyesno("Training in Progress", 
-                              "Training is currently in progress. Are you sure you want to close this window?\n\n" +
-                              "Note: Training will continue in the background.", parent=train_win):
-                    train_win.destroy()
-            else:
-                train_win.destroy()
-        
-        # Set up window close protocol to prevent accidental closure during training
-        train_win.protocol("WM_DELETE_WINDOW", safe_close)
-        
-        tk.Button(button_frame, text="Cancel", command=safe_close).pack(side=tk.RIGHT, expand=True, padx=5)
+        tk.Button(button_frame, text="Cancel", command=safe_cancel).pack(side=tk.RIGHT, expand=True, padx=5)
 
-    def _export_yaml_logic(self, split_type="split"):
+    def bbox_to_polygon(self, x_center, y_center, width, height):
+        """Convert bounding box to rectangle polygon format."""
+        # Calculate corners
+        x1 = x_center - width/2
+        y1 = y_center - height/2
+        x2 = x_center + width/2
+        y2 = y_center + height/2
+        
+        # Return as polygon (rectangle): top-left, top-right, bottom-right, bottom-left
+        return [x1, y1, x2, y1, x2, y2, x1, y2]
+
+    def convert_label_file_to_segmentation(self, input_file, output_file):
+        """Convert a single label file from mixed format to pure segmentation format."""
+        try:
+            with open(input_file, 'r') as f:
+                lines = f.readlines()
+            
+            converted_lines = []
+            
+            for line in lines:
+                parts = line.strip().split()
+                if len(parts) == 5:  # Bounding box format
+                    class_id = parts[0]
+                    x_center, y_center, width, height = map(float, parts[1:5])
+                    
+                    # Convert to polygon
+                    polygon_coords = self.bbox_to_polygon(x_center, y_center, width, height)
+                    
+                    # Format as segmentation annotation
+                    converted_line = f"{class_id} " + " ".join(map(str, polygon_coords)) + "\n"
+                    converted_lines.append(converted_line)
+                    
+                elif len(parts) > 5 and len(parts) % 2 == 1:  # Already polygon format
+                    converted_lines.append(line)
+                else:
+                    logging.warning(f"Skipping invalid annotation in {input_file}: {line.strip()}")
+            
+            with open(output_file, 'w') as f:
+                f.writelines(converted_lines)
+                
+            return True
+        except Exception as e:
+            logging.error(f"Failed to convert label file {input_file}: {e}")
+            return False
+
+    def convert_dataset_to_segmentation(self, log_callback=None):
+        """Convert the entire dataset to segmentation format."""
+        def log_msg(msg):
+            if log_callback:
+                log_callback(msg)
+            else:
+                logging.info(msg)
+        
+        try:
+            from pathlib import Path
+            import shutil
+            import os
+            
+            source_dir = Path("yolo_prepared_dataset")
+            output_dir = Path("yolo_prepared_dataset_segmentation")
+            
+            if not source_dir.exists():
+                log_msg("❌ Error: yolo_prepared_dataset directory not found!")
+                return False
+            
+            # Create output directory structure
+            output_dir.mkdir(exist_ok=True)
+            (output_dir / "images").mkdir(exist_ok=True)
+            (output_dir / "labels").mkdir(exist_ok=True)
+            (output_dir / "images" / "train").mkdir(exist_ok=True)
+            (output_dir / "images" / "val").mkdir(exist_ok=True)
+            (output_dir / "labels" / "train").mkdir(exist_ok=True)
+            (output_dir / "labels" / "val").mkdir(exist_ok=True)
+            
+            log_msg("📁 Copying images...")
+            for split in ["train", "val"]:
+                source_img_dir = source_dir / "images" / split
+                output_img_dir = output_dir / "images" / split
+                
+                if source_img_dir.exists():
+                    for img_file in source_img_dir.glob("*"):
+                        if img_file.is_file():
+                            shutil.copy2(img_file, output_img_dir / img_file.name)
+            
+            log_msg("🔄 Converting labels...")
+            converted_count = 0
+            for split in ["train", "val"]:
+                source_label_dir = source_dir / "labels" / split
+                output_label_dir = output_dir / "labels" / split
+                
+                if source_label_dir.exists():
+                    for label_file in source_label_dir.glob("*.txt"):
+                        if self.convert_label_file_to_segmentation(label_file, output_label_dir / label_file.name):
+                            converted_count += 1
+                        else:
+                            log_msg(f"⚠️ Failed to convert {label_file.name}")
+            
+            # Create dataset.yaml
+            dataset_yaml = output_dir / "dataset.yaml"
+            yaml_content = f"""# YOLO segmentation dataset configuration
+path: {output_dir.absolute().as_posix()}
+train: images/train
+val: images/val
+nc: 5
+names: [8 star, latin_halal, arabic_halal, arabic_malaysia, star]
+"""
+            
+            with open(dataset_yaml, 'w') as f:
+                f.write(yaml_content)
+            
+            log_msg("✅ Conversion completed!")
+            log_msg(f"📊 Output directory: {output_dir.absolute()}")
+            log_msg(f"📝 Converted {converted_count} label files")
+            log_msg(f"📄 Dataset YAML: {dataset_yaml.absolute()}")
+            
+            return True
+            
+        except Exception as e:
+            log_msg(f"❌ Failed to convert dataset: {e}")
+            logging.error(f"Dataset conversion error: {e}", exc_info=True)
+            return False
+
+    def _export_yaml_logic(self, split_type):
         """
         Prepares a dataset.yaml file for YOLO training, splitting data if requested.
         Only includes images that have a corresponding non-empty label file.
@@ -2000,20 +2119,31 @@ class BoundingBoxEditor(tk.Frame):
             messagebox.showerror("Dataset YAML Error", f"Failed to write dataset.yaml:\n{e}", parent=self.root)
             return None
 
-    def execute_training(self, model, epochs, imgsz, batch, lr, output_dir, auto_export, split_type, start_btn, train_win):
+    def execute_training(self, model, epochs, imgsz, batch, lr, output_dir, auto_export, split_type, start_btn, train_win, stop_flag=None):
         """Execute the YOLO training in a separate thread"""
         def log_message(msg):
             """Helper function to log messages to the training progress window"""
             try:
-                self.train_progress.config(state=tk.NORMAL)
-                self.train_progress.insert(tk.END, f"{msg}\n")
-                self.train_progress.see(tk.END)
-                self.train_progress.config(state=tk.DISABLED)
-                train_win.update_idletasks()
+                # Use thread-safe method to update GUI from background thread
+                def update_gui():
+                    try:
+                        self.train_progress.config(state=tk.NORMAL)
+                        self.train_progress.insert(tk.END, f"{msg}\n")
+                        self.train_progress.see(tk.END)
+                        self.train_progress.config(state=tk.DISABLED)
+                    except:
+                        pass  # GUI might be destroyed
+                
+                # Schedule GUI update on main thread
+                train_win.after(0, update_gui)
             except:
                 print(f"Log: {msg}")  # Fallback logging
         
         try:
+            # Check if training should be stopped
+            if stop_flag and stop_flag.is_set():
+                log_message("🛑 Training cancelled by user")
+                return
             
             log_message("🚀 Starting YOLO training...")
             log_message(f"Model: {model}")
@@ -2058,15 +2188,14 @@ class BoundingBoxEditor(tk.Frame):
                 log_message("🎯 SEGMENTATION MODE: Converting all annotations to polygons...")
             else:
                 log_message("🎯 OBJECT DETECTION MODE: Using bounding boxes for detection...")
-            
-            # Auto-export dataset if requested
+              # Auto-export dataset if requested
             if auto_export:
                 log_message("📤 Exporting dataset for training...")
                 
                 if is_segmentation_model:
                     # SEGMENTATION MODE: Create detection dataset first, then convert to segmentation
                     log_message("🔄 Step 1: Creating base dataset...")
-                    dataset_yaml = self._export_yaml_logic(split_type) 
+                    dataset_yaml = self._export_yaml_logic(split_type)
                     if not dataset_yaml:
                         log_message("❌ Failed to prepare base dataset.yaml for training.")
                         messagebox.showerror("Training Error", "Failed to prepare dataset.yaml.", parent=train_win)
@@ -2074,32 +2203,17 @@ class BoundingBoxEditor(tk.Frame):
                         return
                     
                     log_message("🔄 Step 2: Converting to pure segmentation format...")
-                    try:
-                        import subprocess
-                        import os  # Ensure os is available in this scope
+                    if self.convert_dataset_to_segmentation(log_callback=log_message):
+                        # Use segmentation dataset
+                        import os
                         current_dir = os.getcwd()
-                        convert_script = os.path.join(current_dir, "convert_to_segmentation.py")
-                        if os.path.exists(convert_script):
-                            result = subprocess.run([
-                                "C:/Users/lewka/miniconda3/envs/deep_learning/python.exe", 
-                                convert_script
-                            ], capture_output=True, text=True, cwd=current_dir)
-                            
-                            if result.returncode == 0:
-                                log_message("✅ Dataset converted to segmentation format successfully!")
-                                # Use segmentation dataset
-                                segmentation_dataset_root = os.path.join(current_dir, "yolo_prepared_dataset_segmentation")
-                                dataset_yaml = os.path.join(segmentation_dataset_root, "dataset.yaml")
-                                log_message(f"📊 Using segmentation dataset: {dataset_yaml}")
-                            else:
-                                log_message(f"❌ Conversion failed: {result.stderr}")
-                                raise Exception(f"Dataset conversion failed: {result.stderr}")
-                        else:
-                            raise Exception("Conversion script not found")
-                    except Exception as e:
-                        log_message(f"❌ Failed to convert dataset: {e}")
+                        segmentation_dataset_root = os.path.join(current_dir, "yolo_prepared_dataset_segmentation")
+                        dataset_yaml = os.path.join(segmentation_dataset_root, "dataset.yaml")
+                        log_message(f"📊 Using segmentation dataset: {dataset_yaml}")
+                    else:
+                        log_message("❌ Failed to convert dataset to segmentation format")
                         messagebox.showerror("Dataset Error", 
-                            f"Segmentation training failed:\n{e}\n\nTry detection mode instead.", parent=train_win)
+                            "Segmentation training failed: Dataset conversion error.\n\nTry detection mode instead.", parent=train_win)
                         start_btn.config(state=tk.NORMAL)
                         return
                 else:
@@ -2135,32 +2249,14 @@ class BoundingBoxEditor(tk.Frame):
                                 "Solutions:\n1. Enable 'Auto-export dataset' option\n2. Create datasets manually", parent=train_win)
                             start_btn.config(state=tk.NORMAL)
                             return
-                        
-                        # Convert existing detection dataset to segmentation
-                        try:
-                            import subprocess
-                            import os  # Ensure os is available in this scope
-                            current_dir = os.getcwd()
-                            convert_script = os.path.join(current_dir, "convert_to_segmentation.py")
-                            if os.path.exists(convert_script):
-                                result = subprocess.run([
-                                    "C:/Users/lewka/miniconda3/envs/deep_learning/python.exe", 
-                                    convert_script
-                                ], capture_output=True, text=True, cwd=current_dir)
-                                
-                                if result.returncode == 0:
-                                    log_message("✅ Dataset converted to segmentation format successfully!")
-                                    dataset_yaml = segmentation_yaml
-                                    log_message(f"📊 Using converted segmentation dataset: {dataset_yaml}")
-                                else:
-                                    log_message(f"❌ Conversion failed: {result.stderr}")
-                                    raise Exception(f"Dataset conversion failed: {result.stderr}")
-                            else:
-                                raise Exception("Conversion script not found")
-                        except Exception as e:
-                            log_message(f"❌ Failed to convert dataset: {e}")
+                          # Convert existing detection dataset to segmentation
+                        if self.convert_dataset_to_segmentation(log_callback=log_message):
+                            dataset_yaml = segmentation_yaml
+                            log_message(f"📊 Using converted segmentation dataset: {dataset_yaml}")
+                        else:
+                            log_message("❌ Failed to convert dataset to segmentation format")
                             messagebox.showerror("Dataset Error", 
-                                f"Segmentation training failed:\n{e}\n\nTry detection mode instead.", parent=train_win)
+                                "Segmentation training failed: Dataset conversion error.\n\nTry detection mode instead.", parent=train_win)
                             start_btn.config(state=tk.NORMAL)
                             return
                 else:
@@ -2245,27 +2341,33 @@ class BoundingBoxEditor(tk.Frame):
                             log_message("✅ Dataset format matches model type perfectly.")
                     except Exception as e:
                         log_message(f"⚠️ Could not validate dataset format: {e}")
-            
-            # Import YOLO and start training
+              # Import YOLO and start training
             try:
                 YOLO = lazy_importer.get_yolo()
                 log_message("🤖 Loading YOLO model...")
-                model_instance = YOLO(model)
-                log_message("🏋️ Starting training...")
                 
                 # Enhanced memory optimization for preventing segmentation faults
                 import gc
                 import torch
                 import os
                 
-                # Set environment variables for memory optimization
-                os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:128'
+                # Set environment variables for memory optimization BEFORE loading model
+                os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:64'
                 os.environ['OMP_NUM_THREADS'] = '1'
+                os.environ['MKL_NUM_THREADS'] = '1'
+                os.environ['NUMEXPR_NUM_THREADS'] = '1'
+                
+                # Force single-threaded operation to prevent segfaults
+                torch.set_num_threads(1)
                 
                 # Clear any existing PyTorch cache
                 if hasattr(torch.cuda, 'empty_cache'):
                     torch.cuda.empty_cache()
                 gc.collect()
+                
+                # Load model with error handling
+                model_instance = YOLO(model)
+                log_message("🏋️ Starting training...")
                 
                 log_message("🧠 Enhanced memory optimization applied")
                 
@@ -2273,10 +2375,37 @@ class BoundingBoxEditor(tk.Frame):
                 safe_batch = max(1, min(batch, 2))  # Even more conservative batch size
                 safe_imgsz = min(imgsz, 320)       # Smaller image size to reduce memory
                 safe_workers = 0                   # Disable multiprocessing completely
-                
                 log_message(f"🛡️ Safety parameters: batch={safe_batch}, imgsz={safe_imgsz}, workers={safe_workers}")
                 
+                # Check if training should be stopped before starting
+                if stop_flag and stop_flag.is_set():
+                    log_message("🛑 Training cancelled before start")
+                    start_btn.config(state=tk.NORMAL)
+                    return
+                
+                # Custom callback class to handle interruption
+                class TrainingCallback:
+                    def __init__(self, stop_flag, log_func):
+                        self.stop_flag = stop_flag
+                        self.log_func = log_func
+                        
+                    def on_train_epoch_end(self, trainer):
+                        """Called at the end of each training epoch"""
+                        if self.stop_flag and self.stop_flag.is_set():
+                            self.log_func("🛑 Training stopped by user")
+                            trainer.stop = True  # Signal trainer to stop
+                            return True
+                        return False
+                
+                # Create callback instance
+                callback = TrainingCallback(stop_flag, log_message)
+                
+                # Add the callback to the model
+                if hasattr(model_instance, 'add_callback'):
+                    model_instance.add_callback('on_train_epoch_end', callback.on_train_epoch_end)
+                
                 # Train the model with ultra-safe parameters to prevent segmentation faults
+                log_message("🚀 Beginning YOLO training...")
                 results = model_instance.train(
                     data=dataset_yaml,
                     epochs=epochs,

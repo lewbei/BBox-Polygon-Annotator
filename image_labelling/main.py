@@ -10,9 +10,29 @@ if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, os.path.dirname(script_dir))
     __package__ = "image_labelling"
 
+# Critical fix: Set multiprocessing start method to prevent segmentation faults
+import multiprocessing
+if __name__ == "__main__":
+    multiprocessing.set_start_method('spawn', force=True)
+
 from .project_manager import ProjectManager
 
 if __name__ == "__main__":
+    # Configure signal handling for graceful shutdown
+    import signal
+    def signal_handler(signum, frame):
+        logging.error(f"Received signal {signum}. Shutting down gracefully...")
+        try:
+            root.quit()
+        except:
+            pass
+        sys.exit(1)
+    
+    # Handle common signals that might cause segmentation faults
+    signal.signal(signal.SIGINT, signal_handler)
+    if hasattr(signal, 'SIGTERM'):
+        signal.signal(signal.SIGTERM, signal_handler)
+    
     # Configure logging
     log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'error.log')
     logging.basicConfig(
