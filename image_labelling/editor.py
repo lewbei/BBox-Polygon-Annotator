@@ -188,25 +188,93 @@ class BoundingBoxEditor(tk.Frame):
                     pass  # First image not found in tree during fallback
             except tk.TclError as e:
                 pass  # TclError while trying to select first image
-
+    
     def auto_annotate_dataset_threaded(self):
-        """Initiates the auto-annotation process in a separate thread."""
-        if self.model is None: messagebox.showerror("Model Not Loaded", "Please load a YOLO model first."); return
+        """Initiates the auto-annotation process with model detection and configuration dialog."""
+        if self.model is None: 
+            messagebox.showerror("Model Not Loaded", "Please load a YOLO model first.")
+            return
+        
+        # Import the new modules
+        try:
+            from .model_analyzer import ModelAnalyzer
+            from .auto_annotation_dialog import AutoAnnotationDialog
+        except ImportError as e:
+            messagebox.showerror("Import Error", f"Failed to import auto-annotation modules: {e}")
+            return
+        
+        try:
+            # Analyze the loaded model
+            analyzer = ModelAnalyzer()
+            model_analysis = analyzer.analyze_model(
+                getattr(self.model, 'model_path', 'Unknown'), 
+                self.model
+            )
+            
+            # Show configuration dialog
+            dialog = AutoAnnotationDialog(
+                parent=self.root,
+                model_analysis=model_analysis,
+                image_files=list(self.image_files),
+                confidence_threshold=self.confidence_threshold.get()
+            )
+            
+            config = dialog.show_dialog()
+            
+            # If user cancelled, return
+            if config is None:
+                return
+            
+            # Update confidence threshold
+            self.confidence_threshold.set(config['confidence_threshold'])
+            
+            # Start auto-annotation with configuration
+            self._start_auto_annotation_with_config(config)
+            
+        except Exception as e:
+            messagebox.showerror("Auto Annotation Error", f"Failed to start auto annotation: {e}")
+    
+    def _start_auto_annotation_with_config(self, config):
+        """Start the auto-annotation process with the given configuration."""
         self.auto_annotate_button.config(state=tk.DISABLED)
-        self.progress_win = tk.Toplevel(self.root); self.progress_win.title("Auto Annotation Progress")
-        self.progress_win.transient(self.root); self.progress_win.grab_set()
+        
+        # Create progress window
+        self.progress_win = tk.Toplevel(self.root)
+        self.progress_win.title("Auto Annotation Progress")
+        self.progress_win.transient(self.root)
+        self.progress_win.grab_set()
+        
         self.progress_var = tk.DoubleVar()
         self.progress_bar = ttk.Progressbar(self.progress_win, variable=self.progress_var, maximum=100)
-        self.progress_bar.pack(padx=20, pady=10, fill=tk.X, expand=True) # Make progress bar fill horizontally
-        self.progress_label = tk.Label(self.progress_win, text="0/0 images processed"); self.progress_label.pack(pady=5)
-        self.cancel_button = tk.Button(self.progress_win, text="Cancel", command=self.cancel_annotation); self.cancel_button.pack(pady=5)
+        self.progress_bar.pack(padx=20, pady=10, fill=tk.X, expand=True)
+        
+        self.progress_label = tk.Label(self.progress_win, text="0/0 images processed")
+        self.progress_label.pack(pady=5)
+        
+        self.cancel_button = tk.Button(self.progress_win, text="Cancel", command=self.cancel_annotation)
+        self.cancel_button.pack(pady=5)
+        
+        # Add annotation type info
+        annotation_info = tk.Label(self.progress_win, 
+                                 text=f"Mode: {config['annotation_type'].replace('_', ' ').title()}")
+        annotation_info.pack(pady=2)
+        
         self.progress_win.update_idletasks()
-        main_width = self.root.winfo_width(); main_height = self.root.winfo_height()
-        main_x = self.root.winfo_x(); main_y = self.root.winfo_y()
-        progress_width = 300; progress_height = 100
-        x = main_x + (main_width - progress_width) // 2; y = main_y + (main_height - progress_height) // 2
+        
+        # Center progress window
+        main_width = self.root.winfo_width()
+        main_height = self.root.winfo_height()
+        main_x = self.root.winfo_x()
+        main_y = self.root.winfo_y()
+        progress_width = 350
+        progress_height = 150
+        x = main_x + (main_width - progress_width) // 2
+        y = main_y + (main_height - progress_height) // 2
         self.progress_win.geometry(f"{progress_width}x{progress_height}+{x}+{y}")
+        
+        # Start annotation in thread
         self.cancel_event = threading.Event()
+        self.annotation_config = config
         threading.Thread(target=self.auto_annotate_dataset, daemon=True).start()
 
     def show_shortcuts(self):
@@ -314,17 +382,19 @@ class BoundingBoxEditor(tk.Frame):
             progress_win.update_idletasks()
             
             def load_model_thread():
-                try:
+                try:                    
                     YOLO = lazy_importer.get_yolo()
                     model = YOLO(model_path)
                     
                     def on_success():
                         try:
                             self.model = model
+                            # Store model path for analysis
+                            self.model.model_path = model_path
                             progress_win.destroy()
                             messagebox.showinfo("Success", f"Model loaded successfully from:\n{model_path}")
                         except:
-                            pass 
+                            pass
                     
                     self.root.after(0, on_success)
                     
@@ -1603,62 +1673,219 @@ class BoundingBoxEditor(tk.Frame):
             self.progress_win.update_idletasks()
 
     def auto_annotate_dataset(self):
-        conf_threshold = self.confidence_threshold.get(); flagged_images = []; total_images = len(self.image_files); processed_count = 0
+        """Auto-annotate dataset based on configuration from dialog."""
+        # Get configuration from the stored config
+        config = getattr(self, 'annotation_config', {})
+        annotation_type = config.get('annotation_type', 'bounding_boxes')
+        conf_threshold = config.get('confidence_threshold', self.confidence_threshold.get())
+        selected_files = config.get('selected_files', list(self.image_files))
+        
+        flagged_images = []
+        processed_count = 0
+        total_images = len(selected_files)
+        
         try:
-            for idx, image_file in enumerate(self.image_files):
+            for idx, image_file in enumerate(selected_files):
                 processed_count = idx + 1
-                if self.cancel_event and self.cancel_event.is_set(): break
+                if self.cancel_event and self.cancel_event.is_set(): 
+                    break
+                
                 image_path = os.path.join(self.folder_path, image_file)
                 label_filename = os.path.splitext(image_file)[0] + '.txt'
                 label_path = os.path.join(self.label_folder, label_filename)
+                
+                # Run model inference
                 results = self.model(image_path, conf=conf_threshold, verbose=False)
-                detections = results[0].boxes; bboxes = []; uncertain = False; img_h, img_w = None, None
                 relative_image_path = image_file
-                if not detections: self.image_status[relative_image_path] = "viewed"
+                
+                # Process results based on annotation type
+                if annotation_type == "segmentation":
+                    success = self._process_segmentation_results(results, label_path, image_file, conf_threshold)
+                elif annotation_type == "both":
+                    success = self._process_both_results(results, label_path, image_file, conf_threshold)
+                else:  # bounding_boxes
+                    success = self._process_detection_results(results, label_path, image_file, conf_threshold)
+                
+                # Update image status
+                if success.get('has_annotations'):
+                    if success.get('uncertain'):
+                        flagged_images.append(relative_image_path)
+                        self.image_status[relative_image_path] = "review_needed"
+                    else:
+                        self.image_status[relative_image_path] = "edited"
                 else:
-                    for box in detections:
-                        if self.cancel_event and self.cancel_event.is_set(): break
-                        conf_score = box.conf[0].item(); class_id = int(box.cls[0])
-                        if img_h is None or img_w is None: img_h, img_w = results[0].orig_shape[:2]
-                        if class_id >= len(self.class_names): continue
-                        np_module = lazy_importer.get_numpy() 
-                        x_center, y_center, width, height = box.xywhn[0].cpu().numpy()
-                        x_center_abs = x_center * img_w; y_center_abs = y_center * img_h
-                        width_abs = width * img_w; height_abs = height * img_h
-                        x_min = int(x_center_abs - width_abs / 2); y_min = int(y_center_abs - height_abs / 2)
-                        bboxes.append((x_min, y_min, int(width_abs), int(height_abs), class_id, conf_score))
-                        if conf_score < conf_threshold: 
-                            uncertain = True
-                    
-                    if bboxes:
-                        if uncertain: 
-                            flagged_images.append(relative_image_path)
-                            self.image_status[relative_image_path] = "review_needed"
-                        else:
-                            # Create directory structure for label file if it doesn't exist
-                            os.makedirs(os.path.dirname(label_path), exist_ok=True)
-                            existing_bboxes, existing_polygons = read_annotations_from_file(label_path, (img_h, img_w))
-                            new_bboxes_for_file = [(x,y,w,h,cid) for (x,y,w,h,cid,_) in bboxes]
-                            write_annotations_to_file(label_path, new_bboxes_for_file, existing_polygons, (img_h, img_w))
-                            self.image_status[relative_image_path] = "edited"
-                    else: 
-                        self.image_status[relative_image_path] = "viewed"
+                    self.image_status[relative_image_path] = "viewed"
+                
+                # Update progress
                 progress_percent = (processed_count / total_images) * 100
                 self.root.after(0, self.update_progress, progress_percent, processed_count, total_images)
-                if self.cancel_event.is_set(): break
+                
+                if self.cancel_event.is_set(): 
+                    break
+                    
         except Exception as e:
-            error_message = str(e) 
+            error_message = str(e)
             self.root.after(0, lambda err_msg=error_message: messagebox.showerror("Error", f"Annotation failed: {err_msg}"))
         finally:
-            self.save_statuses(); self.root.after(0, self.update_status_labels)
-            if hasattr(self, 'progress_win') and self.progress_win.winfo_exists(): self.root.after(0, self.progress_win.destroy)
+            self.save_statuses()
+            self.root.after(0, self.update_status_labels)
+            
+            # Update image tree tags
+            for relative_image_path in selected_files:
+                if self.image_tree.exists(relative_image_path):
+                    status = self.image_status.get(relative_image_path, "not_viewed")
+                    self.image_tree.item(relative_image_path, tags=(status,))
+            
+            if hasattr(self, 'progress_win') and self.progress_win.winfo_exists(): 
+                self.root.after(0, self.progress_win.destroy)
             self.root.after(0, lambda: self.auto_annotate_button.config(state=tk.NORMAL))
-            for relative_image_path_loop in self.image_files: # Renamed loop var
-                 if self.image_tree.exists(relative_image_path_loop): # Check if item exists
-                    self.image_tree.item(relative_image_path_loop, tags=(self.image_status.get(relative_image_path_loop, "not_viewed"),))
-            if self.cancel_event and self.cancel_event.is_set(): self.root.after(0, lambda: messagebox.showinfo("Cancelled", f"Annotation cancelled. Processed {processed_count}/{total_images} images."))
-            elif flagged_images: self.root.after(0, lambda: messagebox.showwarning("Review Needed", f"{len(flagged_images)} images have low-confidence detections requiring review."))
-            else: self.root.after(0, lambda: messagebox.showinfo("Complete", "Auto-annotation finished successfully!"))
+            
+            # Show completion message
+            if self.cancel_event and self.cancel_event.is_set():
+                self.root.after(0, lambda: messagebox.showinfo("Cancelled", f"Annotation cancelled. Processed {processed_count}/{total_images} images."))
+            elif flagged_images:
+                self.root.after(0, lambda: messagebox.showwarning("Review Needed", f"{len(flagged_images)} images have low-confidence detections requiring review."))
+            else:
+                self.root.after(0, lambda: messagebox.showinfo("Complete", "Auto-annotation finished successfully!"))
+    
+    def _process_detection_results(self, results, label_path, image_file, conf_threshold):
+        """Process detection results for bounding box annotations."""
+        detections = results[0].boxes
+        bboxes = []
+        uncertain = False
+        img_h, img_w = None, None
+        
+        if not detections:
+            return {"has_annotations": False, "uncertain": False}
+        
+        for box in detections:
+            if self.cancel_event and self.cancel_event.is_set(): 
+                break
+                
+            conf_score = box.conf[0].item()
+            class_id = int(box.cls[0])
+            
+            if img_h is None or img_w is None: 
+                img_h, img_w = results[0].orig_shape[:2]
+            
+            if class_id >= len(self.class_names): 
+                continue
+            
+            np_module = lazy_importer.get_numpy()
+            x_center, y_center, width, height = box.xywhn[0].cpu().numpy()
+            x_center_abs = x_center * img_w
+            y_center_abs = y_center * img_h
+            width_abs = width * img_w
+            height_abs = height * img_h
+            x_min = int(x_center_abs - width_abs / 2)
+            y_min = int(y_center_abs - height_abs / 2)
+            
+            bboxes.append((x_min, y_min, int(width_abs), int(height_abs), class_id, conf_score))
+            
+            if conf_score < conf_threshold * 1.2:  # Mark uncertain if close to threshold
+                uncertain = True
+        
+        if bboxes:
+            # Create directory structure for label file if it doesn't exist
+            os.makedirs(os.path.dirname(label_path), exist_ok=True)
+            existing_bboxes, existing_polygons = read_annotations_from_file(label_path, (img_h, img_w))
+            new_bboxes_for_file = [(x, y, w, h, cid) for (x, y, w, h, cid, _) in bboxes]
+            write_annotations_to_file(label_path, new_bboxes_for_file, existing_polygons, (img_h, img_w))
+            return {"has_annotations": True, "uncertain": uncertain}
+        
+        return {"has_annotations": False, "uncertain": False}
+    
+    def _process_segmentation_results(self, results, label_path, image_file, conf_threshold):
+        """Process segmentation results for polygon annotations."""
+        # Check if model supports segmentation
+        if not hasattr(results[0], 'masks') or results[0].masks is None:
+            # Fall back to bounding boxes if no masks available
+            return self._process_detection_results(results, label_path, image_file, conf_threshold)
+        
+        masks = results[0].masks
+        detections = results[0].boxes
+        polygons = []
+        uncertain = False
+        img_h, img_w = None, None
+        
+        if not detections:
+            return {"has_annotations": False, "uncertain": False}
+        
+        for i, (box, mask) in enumerate(zip(detections, masks)):
+            if self.cancel_event and self.cancel_event.is_set(): 
+                break
+                
+            conf_score = box.conf[0].item()
+            class_id = int(box.cls[0])
+            
+            if img_h is None or img_w is None: 
+                img_h, img_w = results[0].orig_shape[:2]
+            
+            if class_id >= len(self.class_names): 
+                continue
+            
+            # Convert mask to polygon
+            try:
+                np_module = lazy_importer.get_numpy()
+                cv2_module = lazy_importer.get_opencv()
+                
+                # Get mask as numpy array
+                mask_array = mask.data[0].cpu().numpy()
+                mask_resized = cv2_module.resize(mask_array, (img_w, img_h))
+                mask_binary = (mask_resized > 0.5).astype(np_module.uint8) * 255
+                
+                # Find contours
+                contours, _ = cv2_module.findContours(mask_binary, cv2_module.RETR_EXTERNAL, cv2_module.CHAIN_APPROX_SIMPLE)
+                
+                if contours:
+                    # Get the largest contour
+                    largest_contour = max(contours, key=cv2_module.contourArea)
+                    
+                    # Simplify polygon
+                    epsilon = 0.02 * cv2_module.arcLength(largest_contour, True)
+                    simplified = cv2_module.approxPolyDP(largest_contour, epsilon, True)
+                    
+                    if len(simplified) >= 3:
+                        # Convert to relative coordinates
+                        polygon_points = []
+                        for point in simplified:
+                            x, y = point[0]
+                            rel_x = x / img_w
+                            rel_y = y / img_h
+                            polygon_points.extend([rel_x, rel_y])
+                        
+                        polygons.append((polygon_points, class_id, conf_score))
+                        
+                        if conf_score < conf_threshold * 1.2:  # Mark uncertain if close to threshold
+                            uncertain = True
+                            
+            except Exception as e:
+                # If polygon conversion fails, skip this detection
+                continue
+        
+        if polygons:
+            # Create directory structure for label file if it doesn't exist
+            os.makedirs(os.path.dirname(label_path), exist_ok=True)
+            existing_bboxes, existing_polygons = read_annotations_from_file(label_path, (img_h, img_w))
+            new_polygons_for_file = [(points, cid) for (points, cid, _) in polygons]
+            write_annotations_to_file(label_path, existing_bboxes, new_polygons_for_file, (img_h, img_w))
+            return {"has_annotations": True, "uncertain": uncertain}
+        
+        return {"has_annotations": False, "uncertain": False}
+    
+    def _process_both_results(self, results, label_path, image_file, conf_threshold):
+        """Process results for both bounding boxes and segmentation."""
+        # Process bounding boxes first
+        bbox_result = self._process_detection_results(results, label_path, image_file, conf_threshold)
+        
+        # Then process segmentation if available
+        seg_result = self._process_segmentation_results(results, label_path, image_file, conf_threshold)
+        
+        # Combine results
+        has_annotations = bbox_result.get("has_annotations", False) or seg_result.get("has_annotations", False)
+        uncertain = bbox_result.get("uncertain", False) or seg_result.get("uncertain", False)
+        
+        return {"has_annotations": has_annotations, "uncertain": uncertain}
 
     # --------------------------------------------------
     # YOLO Training Functionality (related methods)
