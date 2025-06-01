@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+import logging.handlers
 import tkinter as tk
 from tkinter import messagebox, ttk
 
@@ -12,6 +13,17 @@ if __name__ == "__main__" and __package__ is None:
 from .project_manager import ProjectManager
 
 if __name__ == "__main__":
+    # Configure logging
+    log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'error.log')
+    logging.basicConfig(
+        level=logging.ERROR,
+        format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+        handlers=[
+            logging.handlers.RotatingFileHandler(log_file_path, maxBytes=1024*1024, backupCount=5), # 1MB per file, 5 backups
+            logging.StreamHandler() # Also log to console
+        ]
+    )
+
     root = tk.Tk()
     def report_callback_exception(self, exc, val, tb):
         logging.error("Exception in Tkinter callback", exc_info=(exc, val, tb))

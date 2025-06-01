@@ -15,6 +15,7 @@ ICON_UNICODE = {
     "save": "💾",
     "load_model": "📂",
     "export": "📤",
+    "train": "🚀",
     "mode_box": "⬜",
     "mode_polygon": "🔷",
     "undo": "↶",

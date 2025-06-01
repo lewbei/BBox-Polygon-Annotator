@@ -1,6 +1,10 @@
-projects/authentic logo.json
+projects/
 __pycache__/
 image_labelling/__pycache__/
 archive/
 .gitignore
 error.log
+runs/
+yolo_prepared_dataset/
+yolo_prepared_dataset_segmentation/
+*.pt

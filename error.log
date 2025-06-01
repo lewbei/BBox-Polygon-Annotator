@@ -3033,4 +3033,182 @@ Traceback (most recent call last):
     self.canvas.bind("<Button-1>", self.on_click)
                                    ^^^^^^^^^^^^^
 AttributeError: 'BoundingBoxEditor' object has no attribute 'on_click'
-v
+v2025-06-01 12:50:57,032 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 78, in __init__
+    self.setup_top_bar()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 330, in setup_top_bar
+    self.export_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['export']} Export Annotations", command=self.export_format_selection_window)
+                                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'export_format_selection_window'
+2025-06-01 12:51:15,557 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 78, in __init__
+    self.setup_top_bar()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 330, in setup_top_bar
+    self.export_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['export']} Export Annotations", command=self.export_format_selection_window)
+                                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'export_format_selection_window'
+2025-06-01 13:16:56,561 ERROR Failed to create or run BoundingBoxEditor
+Traceback (most recent call last):
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 281, in open_editor
+    editor = BoundingBoxEditor(editor_root, project)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 78, in __init__
+    self.setup_top_bar()
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 330, in setup_top_bar
+    self.export_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['export']} Export Annotations", command=self.export_format_selection_window)
+                                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BoundingBoxEditor' object has no attribute 'export_format_selection_window'
+2025-06-01 13:46:52,979 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 146, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 289, in open_editor
+    editor_root.mainloop() # Start the editor's main event loop
+    ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-06-01 13:48:56,672 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 146, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 289, in open_editor
+    editor_root.mainloop() # Start the editor's main event loop
+    ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-06-01 14:42:41,574 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 146, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 289, in open_editor
+    editor_root.mainloop() # Start the editor's main event loop
+    ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-06-01 15:16:30,639 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 146, in _open_selected_project_action
+    self.open_editor(project)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\project_manager.py", line 289, in open_editor
+    editor_root.mainloop() # Start the editor's main event loop
+    ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-06-01 16:22:08,184 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 178, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1053, in load_image
+    self.display_annotations()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1147, in display_annotations
+    if canvas_coords_flat: self.canvas.create_text(canvas_coords_flat[0], canvas_coordsFlat[1] - 10, text=self.class_names[class_id], fill=color, anchor=tk.NW, tags="polygon", font=("Arial", 8, "bold"))
+                                                                          ^^^^^^^^^^^^^^^^^
+NameError: name 'canvas_coordsFlat' is not defined. Did you mean: 'canvas_coords_flat'?
+2025-06-01 16:22:08,207 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 178, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1053, in load_image
+    self.display_annotations()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1147, in display_annotations
+    if canvas_coords_flat: self.canvas.create_text(canvas_coords_flat[0], canvas_coordsFlat[1] - 10, text=self.class_names[class_id], fill=color, anchor=tk.NW, tags="polygon", font=("Arial", 8, "bold"))
+                                                                          ^^^^^^^^^^^^^^^^^
+NameError: name 'canvas_coordsFlat' is not defined. Did you mean: 'canvas_coords_flat'?
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 999, in on_image_select
+    self.load_image(image_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1045, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1118, in display_image
+    self.display_annotations()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1147, in display_annotations
+    if canvas_coords_flat: self.canvas.create_text(canvas_coords_flat[0], canvas_coordsFlat[1] - 10, text=self.class_names[class_id], fill=color, anchor=tk.NW, tags="polygon", font=("Arial", 8, "bold"))
+                                                                          ^^^^^^^^^^^^^^^^^
+NameError: name 'canvas_coordsFlat' is not defined. Did you mean: 'canvas_coords_flat'?
+2025-06-01 16:22:08,498 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\Lib\tkinter\__init__.py", line 862, in callit
+    func(*args)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 178, in _attempt_load_initial_image
+    self.load_image(last_image_full_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1053, in load_image
+    self.display_annotations()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1147, in display_annotations
+    if canvas_coords_flat: self.canvas.create_text(canvas_coords_flat[0], canvas_coordsFlat[1] - 10, text=self.class_names[class_id], fill=color, anchor=tk.NW, tags="polygon", font=("Arial", 8, "bold"))
+                                                                          ^^^^^^^^^^^^^^^^^
+NameError: name 'canvas_coordsFlat' is not defined. Did you mean: 'canvas_coords_flat'?
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 999, in on_image_select
+    self.load_image(image_path)
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1045, in load_image
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1118, in display_image
+    self.display_annotations()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1147, in display_annotations
+    if canvas_coords_flat: self.canvas.create_text(canvas_coords_flat[0], canvas_coordsFlat[1] - 10, text=self.class_names[class_id], fill=color, anchor=tk.NW, tags="polygon", font=("Arial", 8, "bold"))
+                                                                          ^^^^^^^^^^^^^^^^^
+NameError: name 'canvas_coordsFlat' is not defined. Did you mean: 'canvas_coords_flat'?
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 445, in on_canvas_resize
+    self.display_image()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1118, in display_image
+    self.display_annotations()
+  File "C:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1147, in display_annotations
+    if canvas_coords_flat: self.canvas.create_text(canvas_coords_flat[0], canvas_coordsFlat[1] - 10, text=self.class_names[class_id], fill=color, anchor=tk.NW, tags="polygon", font=("Arial", 8, "bold"))
+                                                                          ^^^^^^^^^^^^^^^^^
+NameError: name 'canvas_coordsFlat' is not defined. Did you mean: 'canvas_coords_flat'?

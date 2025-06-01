@@ -19,6 +19,7 @@ import numpy as np
 from image_labelling.constants import ICON_UNICODE, PROJECTS_DIR
 from image_labelling.helpers import center_window, write_annotations_to_file, read_annotations_from_file, copy_files_recursive
 from image_labelling.startup_optimizer import lazy_importer
+from .exporter import convert_to_coco_format, convert_to_pascal_voc_format, convert_to_csv_format
 
 # --------------------------------------------------
 # BoundingBoxEditor Class
@@ -329,6 +330,8 @@ class BoundingBoxEditor(tk.Frame):
         self.load_model_button.pack(side=tk.LEFT, padx=5)
         self.export_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['export']} Export Annotations", command=self.export_format_selection_window)
         self.export_button.pack(side=tk.LEFT, padx=5)
+        self.train_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['train']} Train YOLO", command=self.train_yolo_model)
+        self.train_button.pack(side=tk.LEFT, padx=5)
         self.mode_toggle_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['mode_box']} Mode: Box", command=self.toggle_annotation_mode)
         self.mode_toggle_button.pack(side=tk.LEFT, padx=15)
         self.undo_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['undo']} Undo", command=self.undo, state=tk.DISABLED)
@@ -1046,7 +1049,6 @@ class BoundingBoxEditor(tk.Frame):
         label_path = os.path.join(self.label_folder, label_relative_path)
         os.makedirs(os.path.dirname(label_path), exist_ok=True)
 
-        print(f"DEBUG: load_image calling read_annotations_from_file for: {label_path}")
         self.bboxes, self.polygons = read_annotations_from_file(label_path, (self.original_image.height, self.original_image.width))
         self.display_annotations()
 
@@ -1406,14 +1408,13 @@ class BoundingBoxEditor(tk.Frame):
             self.canvas.create_line(
                 x_last, y_last, x_first, y_first,
                 fill="red", width=2, dash=(4, 2), tags="polygon_drawing"
-            )
-
+        )    
+    
     def on_double_click(self, event):
         if self.annotation_mode == 'polygon' and self.polygon_drawing_active:
             if self.current_polygon_points and len(self.current_polygon_points) > 2:
                 # The points in self.current_polygon_points are already original image coordinates.
-                # Close the polygon by appending the first point.
-                self.current_polygon_points.append(self.current_polygon_points[0]) 
+                # Don't append the first point - polygon will be closed visually during display
                 
                 if self.selected_class_index is None:
                     messagebox.showwarning("No Class Selected", "Please select a class before completing the polygon.", parent=self.root)
@@ -1442,6 +1443,7 @@ class BoundingBoxEditor(tk.Frame):
             else: # Not enough points to form a polygon
                 self.cancel_current_polygon()
         # If not in polygon drawing mode, or not enough points, display_annotations might still be needed
+       
         # if other actions (like clearing selection) should refresh the main annotation display.
         # However, if double-click is only for polygon completion, this call might be too broad.
         # For now, keeping it to ensure display is up-to-date after any double-click attempt.
@@ -1691,231 +1693,8 @@ class BoundingBoxEditor(tk.Frame):
             else: self.root.after(0, lambda: messagebox.showinfo("Complete", "Auto-annotation finished successfully!"))
 
     # --------------------------------------------------
-    # YAML Export Logic (Refactored)
+    # YOLO Training Functionality
     # --------------------------------------------------
-    def _export_yaml_logic(self, base_export_folder, split_option, test_data, include_val):
-        try:
-            with open(self.yaml_path, "r") as f: data = yaml.safe_load(f)
-        except Exception as e: messagebox.showerror("Error", f"Could not load YAML file:\\n{e}"); return
-        if not include_val: data["val"] = ""
-        export_folder = os.path.join(base_export_folder, "exported_yaml_dataset"); os.makedirs(export_folder, exist_ok=True)
-        if split_option == "in_sample":
-            train_folder = os.path.join(export_folder, "train")
-            os.makedirs(os.path.join(train_folder, "images"), exist_ok=True); os.makedirs(os.path.join(train_folder, "labels"), exist_ok=True)
-            val_folder = train_folder; data["train"] = os.path.relpath(train_folder, export_folder); data["val"] = os.path.relpath(val_folder, export_folder)
-            test_files = []
-        else: 
-            annotated = []
-            for relative_image_path in self.image_files:
-                label_relative_path = os.path.splitext(relative_image_path)[0] + '.txt'
-                src_label_path = os.path.join(self.label_folder, label_relative_path)
-                if os.path.exists(src_label_path) and os.path.getsize(src_label_path) > 0:
-                    with open(src_label_path, 'r') as f:
-                        if any(line.strip() for line in f): annotated.append(relative_image_path)
-            num_annotated = len(annotated)
-            if num_annotated ==  0: messagebox.showwarning("Warning", "No annotated images found for YAML export."); return
-            if test_data:
-                num_train = int(num_annotated * 0.6); num_val = int(num_annotated * 0.2)
-                train_files = annotated[:num_train]; val_files = annotated[num_train : num_train + num_val]; test_files = annotated[num_train + num_val :]
-            else:
-                num_train = int(num_annotated * 0.8); train_files = annotated[:num_train]; val_files = annotated[num_train:]; test_files = []
-            train_folder = os.path.join(export_folder, "train")
-            os.makedirs(os.path.join(train_folder, "images"), exist_ok=True); os.makedirs(os.path.join(train_folder, "labels"), exist_ok=True)
-            data["train"] = os.path.relpath(train_folder, export_folder)
-            val_folder = os.path.join(export_folder, "val")
-            os.makedirs(os.path.join(val_folder, "images"), exist_ok=True); os.makedirs(os.path.join(val_folder, "labels"), exist_ok=True)
-            data["val"] = os.path.relpath(val_folder, export_folder)
-            if test_files:
-                test_folder_path = os.path.join(export_folder, "test")
-                os.makedirs(os.path.join(test_folder_path, "images"), exist_ok=True); os.makedirs(os.path.join(test_folder_path, "labels"), exist_ok=True)
-                data["test"] = os.path.relpath(test_folder_path, export_folder)
-            else: data["test"] = ""
-        data["path"] = "." 
-        export_yaml_path = os.path.join(export_folder, "dataset.yaml")
-        try:
-            with open(export_yaml_path, "w") as f: yaml.dump(data, f, sort_keys=False)
-        except Exception as e: messagebox.showerror("Error", f"Could not export YAML:\\n{e}"); return
-        if split_option == "in_sample":
-            all_labeled = [rf_path for rf_path in self.image_files if os.path.exists(os.path.join(self.label_folder, os.path.splitext(rf_path)[0] + '.txt'))]
-            copy_files_recursive(all_labeled, self.folder_path, os.path.join(train_folder, "images"), self.label_folder, os.path.join(train_folder, "labels"))
-        else: 
-            copy_files_recursive(train_files, self.folder_path, os.path.join(train_folder, "images"), self.label_folder, os.path.join(train_folder, "labels"))
-            copy_files_recursive(val_files, self.folder_path, os.path.join(val_folder, "images"), self.label_folder, os.path.join(val_folder, "labels"))
-            if test_files: 
-                test_folder_path = os.path.join(export_folder, "test")
-                copy_files_recursive(test_files, self.folder_path, os.path.join(test_folder_path, "images"), self.label_folder, os.path.join(test_folder_path, "labels"))
-        messagebox.showinfo("Success", f"YAML Dataset export complete!\\nExported to:\\n{export_folder}")
-
-    # --------------------------------------------------
-    # Export Format Conversion Functions
-    # --------------------------------------------------
-    
-    @staticmethod
-    def convert_to_coco_format(image_files, all_bboxes, all_polygons, class_names, base_folder):
-        coco_data = {"info": {"description": "Dataset exported from BBox & Polygon Annotator", "version": "1.0", "year": datetime.now().year, "contributor": "BBox & Polygon Annotator v9", "date_created": datetime.now().isoformat()},
-                     "licenses": [{"id": 1, "name": "Unknown", "url": ""}], "images": [], "annotations": [], "categories": []}
-        for i, class_name in enumerate(class_names): coco_data["categories"].append({"id": i, "name": class_name, "supercategory": "object"})
-        annotation_id = 1
-        for img_idx, image_path in enumerate(image_files):
-            full_image_path = os.path.join(base_folder, image_path)
-            if os.path.exists(full_image_path):
-                cv2_module = lazy_importer.get_cv2(); img = cv2_module.imread(full_image_path) 
-                height, width = img.shape[:2]
-            else: width, height = 640,480
-            coco_data["images"].append({"id": img_idx, "width": width, "height": height, "file_name": os.path.basename(image_path)})
-            if image_path in all_bboxes:
-                for bbox in all_bboxes[image_path]:
-                    x, y, w, h, class_id = bbox
-                    coco_data["annotations"].append({"id": annotation_id, "image_id": img_idx, "category_id": class_id, "bbox": [x,y,w,h], "area": w*h, "iscrowd": 0}); annotation_id += 1
-            if image_path in all_polygons:
-                for polygon in all_polygons[image_path]:
-                    class_id = polygon['class_id']; points = polygon['points']; segmentation = []
-                    for x,y in points: segmentation.extend([float(x), float(y)])
-                    xs = [p[0] for p in points]; ys = [p[1] for p in points]; x_min, x_max = min(xs), max(xs); y_min, y_max = min(ys), max(ys)
-                    bbox_w, bbox_h = x_max - x_min, y_max - y_min; area = bbox_w * bbox_h
-                    coco_data["annotations"].append({"id": annotation_id, "image_id": img_idx, "category_id": class_id, "segmentation": [segmentation], "bbox": [x_min,y_min,bbox_w,bbox_h], "area": area, "iscrowd": 0}); annotation_id += 1
-        return coco_data
-    
-    @staticmethod
-    def convert_to_pascal_voc_format(image_path, bboxes, polygons, class_names, image_shape):
-        height, width = image_shape[:2]; annotation = ET.Element("annotation")
-        ET.SubElement(annotation, "folder").text = os.path.dirname(image_path) or "images"
-        ET.SubElement(annotation, "filename").text = os.path.basename(image_path)
-        source = ET.SubElement(annotation, "source"); ET.SubElement(source, "database").text = "BBox & Polygon Annotator"
-        size = ET.SubElement(annotation, "size"); ET.SubElement(size, "width").text = str(width); ET.SubElement(size, "height").text = str(height); ET.SubElement(size, "depth").text = "3"
-        ET.SubElement(annotation, "segmented").text = "1" if polygons else "0"
-        for x,y,w,h,class_id in bboxes:
-            obj = ET.SubElement(annotation, "object"); ET.SubElement(obj, "name").text = class_names[class_id]
-            ET.SubElement(obj, "pose").text = "Unspecified"; ET.SubElement(obj, "truncated").text = "0"; ET.SubElement(obj, "difficult").text = "0"
-            bndbox = ET.SubElement(obj, "bndbox"); ET.SubElement(bndbox, "xmin").text = str(int(x)); ET.SubElement(bndbox, "ymin").text = str(int(y)); ET.SubElement(bndbox, "xmax").text = str(int(x+w)); ET.SubElement(bndbox, "ymax").text = str(int(y+h))
-        for polygon in polygons:
-            class_id = polygon['class_id']; points = polygon['points']
-            obj = ET.SubElement(annotation, "object"); ET.SubElement(obj, "name").text = class_names[class_id]
-            ET.SubElement(obj, "pose").text = "Unspecified"; ET.SubElement(obj, "truncated").text = "0"; ET.SubElement(obj, "difficult").text = "0"
-            xs = [p[0] for p in points]; ys = [p[1] for p in points]; x_min, x_max = min(xs), max(xs); y_min, y_max = min(ys), max(ys)
-            bndbox = ET.SubElement(obj, "bndbox"); ET.SubElement(bndbox, "xmin").text = str(int(x_min)); ET.SubElement(bndbox, "ymin").text = str(int(y_min)); ET.SubElement(bndbox, "xmax").text = str(int(x_max)); ET.SubElement(bndbox, "ymax").text = str(int(y_max))
-            polygon_elem = ET.SubElement(obj, "polygon")
-            for i, (px,py) in enumerate(points): point = ET.SubElement(polygon_elem, f"point{i+1}"); point.set("x", str(int(px))); point.set("y", str(int(py)))
-        return ET.tostring(annotation, encoding='unicode')
-    
-    @staticmethod
-    def convert_to_csv_format(image_files, all_bboxes, all_polygons, class_names):
-        rows = []; headers = ["image_name", "annotation_type", "class_name", "class_id", "coordinates", "area"]; rows.append(headers)
-        for image_path in image_files:
-            image_name = os.path.basename(image_path)
-            if image_path in all_bboxes:
-                for x,y,w,h,class_id in all_bboxes[image_path]:
-                    coordinates = f"x={x},y={y},w={w},h={h}"; area = w*h
-                    rows.append([image_name, "bbox", class_names[class_id], class_id, coordinates, area])
-            if image_path in all_polygons:
-                for polygon in all_polygons[image_path]:
-                    class_id = polygon['class_id']; points = polygon['points']; coordinates = ";".join([f"{x},{y}" for x,y in points])
-                    area = 0.5 * abs(sum(points[i][0] * (points[(i+1)%len(points)][1] - points[i-1][1]) for i in range(len(points)))) if len(points) >= 3 else 0
-                    rows.append([image_name, "polygon", class_names[class_id], class_id, coordinates, area])
-        return rows
-
-    def export_format_selection_window(self):
-        export_win = tk.Toplevel(self.root); export_win.title("Export Annotations"); export_win.transient(self.root); export_win.grab_set(); center_window(export_win, 500, 450)
-        format_frame = tk.LabelFrame(export_win, text="Export Format"); format_frame.pack(fill=tk.X, padx=10, pady=5)
-        format_var = tk.StringVar(value="yaml"); formats = [("YAML (YOLO Training)","yaml"),("COCO JSON","coco"),("Pascal VOC XML","voc"),("CSV Spreadsheet","csv"),("JSON (Generic)","json")]
-        for text, value in formats: tk.Radiobutton(format_frame, text=text, variable=format_var, value=value).pack(anchor=tk.W, padx=5, pady=2)
-        location_frame = tk.LabelFrame(export_win, text="Export Location"); location_frame.pack(fill=tk.X, padx=10, pady=5)
-        export_to_current_var = tk.BooleanVar(value=True); tk.Checkbutton(location_frame, text="Export to Current Dataset Location", variable=export_to_current_var).pack(anchor=tk.W, padx=5, pady=2)
-        custom_frame = tk.Frame(location_frame); custom_frame.pack(fill=tk.X, padx=5, pady=2)
-        tk.Label(custom_frame, text="Custom Location:").pack(side=tk.LEFT); custom_export_entry = tk.Entry(custom_frame, width=40); custom_export_entry.pack(side=tk.LEFT, padx=5)
-        custom_export_button = tk.Button(custom_frame, text="Browse", command=lambda: custom_export_entry.insert(0, filedialog.askdirectory(title="Select Export Folder") or "")); custom_export_button.pack(side=tk.LEFT)
-        def toggle_custom(*args):
-            state = "disabled" if export_to_current_var.get() else "normal"
-            custom_export_entry.config(state=state); custom_export_button.config(state=state)
-        export_to_current_var.trace("w", toggle_custom); toggle_custom()
-        yaml_frame = tk.LabelFrame(export_win, text="YAML Options (YOLO Training)"); yaml_frame.pack(fill=tk.X, padx=10, pady=5)
-        split_option = tk.StringVar(value="in_sample")
-        tk.Radiobutton(yaml_frame, text="In-Sample Validation", variable=split_option, value="in_sample").pack(anchor=tk.W, padx=5, pady=2)
-        tk.Radiobutton(yaml_frame, text="Split Data (Train/Val/Test)", variable=split_option, value="split").pack(anchor=tk.W, padx=5, pady=2)
-        test_data_var = tk.BooleanVar(value=False); test_data_check = tk.Checkbutton(yaml_frame, text="Include Test Data (60:20:20 split)", variable=test_data_var); test_data_check.pack(anchor=tk.W, padx=20, pady=2)
-        include_val_var = tk.BooleanVar(value=self.validation); tk.Checkbutton(yaml_frame, text="Include Validation in YAML", variable=include_val_var).pack(anchor=tk.W, padx=5, pady=2)
-        def toggle_yaml_options(*args):
-            if format_var.get() == "yaml": yaml_frame.pack(fill=tk.X, padx=10, pady=5); test_data_check.config(state="normal" if split_option.get() == "split" else "disabled")
-            else: yaml_frame.pack_forget()
-        def toggle_test_data_check(*args): test_data_check.config(state="normal" if split_option.get() == "split" and format_var.get() == "yaml" else "disabled")
-        format_var.trace("w", toggle_yaml_options); split_option.trace("w", toggle_test_data_check); toggle_yaml_options()
-        options_frame = tk.LabelFrame(export_win, text="Export Options"); options_frame.pack(fill=tk.X, padx=10, pady=5)
-        include_images_var = tk.BooleanVar(value=True); tk.Checkbutton(options_frame, text="Copy Images to Export Folder", variable=include_images_var).pack(anchor=tk.W, padx=5, pady=2)
-        include_unannotated_var = tk.BooleanVar(value=False); tk.Checkbutton(options_frame, text="Include Unannotated Images", variable=include_unannotated_var).pack(anchor=tk.W, padx=5, pady=2)
-        button_frame = tk.Frame(export_win); button_frame.pack(fill=tk.X, padx=10, pady=10)
-        def perform_export():
-            selected_format = format_var.get()
-            base_export_folder = self.folder_path if export_to_current_var.get() else custom_export_entry.get().strip()
-            if not base_export_folder and not export_to_current_var.get(): messagebox.showerror("Error", "Please select a custom export location."); return
-            if selected_format == "yaml": self._export_yaml_logic(base_export_folder, split_option.get(), test_data_var.get(), include_val_var.get())
-            else: self.export_to_other_formats(selected_format, base_export_folder, include_images_var.get(), include_unannotated_var.get())
-            export_win.destroy()
-        tk.Button(button_frame, text="Export", command=perform_export).pack(side=tk.RIGHT, padx=5)
-        tk.Button(button_frame, text="Cancel", command=export_win.destroy).pack(side=tk.RIGHT, padx=5)
-
-    def export_to_other_formats(self, format_type, base_folder, copy_images, include_unannotated):
-        try:
-            export_format_folder = os.path.join(base_folder, f"exported_{format_type}_dataset"); os.makedirs(export_format_folder, exist_ok=True)
-            all_bboxes = {}; all_polygons = {}; annotated_images = []
-            for image_path in self.image_files:
-                label_relative_path = os.path.splitext(image_path)[0] + '.txt'
-                label_full_path = os.path.join(self.label_folder, label_relative_path)
-                if os.path.exists(label_full_path) and os.path.getsize(label_full_path) > 0:
-                    full_image_path = os.path.join(self.folder_path, image_path)
-                    if os.path.exists(full_image_path):
-                        cv2_module = lazy_importer.get_cv2(); img = cv2_module.imread(full_image_path) 
-                        if img is not None:
-                            height, width = img.shape[:2]
-                            bboxes, polygons = read_annotations_from_file(label_full_path, (height,width))
-                            if bboxes or polygons: all_bboxes[image_path] = bboxes; all_polygons[image_path] = polygons; annotated_images.append(image_path)
-            if format_type == "coco":
-                coco_data = BoundingBoxEditor.convert_to_coco_format(self.image_files, all_bboxes, all_polygons, self.class_names, self.folder_path)
-                with open(os.path.join(export_format_folder, "annotations.json"), "w") as f: json.dump(coco_data, f, indent=2)
-                messagebox.showinfo("Export Complete", f"COCO format export successful to:\n{export_format_folder}")
-            elif format_type == "voc":
-                voc_output_dir = os.path.join(export_format_folder, "Annotations"); os.makedirs(voc_output_dir, exist_ok=True)
-                for image_path in annotated_images:
-                    bboxes = all_bboxes.get(image_path, []); polygons = all_polygons.get(image_path, [])
-                    full_image_path = os.path.join(self.folder_path, image_path)
-                    if os.path.exists(full_image_path):
-                        cv2_module = lazy_importer.get_cv2(); img = cv2_module.imread(full_image_path) 
-                        if img is not None:
-                            height, width = img.shape[:2]
-                            xml_str = BoundingBoxEditor.convert_to_pascal_voc_format(image_path, bboxes, polygons, self.class_names, (height,width))
-                            image_name = os.path.splitext(os.path.basename(image_path))[0]
-                            with open(os.path.join(voc_output_dir, f"{image_name}.xml"), "w") as xml_file: xml_file.write(xml_str)
-                messagebox.showinfo("Export Complete", f"Pascal VOC format export successful to:\n{voc_output_dir}")
-            elif format_type == "csv":
-                csv_rows = BoundingBoxEditor.convert_to_csv_format(self.image_files, all_bboxes, all_polygons, self.class_names)
-                with open(os.path.join(export_format_folder, "annotations.csv"), "w", newline="") as csv_file: csv.writer(csv_file).writerows(csv_rows)
-                messagebox.showinfo("Export Complete", f"CSV format export successful to:\n{export_format_folder}")
-            elif format_type == "json":
-                json_data = {"images": [], "annotations": [], "categories": [{"id": i, "name": name} for i,name in enumerate(self.class_names)]}
-                annotation_id = 1
-                for img_idx, image_path in enumerate(self.image_files):
-                    full_image_path = os.path.join(self.folder_path, image_path); width, height = 640,480
-                    if os.path.exists(full_image_path):
-                        cv2_module = lazy_importer.get_cv2(); img = cv2_module.imread(full_image_path) 
-                        if img is not None: height, width = img.shape[:2]
-                    json_data["images"].append({"id":img_idx, "file_name":os.path.basename(image_path), "width":width, "height":height})
-                    if image_path in all_bboxes:
-                        for x,y,w,h,class_id in all_bboxes[image_path]:
-                            json_data["annotations"].append({"id":annotation_id, "image_id":img_idx, "category_id":class_id, "bbox":[x,y,w,h], "area":w*h, "type":"bbox"}); annotation_id+=1
-                    if image_path in all_polygons:
-                        for polygon in all_polygons[image_path]:
-                            class_id = polygon['class_id']; points = polygon['points']
-                            json_data["annotations"].append({"id":annotation_id, "image_id":img_idx, "category_id":class_id, "polygon":points, "type":"polygon"}); annotation_id+=1
-                with open(os.path.join(export_format_folder, "annotations.json"), "w") as json_file: json.dump(json_data, json_file, indent=2)
-                messagebox.showinfo("Export Complete", f"JSON format export successful to:\n{export_format_folder}")
-            if copy_images:
-                images_output_dir = os.path.join(export_format_folder, "images"); os.makedirs(images_output_dir, exist_ok=True)
-                images_to_copy = annotated_images if not include_unannotated else self.image_files
-                for relative_image_path in images_to_copy:
-                    src_image_path = os.path.join(self.folder_path, relative_image_path)
-                    dst_image_path = os.path.join(images_output_dir, relative_image_path)
-                    os.makedirs(os.path.dirname(dst_image_path), exist_ok=True)
-                    if os.path.exists(src_image_path): shutil.copy(src_image_path, dst_image_path)
-        except Exception as e: logging.exception("Error during export_to_other_formats"); messagebox.showerror("Export Error", f"An error occurred during export:\n{e}")
 
     def reload_classes_from_yaml(self):
         try:
@@ -1927,3 +1706,935 @@ class BoundingBoxEditor(tk.Frame):
             self.update_class_colors(); self.display_annotations()
             messagebox.showinfo("Classes Reloaded", f"Successfully reloaded {len(self.class_names)} classes from YAML file.")
         except Exception as e: messagebox.showerror("Error", f"Failed to reload classes from YAML: {str(e)}")
+
+    def train_yolo_model(self):
+        """Open a dialog for YOLO model training configuration and execution"""
+        # Check if we have annotations first
+        annotated_count = 0
+        for image_path in self.image_files:
+            label_path = os.path.join(self.label_folder, os.path.splitext(image_path)[0] + '.txt')
+            if os.path.exists(label_path) and os.path.getsize(label_path) > 0:
+                annotated_count += 1
+        
+        if annotated_count < 10:
+            messagebox.showwarning("Insufficient Data", 
+                f"Only {annotated_count} annotated images found. Recommend at least 10+ images for training.")
+            return
+
+        self.open_training_dialog()
+
+    def open_training_dialog(self):
+        """Open the YOLO training configuration dialog"""
+        train_win = tk.Toplevel(self.root)
+        train_win.title("Train YOLO Model")
+        train_win.transient(self.root)
+        # Note: Removed grab_set() to prevent window closing when focus is lost during training
+        train_win.geometry("700x750") # Increased height
+        
+        # Make window stay on top during training but allow focus to other apps
+        train_win.attributes('-topmost', False)  # Don't force always on top
+        train_win.focus_force()  # Give initial focus but don't grab it
+          # Model selection
+        model_frame = tk.LabelFrame(train_win, text="🎯 Training Mode Selection")
+        model_frame.pack(fill=tk.X, padx=10, pady=5)
+        tk.Label(model_frame, text="Choose Training Mode:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
+        model_var = tk.StringVar(value="yolov8n.pt")
+        model_options = [
+            "🎯 OBJECT DETECTION:",
+            "yolov8n.pt", "yolov8s.pt", "yolov8m.pt", "yolov8l.pt", "yolov8x.pt",
+            "🎯 SEGMENTATION:",
+            "yolov8n-seg.pt", "yolov8s-seg.pt", "yolov8m-seg.pt", "yolov8l-seg.pt", "yolov8x-seg.pt"
+        ]
+        model_combo = ttk.Combobox(model_frame, textvariable=model_var, values=model_options, state="readonly")
+        model_combo.grid(row=0, column=1, sticky="ew", padx=5, pady=2)
+        
+        # Add clear mode explanations
+        mode_info_frame = tk.Frame(model_frame)
+        mode_info_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
+        
+        tk.Label(mode_info_frame, text="🎯 OBJECT DETECTION MODE:", 
+                font=("TkDefaultFont", 9, "bold"), fg="darkgreen").pack(anchor="w")
+        tk.Label(mode_info_frame, text="   • Detects objects with bounding boxes", 
+                font=("TkDefaultFont", 8), fg="darkgreen").pack(anchor="w")
+        tk.Label(mode_info_frame, text="   • Works with any annotation type (auto-converts polygons to boxes)", 
+                font=("TkDefaultFont", 8), fg="darkgreen").pack(anchor="w")
+        
+        tk.Label(mode_info_frame, text="🎯 SEGMENTATION MODE:", 
+                font=("TkDefaultFont", 9, "bold"), fg="darkblue").pack(anchor="w", pady=(10,0))
+        tk.Label(mode_info_frame, text="   • Precise pixel-level object segmentation", 
+                font=("TkDefaultFont", 8), fg="darkblue").pack(anchor="w")
+        tk.Label(mode_info_frame, text="   • Auto-converts all annotations to polygon format", 
+                font=("TkDefaultFont", 8), fg="darkblue").pack(anchor="w")
+        
+        # Training parameters
+        params_frame = tk.LabelFrame(train_win, text="Training Parameters")
+        params_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        tk.Label(params_frame, text="Epochs:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
+        epochs_var = tk.StringVar(value="100")
+        tk.Entry(params_frame, textvariable=epochs_var, width=10).grid(row=0, column=1, sticky="w", padx=5, pady=2)
+        
+        tk.Label(params_frame, text="Image Size:").grid(row=0, column=2, sticky="w", padx=5, pady=2)
+        imgsz_var = tk.StringVar(value="640")
+        tk.Entry(params_frame, textvariable=imgsz_var, width=10).grid(row=0, column=3, sticky="w", padx=5, pady=2)
+        
+        tk.Label(params_frame, text="Batch Size:").grid(row=1, column=0, sticky="w", padx=5, pady=2)
+        batch_var = tk.StringVar(value="16")
+        tk.Entry(params_frame, textvariable=batch_var, width=10).grid(row=1, column=1, sticky="w", padx=5, pady=2)
+        
+        tk.Label(params_frame, text="Learning Rate:").grid(row=1, column=2, sticky="w", padx=5, pady=2)
+        lr_var = tk.StringVar(value="0.01")
+        tk.Entry(params_frame, textvariable=lr_var, width=10).grid(row=1, column=3, sticky="w", padx=5, pady=2)
+        
+        # Data splitting
+        data_frame = tk.LabelFrame(train_win, text="Data Configuration")
+        data_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        auto_export_var = tk.BooleanVar(value=True)
+        tk.Checkbutton(data_frame, text="Auto-export dataset for training", variable=auto_export_var).pack(anchor="w", padx=5, pady=2)
+        
+        split_var = tk.StringVar(value="split")
+        tk.Radiobutton(data_frame, text="Split data (80/20 train/val)", variable=split_var, value="split").pack(anchor="w", padx=5, pady=2)
+        tk.Radiobutton(data_frame, text="Use existing train/val split", variable=split_var, value="existing").pack(anchor="w", padx=5, pady=2)
+        
+        # Output location
+        output_frame = tk.LabelFrame(train_win, text="Output Location")
+        output_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        output_var = tk.StringVar(value=os.path.join(self.folder_path, "runs", "train"))
+        tk.Label(output_frame, text="Output Directory:").pack(anchor="w", padx=5, pady=2)
+        output_entry = tk.Entry(output_frame, textvariable=output_var, width=60)
+        output_entry.pack(fill=tk.X, padx=5, pady=2)
+        
+        # Progress area
+        progress_frame = tk.LabelFrame(train_win, text="Training Progress")
+        progress_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        
+        self.train_progress = tk.Text(progress_frame, height=8, state=tk.DISABLED)
+        scrollbar = tk.Scrollbar(progress_frame, orient="vertical", command=self.train_progress.yview)
+        self.train_progress.configure(yscrollcommand=scrollbar.set)
+        self.train_progress.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # Buttons
+        button_frame = tk.Frame(train_win)
+        button_frame.pack(fill=tk.X, padx=10, pady=10)
+        
+        def start_training():
+            # Disable the button during training
+            start_btn.config(state=tk.DISABLED)
+            
+            # Get parameters
+            model = model_var.get()
+              # Validate model selection (prevent header selection)
+            if model.startswith("🎯"):
+                messagebox.showerror("Invalid Selection", "Please select an actual model, not a category header.", parent=train_win)
+                start_btn.config(state=tk.NORMAL)
+                return
+            
+            epochs = int(epochs_var.get())
+            imgsz = int(imgsz_var.get())
+            batch = int(batch_var.get())
+            lr = float(lr_var.get())
+            output_dir = output_var.get()
+              # Start training in a separate thread
+            import threading
+            training_thread = threading.Thread(
+                target=self.execute_training,
+                args=(model, epochs, imgsz, batch, lr, output_dir, auto_export_var.get(), 
+                      split_var.get(), start_btn, train_win)
+            )
+            training_thread.daemon = True
+            training_thread.start()
+        
+        start_btn = tk.Button(button_frame, text="🚀 Start Training", command=start_training)
+        start_btn.pack(side=tk.LEFT, padx=5)
+        
+        def safe_close():
+            """Safely close the training window with confirmation if training is in progress"""
+            # Check if training is currently running by checking button state
+            if start_btn['state'] == 'disabled':
+                import tkinter.messagebox as mb
+                if mb.askyesno("Training in Progress", 
+                              "Training is currently in progress. Are you sure you want to close this window?\n\n" +
+                              "Note: Training will continue in the background.", parent=train_win):
+                    train_win.destroy()
+            else:
+                train_win.destroy()
+        
+        # Set up window close protocol to prevent accidental closure during training
+        train_win.protocol("WM_DELETE_WINDOW", safe_close)
+        
+        tk.Button(button_frame, text="Cancel", command=safe_close).pack(side=tk.RIGHT, expand=True, padx=5)
+
+    def _export_yaml_logic(self, split_type="split"):
+        """
+        Prepares a dataset.yaml file for YOLO training, splitting data if requested.
+        Only includes images that have a corresponding non-empty label file.
+        The YAML file is placed in a new 'yolo_prepared_dataset' directory,
+        along with copied images and labels, using relative paths.
+        """
+        # Define the new root directory for the prepared dataset
+        prepared_dataset_root = os.path.join(os.getcwd(), "yolo_prepared_dataset") # os.getcwd() is image_labelling/
+        
+        # Clean up existing prepared dataset directory if it exists
+        if os.path.exists(prepared_dataset_root):
+            shutil.rmtree(prepared_dataset_root)
+        os.makedirs(prepared_dataset_root, exist_ok=True)
+
+        # Define subdirectories for images and labels
+        train_images_dir = os.path.join(prepared_dataset_root, "images", "train")
+        val_images_dir = os.path.join(prepared_dataset_root, "images", "val")
+        train_labels_dir = os.path.join(prepared_dataset_root, "labels", "train")
+        val_labels_dir = os.path.join(prepared_dataset_root, "labels", "val")
+
+        os.makedirs(train_images_dir, exist_ok=True)
+        os.makedirs(val_images_dir, exist_ok=True)
+        os.makedirs(train_labels_dir, exist_ok=True)
+        os.makedirs(val_labels_dir, exist_ok=True)
+
+        dataset_yaml_path = os.path.join(prepared_dataset_root, "dataset.yaml")
+        
+        all_image_files_in_project = list(self.image_files) # These are relative to self.folder_path (original dataset)
+        
+        labeled_image_files_relative_to_original_dataset = []
+        for relative_image_path in all_image_files_in_project:
+            # Construct path to original label file
+            original_label_filename_part = os.path.splitext(relative_image_path)[0]
+            if original_label_filename_part.startswith(os.path.sep) or original_label_filename_part.startswith('/'):
+                 original_label_filename_part = original_label_filename_part[1:]
+            original_label_file_path = os.path.join(self.label_folder, original_label_filename_part + ".txt")
+
+            if os.path.exists(original_label_file_path) and os.path.getsize(original_label_file_path) > 0:
+                labeled_image_files_relative_to_original_dataset.append(relative_image_path)
+            else:
+                logging.info(f"Skipping image {relative_image_path} for training YAML as its label file is missing or empty at {original_label_file_path}")
+
+        if not labeled_image_files_relative_to_original_dataset:
+            logging.error("No labeled images with non-empty label files found to create dataset.yaml for training.")
+            messagebox.showerror("Dataset YAML Error", "No labeled images found for training. Ensure images are annotated and labels saved.", parent=self.root)
+            return None
+
+        # These lists will store paths relative to the original dataset for splitting
+        source_train_files_rel = []
+        source_val_files_rel = []
+
+        if split_type == "split":
+            import random
+            random.shuffle(labeled_image_files_relative_to_original_dataset)
+            split_idx = int(len(labeled_image_files_relative_to_original_dataset) * 0.8)
+            source_train_files_rel = labeled_image_files_relative_to_original_dataset[:split_idx]
+            source_val_files_rel = labeled_image_files_relative_to_original_dataset[split_idx:]
+            
+            if not source_train_files_rel and labeled_image_files_relative_to_original_dataset:
+                source_train_files_rel = labeled_image_files_relative_to_original_dataset
+                source_val_files_rel = []
+                logging.warning("Too few labeled images for a train/val split. Using all for training.")
+        elif split_type == "existing":
+            logging.warning("Split type 'existing' with auto_export. This logic assumes 'train' and 'val' subdirectories exist with images in the original dataset.")
+            for rel_path in labeled_image_files_relative_to_original_dataset:
+                if rel_path.startswith("train" + os.path.sep) or rel_path.startswith("train/"):
+                    source_train_files_rel.append(rel_path)
+                elif rel_path.startswith("valid" + os.path.sep) or rel_path.startswith("valid/") or \
+                     rel_path.startswith("val" + os.path.sep) or rel_path.startswith("val/"):
+                    source_val_files_rel.append(rel_path)
+            if not source_train_files_rel:
+                logging.warning("No labeled images found in 'train' subdirectory for 'existing' split. Using all labeled images for training.")
+                source_train_files_rel = labeled_image_files_relative_to_original_dataset
+                source_val_files_rel = []
+        else:
+            logging.error(f"Unknown split_type: {split_type}")
+            messagebox.showerror("Dataset YAML Error", f"Unknown split type: {split_type}", parent=self.root)
+            return None
+            
+        if not source_train_files_rel and not source_val_files_rel and labeled_image_files_relative_to_original_dataset:
+            logging.warning("Train/Val split resulted in empty lists, using all labeled images for training as fallback.")
+            source_train_files_rel = labeled_image_files_relative_to_original_dataset
+            source_val_files_rel = []
+
+        # Helper function to copy files and return relative paths for YAML
+        def copy_and_get_relative_paths(source_files_relative_to_original, dest_image_dir, dest_label_dir):
+            yaml_image_paths = []
+            for original_rel_img_path in source_files_relative_to_original:
+                original_abs_img_path = os.path.join(self.folder_path, original_rel_img_path)
+                
+                original_label_filename_part = os.path.splitext(original_rel_img_path)[0]
+                if original_label_filename_part.startswith(os.path.sep) or original_label_filename_part.startswith('/'):
+                    original_label_filename_part = original_label_filename_part[1:]
+                original_abs_label_path = os.path.join(self.label_folder, original_label_filename_part + ".txt")
+
+                img_basename = os.path.basename(original_abs_img_path)
+                label_basename = os.path.basename(original_abs_label_path)
+
+                dest_abs_img_path = os.path.join(dest_image_dir, img_basename)
+                dest_abs_label_path = os.path.join(dest_label_dir, label_basename)
+
+                try:
+                    shutil.copy2(original_abs_img_path, dest_abs_img_path)
+                    shutil.copy2(original_abs_label_path, dest_abs_label_path)
+                    # Path for YAML should be relative to prepared_dataset_root
+                    yaml_image_paths.append(os.path.join("images", os.path.basename(dest_image_dir), img_basename).replace("\\", "/"))
+                except Exception as e:
+                    logging.error(f"Error copying file {original_abs_img_path} or {original_abs_label_path}: {e}")
+            return yaml_image_paths
+
+        yaml_train_image_paths = copy_and_get_relative_paths(source_train_files_rel, train_images_dir, train_labels_dir)
+        yaml_val_image_paths = copy_and_get_relative_paths(source_val_files_rel, val_images_dir, val_labels_dir)
+
+        yaml_data = {
+            'path': prepared_dataset_root.replace("\\", "/"), # Absolute path to the dataset root
+            'train': 'images/train', # Folder path relative to the dataset root
+            'val': 'images/val',     # Folder path relative to the dataset root
+            'nc': len(self.class_names),
+            'names': self.class_names
+        }
+        logging.info(f"Generated dataset.yaml with folder paths in {prepared_dataset_root}.")
+
+        try:
+            with open(dataset_yaml_path, 'w') as f:
+                yaml.dump(yaml_data, f, sort_keys=False, default_flow_style=None, width=float("inf"))
+            logging.info(f"Generated dataset.yaml at {dataset_yaml_path}")
+            return dataset_yaml_path # Return path to the new YAML in the prepared directory
+        except Exception as e:
+            logging.error(f"Failed to write dataset.yaml: {e}", exc_info=True)
+            messagebox.showerror("Dataset YAML Error", f"Failed to write dataset.yaml:\n{e}", parent=self.root)
+            return None
+
+    def execute_training(self, model, epochs, imgsz, batch, lr, output_dir, auto_export, split_type, start_btn, train_win):
+        """Execute the YOLO training in a separate thread"""
+        def log_message(msg):
+            """Helper function to log messages to the training progress window"""
+            try:
+                self.train_progress.config(state=tk.NORMAL)
+                self.train_progress.insert(tk.END, f"{msg}\n")
+                self.train_progress.see(tk.END)
+                self.train_progress.config(state=tk.DISABLED)
+                train_win.update_idletasks()
+            except:
+                print(f"Log: {msg}")  # Fallback logging
+        
+        try:
+            
+            log_message("🚀 Starting YOLO training...")
+            log_message(f"Model: {model}")
+            log_message(f"Epochs: {epochs}, Image Size: {imgsz}, Batch: {batch}, LR: {lr}")
+            
+            # System resource check to prevent segmentation faults
+            try:
+                import psutil
+                memory = psutil.virtual_memory()
+                available_gb = memory.available / (1024**3)
+                
+                log_message(f"💾 System check: {available_gb:.1f} GB RAM available")
+                
+                # Adjust parameters based on available memory
+                if available_gb < 2:
+                    log_message("⚠️ WARNING: Low memory detected - adjusting parameters to prevent crashes")
+                    batch = 1
+                    imgsz = min(imgsz, 320)
+                    log_message(f"🔧 Auto-adjusted: batch_size={batch}, imgsz={imgsz}")
+                elif available_gb < 4:
+                    log_message("⚠️ CAUTION: Limited memory - using conservative settings")
+                    batch = min(batch, 2)
+                    imgsz = min(imgsz, 416)
+                    log_message(f"🔧 Auto-adjusted: batch_size={batch}, imgsz={imgsz}")
+                else:
+                    log_message("✅ Good memory available for training")
+                    
+            except ImportError:
+                log_message("⚠️ Cannot check system resources (psutil not available)")
+            except Exception as e:
+                log_message(f"⚠️ System check failed: {e}")
+            
+            # Initialize variables
+            dataset_yaml = None
+            is_segmentation_model = "-seg.pt" in model.lower()
+            
+            # 🎯 TWO TRAINING MODES:
+            # 1. OBJECT DETECTION MODE: Uses mixed/detection dataset (bboxes + polygons → bboxes)
+            # 2. SEGMENTATION MODE: Uses pure segmentation dataset (all polygons)
+            
+            if is_segmentation_model:
+                log_message("🎯 SEGMENTATION MODE: Converting all annotations to polygons...")
+            else:
+                log_message("🎯 OBJECT DETECTION MODE: Using bounding boxes for detection...")
+            
+            # Auto-export dataset if requested
+            if auto_export:
+                log_message("📤 Exporting dataset for training...")
+                
+                if is_segmentation_model:
+                    # SEGMENTATION MODE: Create detection dataset first, then convert to segmentation
+                    log_message("🔄 Step 1: Creating base dataset...")
+                    dataset_yaml = self._export_yaml_logic(split_type) 
+                    if not dataset_yaml:
+                        log_message("❌ Failed to prepare base dataset.yaml for training.")
+                        messagebox.showerror("Training Error", "Failed to prepare dataset.yaml.", parent=train_win)
+                        start_btn.config(state=tk.NORMAL)
+                        return
+                    
+                    log_message("🔄 Step 2: Converting to pure segmentation format...")
+                    try:
+                        import subprocess
+                        import os  # Ensure os is available in this scope
+                        current_dir = os.getcwd()
+                        convert_script = os.path.join(current_dir, "convert_to_segmentation.py")
+                        if os.path.exists(convert_script):
+                            result = subprocess.run([
+                                "C:/Users/lewka/miniconda3/envs/deep_learning/python.exe", 
+                                convert_script
+                            ], capture_output=True, text=True, cwd=current_dir)
+                            
+                            if result.returncode == 0:
+                                log_message("✅ Dataset converted to segmentation format successfully!")
+                                # Use segmentation dataset
+                                segmentation_dataset_root = os.path.join(current_dir, "yolo_prepared_dataset_segmentation")
+                                dataset_yaml = os.path.join(segmentation_dataset_root, "dataset.yaml")
+                                log_message(f"📊 Using segmentation dataset: {dataset_yaml}")
+                            else:
+                                log_message(f"❌ Conversion failed: {result.stderr}")
+                                raise Exception(f"Dataset conversion failed: {result.stderr}")
+                        else:
+                            raise Exception("Conversion script not found")
+                    except Exception as e:
+                        log_message(f"❌ Failed to convert dataset: {e}")
+                        messagebox.showerror("Dataset Error", 
+                            f"Segmentation training failed:\n{e}\n\nTry detection mode instead.", parent=train_win)
+                        start_btn.config(state=tk.NORMAL)
+                        return
+                else:
+                    # DETECTION MODE: Just create the detection dataset
+                    dataset_yaml = self._export_yaml_logic(split_type) 
+                    if not dataset_yaml:
+                        log_message("❌ Failed to prepare dataset.yaml for training.")
+                        messagebox.showerror("Training Error", "Failed to prepare dataset.yaml.", parent=train_win)
+                        start_btn.config(state=tk.NORMAL)
+                        return
+                    log_message(f"📊 Using detection dataset: {dataset_yaml}")
+            else:
+                # Use existing prepared datasets (no auto-export)
+                
+                if is_segmentation_model:
+                    # SEGMENTATION MODE: Look for existing segmentation dataset
+                    import os  # Ensure os is available in this scope
+                    current_dir = os.getcwd()
+                    segmentation_dataset_root = os.path.join(current_dir, "yolo_prepared_dataset_segmentation")
+                    segmentation_yaml = os.path.join(segmentation_dataset_root, "dataset.yaml")
+                    
+                    if os.path.exists(segmentation_yaml):
+                        dataset_yaml = segmentation_yaml
+                        log_message(f"📊 Using existing segmentation dataset: {dataset_yaml}")
+                    else:
+                        log_message("⚠️ No segmentation dataset found. Auto-converting from detection dataset...")
+                        # Check if we have detection dataset to convert
+                        detection_dataset_root = os.path.join(current_dir, "yolo_prepared_dataset")
+                        if not os.path.exists(detection_dataset_root):
+                            log_message("❌ No datasets found. Please enable auto-export or create datasets first.")
+                            messagebox.showerror("Dataset Error", 
+                                "No datasets found for segmentation training.\n\n" +
+                                "Solutions:\n1. Enable 'Auto-export dataset' option\n2. Create datasets manually", parent=train_win)
+                            start_btn.config(state=tk.NORMAL)
+                            return
+                        
+                        # Convert existing detection dataset to segmentation
+                        try:
+                            import subprocess
+                            import os  # Ensure os is available in this scope
+                            current_dir = os.getcwd()
+                            convert_script = os.path.join(current_dir, "convert_to_segmentation.py")
+                            if os.path.exists(convert_script):
+                                result = subprocess.run([
+                                    "C:/Users/lewka/miniconda3/envs/deep_learning/python.exe", 
+                                    convert_script
+                                ], capture_output=True, text=True, cwd=current_dir)
+                                
+                                if result.returncode == 0:
+                                    log_message("✅ Dataset converted to segmentation format successfully!")
+                                    dataset_yaml = segmentation_yaml
+                                    log_message(f"📊 Using converted segmentation dataset: {dataset_yaml}")
+                                else:
+                                    log_message(f"❌ Conversion failed: {result.stderr}")
+                                    raise Exception(f"Dataset conversion failed: {result.stderr}")
+                            else:
+                                raise Exception("Conversion script not found")
+                        except Exception as e:
+                            log_message(f"❌ Failed to convert dataset: {e}")
+                            messagebox.showerror("Dataset Error", 
+                                f"Segmentation training failed:\n{e}\n\nTry detection mode instead.", parent=train_win)
+                            start_btn.config(state=tk.NORMAL)
+                            return
+                else:
+                    # DETECTION MODE: Use existing detection dataset
+                    import os  # Ensure os is available in this scope
+                    current_dir = os.getcwd()
+                    prepared_dataset_root = os.path.join(current_dir, "yolo_prepared_dataset")
+                    dataset_yaml = os.path.join(prepared_dataset_root, "dataset.yaml")
+                    
+                    if os.path.exists(dataset_yaml):
+                        log_message(f"📊 Using existing detection dataset: {dataset_yaml}")
+                    else:
+                        log_message("❌ No detection dataset found. Please enable auto-export.")
+                        messagebox.showerror("Dataset Error", 
+                            "No detection dataset found.\n\nPlease enable 'Auto-export dataset' option.", parent=train_win)
+                        start_btn.config(state=tk.NORMAL)
+                        return
+                    log_message(f"📊 Using detection dataset: {dataset_yaml}")
+            
+            # Validate dataset format against model type
+            log_message(f"🔍 Validating dataset format for {'segmentation' if is_segmentation_model else 'detection'} model...")
+            
+            # Check a few label files to determine annotation format
+            import os  # Ensure os is available in this scope
+            labels_dir = os.path.join(os.path.dirname(dataset_yaml), "labels", "train")
+            if os.path.exists(labels_dir):
+                label_files = [f for f in os.listdir(labels_dir) if f.endswith('.txt')]
+                if label_files:
+                    sample_file = os.path.join(labels_dir, label_files[0])
+                    try:
+                        with open(sample_file, 'r') as f:
+                            lines = f.readlines()
+                        has_detection = False
+                        has_segmentation = False
+                        total_detection_annotations = 0
+                        total_segmentation_annotations = 0
+                        
+                        # Check multiple files to get a better sample
+                        files_to_check = label_files[:min(5, len(label_files))]
+                        
+                        for file_name in files_to_check:
+                            file_path = os.path.join(labels_dir, file_name)
+                            try:
+                                with open(file_path, 'r') as f:
+                                    file_lines = f.readlines()
+                                
+                                for line in file_lines:
+                                    parts = line.strip().split()
+                                    if len(parts) == 5:  # Detection format: class x y w h
+                                        has_detection = True
+                                        total_detection_annotations += 1
+                                    elif len(parts) > 5 and len(parts) % 2 == 1:  # Segmentation format: class x1 y1 x2 y2 ...
+                                        has_segmentation = True
+                                        total_segmentation_annotations += 1
+                            except Exception as e:
+                                continue
+                        
+                        # Report dataset composition
+                        log_message(f"📋 Dataset analysis: {total_detection_annotations} bounding boxes, {total_segmentation_annotations} polygons")
+                        
+                        # Handle mixed dataset scenarios
+                        if has_detection and has_segmentation:
+                            if is_segmentation_model:
+                                log_message("✅ Mixed dataset with segmentation model: Will use polygons for segmentation, ignore bounding boxes.")
+                                log_message("💡 Note: Bounding box annotations will be ignored during segmentation training.")
+                            else:
+                                log_message("✅ Mixed dataset with detection model: Will convert polygons to bounding boxes automatically.")
+                                log_message("💡 Note: Polygon details will be simplified to bounding boxes.")
+                        elif is_segmentation_model and has_detection and not has_segmentation:
+                            log_message("❌ Error: Segmentation model requires polygon annotations, but only bounding boxes found.")
+                            log_message("💡 Solution: Use a detection model (yolov8n.pt instead of yolov8n-seg.pt)")
+                            messagebox.showerror("Dataset Format Error", 
+                                "This segmentation model requires polygon annotations, but your dataset only contains bounding boxes.\n\n" +
+                                "Solutions:\n" +
+                                "1. Use a detection model (yolov8n.pt)\n" +
+                                "2. Add polygon annotations to your dataset", parent=train_win)
+                            start_btn.config(state=tk.NORMAL)
+                            return
+                        elif not is_segmentation_model and has_segmentation and not has_detection:
+                            log_message("✅ Detection model with polygon dataset: Will convert polygons to bounding boxes.")
+                        else:
+                            log_message("✅ Dataset format matches model type perfectly.")
+                    except Exception as e:
+                        log_message(f"⚠️ Could not validate dataset format: {e}")
+            
+            # Import YOLO and start training
+            try:
+                YOLO = lazy_importer.get_yolo()
+                log_message("🤖 Loading YOLO model...")
+                model_instance = YOLO(model)
+                log_message("🏋️ Starting training...")
+                
+                # Enhanced memory optimization for preventing segmentation faults
+                import gc
+                import torch
+                import os
+                
+                # Set environment variables for memory optimization
+                os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:128'
+                os.environ['OMP_NUM_THREADS'] = '1'
+                
+                # Clear any existing PyTorch cache
+                if hasattr(torch.cuda, 'empty_cache'):
+                    torch.cuda.empty_cache()
+                gc.collect()
+                
+                log_message("🧠 Enhanced memory optimization applied")
+                
+                # Further reduce parameters to prevent segmentation faults
+                safe_batch = max(1, min(batch, 2))  # Even more conservative batch size
+                safe_imgsz = min(imgsz, 320)       # Smaller image size to reduce memory
+                safe_workers = 0                   # Disable multiprocessing completely
+                
+                log_message(f"🛡️ Safety parameters: batch={safe_batch}, imgsz={safe_imgsz}, workers={safe_workers}")
+                
+                # Train the model with ultra-safe parameters to prevent segmentation faults
+                results = model_instance.train(
+                    data=dataset_yaml,
+                    epochs=epochs,
+                    imgsz=safe_imgsz,
+                    batch=safe_batch,
+                    lr0=lr,
+                    project=output_dir,
+                    device='cpu',        # Force CPU to avoid GPU memory issues
+                    workers=safe_workers, # Disable multiprocessing to prevent crashes
+                    patience=20,         # Shorter patience to prevent extremely long training
+                    save_period=5,       # Save more frequently in case of crashes
+                    cache=False,         # Disable caching to reduce memory usage
+                    amp=False,           # Disable mixed precision to avoid potential issues
+                    verbose=True,        # Enable verbose logging
+                    exist_ok=True        # Allow overwriting existing results
+                )
+                
+                log_message("✅ Training completed successfully!")
+                log_message(f"📁 Results saved to: {results.save_dir}")
+                
+                # Clean up memory after training
+                del model_instance
+                del results
+                gc.collect()
+                if hasattr(torch.cuda, 'empty_cache'):
+                    torch.cuda.empty_cache()
+                log_message("🧹 Memory cleanup completed")
+                
+                messagebox.showinfo("Training Complete", f"Training completed successfully!\nResults saved to: {results.save_dir if 'results' in locals() else 'Unknown'}", parent=train_win)
+                
+            except KeyboardInterrupt:
+                log_message("⏹️ Training interrupted by user")
+                messagebox.showinfo("Training Interrupted", "Training was stopped by user.", parent=train_win)
+            except MemoryError:
+                log_message("💾 Out of memory! Try reducing batch size or image size.")
+                messagebox.showerror("Memory Error", 
+                    "Training failed due to insufficient memory.\n\n" +
+                    "Solutions:\n" +
+                    "1. Reduce batch size (try 1-2)\n" +
+                    "2. Reduce image size (try 320 or 416)\n" +
+                    "3. Close other applications\n" +
+                    "4. Use a smaller model (yolov8n instead of yolov8l)", parent=train_win)
+            except Exception as e:
+                error_msg = str(e)
+                log_message(f"❌ Training failed: {error_msg}")
+                
+                # Provide specific guidance for common issues
+                if "segmentation fault" in error_msg.lower() or "access violation" in error_msg.lower():
+                    solution_msg = ("Training crashed due to a system-level error.\n\n" +
+                                  "Solutions:\n" +
+                                  "1. Restart the application\n" +
+                                  "2. Reduce batch size to 1\n" +
+                                  "3. Use smaller image size (320)\n" +
+                                  "4. Close other memory-intensive applications\n" +
+                                  "5. Try detection mode instead of segmentation")
+                elif "out of memory" in error_msg.lower() or "memory" in error_msg.lower():
+                    solution_msg = ("Memory error during training.\n\n" +
+                                  "Solutions:\n" +
+                                  "1. Reduce batch size\n" +
+                                  "2. Reduce image size\n" +
+                                  "3. Use CPU instead of GPU")
+                else:
+                    solution_msg = f"Training failed:\n{error_msg}"
+                
+                messagebox.showerror("Training Error", solution_msg, parent=train_win)
+            
+        except Exception as e:
+            log_message(f"❌ Error: {str(e)}")
+            messagebox.showerror("Error", f"An error occurred:\n{str(e)}", parent=train_win)
+        finally:
+            # Clean up memory and re-enable button
+            try:
+                import gc
+                import torch
+                gc.collect()
+                if hasattr(torch.cuda, 'empty_cache'):
+                    torch.cuda.empty_cache()
+            except:
+                pass
+            
+            # Re-enable the start button
+            if start_btn.winfo_exists(): # Check if button still exists
+                start_btn.config(state=tk.NORMAL)
+
+    # --------------------------------------------------
+    # Annotation Export Functionality
+    # --------------------------------------------------
+
+    def export_format_selection_window(self):
+        export_win = tk.Toplevel(self.root)
+        export_win.title("Select Export Format")
+        export_win.transient(self.root)
+        export_win.grab_set()
+
+        tk.Label(export_win, text="Choose an export format:").pack(pady=10, padx=10)
+
+        export_format_var = tk.StringVar(value="coco") # Default selection
+
+        formats = [
+            ("COCO (.json for all images)", "coco"),
+            ("Pascal VOC (.xml per image)", "pascal_voc"),
+            ("CSV (.csv for all images)", "csv"),
+            ("YOLO (existing .txt files)", "yolo")
+        ]
+
+        for text, value in formats:
+            tk.Radiobutton(export_win, text=text, variable=export_format_var, value=value).pack(anchor=tk.W, padx=20)
+
+        def on_export():
+            selected_format = export_format_var.get()
+            export_win.destroy() # Close dialog first
+            self._execute_export(selected_format)
+
+        button_frame = tk.Frame(export_win)
+        button_frame.pack(pady=10, padx=10, fill=tk.X)
+        
+        tk.Button(button_frame, text="Export", command=on_export).pack(side=tk.LEFT, expand=True, padx=5)
+        tk.Button(button_frame, text="Cancel", command=export_win.destroy).pack(side=tk.RIGHT, expand=True, padx=5)
+        
+        export_win.update_idletasks() 
+        center_window(export_win, 350, 230) # Adjusted size
+
+    def _execute_export(self, export_format):
+        if export_format == "coco":
+            self._export_coco()
+        elif export_format == "pascal_voc":
+            self._export_pascal_voc()
+        elif export_format == "csv":
+            self._export_csv()
+        elif export_format == "yolo":
+            self._export_yolo()
+        else:
+            messagebox.showerror("Export Error", f"Unknown export format: {export_format}", parent=self.root)
+
+    def _get_all_annotations_data(self):
+        all_bboxes_map = {}
+        all_polygons_map = {}
+        cv2_module = lazy_importer.get_cv2()
+
+        for image_relative_path in self.image_files:
+            full_image_path = os.path.join(self.folder_path, image_relative_path)
+            label_relative_path = os.path.splitext(image_relative_path)[0] + '.txt'
+            label_path = os.path.join(self.label_folder, label_relative_path)
+
+            if not os.path.exists(label_path):
+                continue 
+
+            try:
+                height, width = -1, -1
+                if self.image_path and os.path.normpath(full_image_path) == os.path.normpath(self.image_path) and self.original_image:
+                    height, width = self.original_image.height, self.original_image.width
+                else:
+                    img_cv = cv2_module.imread(full_image_path)
+                    if img_cv is None:
+                        logging.warning(f"Could not read image {full_image_path} to get dimensions for export.")
+                        continue
+                    height, width = img_cv.shape[:2]
+                
+                if height == -1 or width == -1: # Should not happen if logic above is correct
+                    logging.warning(f"Could not determine dimensions for {full_image_path}")
+                    continue
+
+                bboxes, polygons = read_annotations_from_file(label_path, (height, width))
+                if bboxes:
+                    all_bboxes_map[image_relative_path] = bboxes
+                if polygons:
+                    all_polygons_map[image_relative_path] = polygons
+            except Exception as e:
+                logging.error(f"Error processing annotations for {image_relative_path} during export prep: {e}", exc_info=True)
+        return all_bboxes_map, all_polygons_map
+
+    def _export_coco(self):
+        try:
+            all_bboxes_map, all_polygons_map = self._get_all_annotations_data()
+            if not self.image_files: # Check if there are any images in the project
+                messagebox.showinfo("Export COCO", "No images in the project to export.", parent=self.root)
+                return
+            # Even if no annotations, COCO file should still list images.
+            # The exporter function handles empty annotations for images.
+
+            coco_data = convert_to_coco_format(
+                self.image_files, 
+                all_bboxes_map,
+                all_polygons_map,
+                self.class_names,
+                self.folder_path 
+            )
+
+            save_path = filedialog.asksaveasfilename(
+                defaultextension=".json",
+                filetypes=[("COCO JSON files", "*.json"), ("All files", "*.*")],
+                title="Save COCO Annotations",
+                parent=self.root
+            )
+            if not save_path:
+                return
+
+            with open(save_path, 'w') as f:
+                json.dump(coco_data, f, indent=4)
+            messagebox.showinfo("Export Successful", f"Annotations exported to COCO format at:\n{save_path}", parent=self.root)
+        except Exception as e:
+            messagebox.showerror("Export Error", f"Failed to export to COCO format:\n{e}", parent=self.root)
+            logging.error("Failed to export COCO", exc_info=True)
+
+    def _export_pascal_voc(self):
+        try:
+            if not self.image_files:
+                messagebox.showinfo("Export Pascal VOC", "No images in the project to export.", parent=self.root)
+                return
+
+            output_dir = filedialog.askdirectory(
+                title="Select Directory to Save Pascal VOC XML Files",
+                parent=self.root
+            )
+            if not output_dir:
+                return
+
+            cv2_module = lazy_importer.get_cv2()
+            exported_count = 0
+            for image_relative_path in self.image_files:
+                full_image_path = os.path.join(self.folder_path, image_relative_path)
+                label_relative_path = os.path.splitext(image_relative_path)[0] + '.txt'
+                label_path = os.path.join(self.label_folder, label_relative_path)
+
+                image_shape = None
+                if self.image_path and os.path.normpath(full_image_path) == os.path.normpath(self.image_path) and self.original_image:
+                    image_shape = (self.original_image.height, self.original_image.width, 3) # Assuming 3 channels
+                else:
+                    img_cv = cv2_module.imread(full_image_path)
+                    if img_cv is not None:
+                        image_shape = img_cv.shape
+                    else:
+                        logging.warning(f"Could not read image {full_image_path} for Pascal VOC export.")
+                        continue
+                
+                if image_shape is None: continue
+
+                current_bboxes, current_polygons = [], []
+                if os.path.exists(label_path):
+                    current_bboxes, current_polygons = read_annotations_from_file(label_path, image_shape[:2])
+
+                xml_data_str = convert_to_pascal_voc_format(
+                    image_relative_path, # Pass relative path for filename in XML
+                    current_bboxes,
+                    current_polygons,
+                    self.class_names,
+                    image_shape
+                )
+                
+                xml_filename = os.path.splitext(os.path.basename(image_relative_path))[0] + ".xml"
+                save_path = os.path.join(output_dir, xml_filename)
+                
+                with open(save_path, 'w', encoding='utf-8') as f:
+                    f.write(xml_data_str)
+                exported_count +=1
+            
+            if exported_count > 0:
+                messagebox.showinfo("Export Successful", f"{exported_count} XML files exported to Pascal VOC format in:\n{output_dir}", parent=self.root)
+            else:
+                messagebox.showinfo("Export Pascal VOC", "No annotations found or images processed for Pascal VOC export.", parent=self.root)
+
+        except Exception as e:
+            messagebox.showerror("Export Error", f"Failed to export to Pascal VOC format:\n{e}", parent=self.root)
+            logging.error("Failed to export Pascal VOC", exc_info=True)
+
+
+    def _export_csv(self):
+        try:
+            all_bboxes_map, all_polygons_map = self._get_all_annotations_data()
+            if not self.image_files:
+                 messagebox.showinfo("Export CSV", "No images in the project to export.", parent=self.root)
+                 return
+
+            # convert_to_csv_format expects image_files list, and the maps
+            csv_rows = convert_to_csv_format(
+                self.image_files,
+                all_bboxes_map,
+                all_polygons_map,
+                self.class_names
+            )
+
+            if len(csv_rows) <= 1: # Only headers
+                messagebox.showinfo("Export CSV", "No annotations found to export to CSV.", parent=self.root)
+                return
+
+            save_path = filedialog.asksaveasfilename(
+                defaultextension=".csv",
+                filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
+                title="Save Annotations as CSV",
+                parent=self.root
+            )
+            if not save_path:
+                return
+
+            with open(save_path, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerows(csv_rows)
+            messagebox.showinfo("Export Successful", f"Annotations exported to CSV format at:\n{save_path}", parent=self.root)
+        except Exception as e:
+            messagebox.showerror("Export Error", f"Failed to export to CSV format:\n{e}", parent=self.root)
+            logging.error("Failed to export CSV", exc_info=True)
+
+    def _export_yolo(self):
+        try:
+            # YOLO format is essentially the .txt files already being saved.
+            # This function can offer to zip the 'labels' folder and the 'dataset.yaml'.
+            
+            # Check if there are labels and a yaml file
+            if not os.path.isdir(self.label_folder) or not os.listdir(self.label_folder):
+                messagebox.showinfo("Export YOLO", "No label files found in the 'labels' directory.", parent=self.root)
+                return
+            if not os.path.exists(self.yaml_path):
+                messagebox.showinfo("Export YOLO", f"Dataset YAML file not found at {self.yaml_path}.", parent=self.root)
+                return
+
+            save_path = filedialog.asksaveasfilename(
+                defaultextension=".zip",
+                filetypes=[("ZIP files", "*.zip"), ("All files", "*.*")],
+                title="Save YOLO Dataset as ZIP",
+                parent=self.root
+            )
+            if not save_path:
+                return
+
+            # Create a temporary directory to stage files for zipping
+            temp_dir_for_zip = os.path.join(self.folder_path, "_temp_yolo_export")
+            if os.path.exists(temp_dir_for_zip):
+                shutil.rmtree(temp_dir_for_zip)
+            os.makedirs(temp_dir_for_zip)
+            
+            # Copy labels folder contents
+            temp_labels_dir = os.path.join(temp_dir_for_zip, "labels")
+            shutil.copytree(self.label_folder, temp_labels_dir)
+            
+            # Copy dataset.yaml
+            shutil.copy2(self.yaml_path, os.path.join(temp_dir_for_zip, "dataset.yaml"))
+            
+            # Copy images (optional, but good for a complete dataset zip)
+            # This could be slow and make a large zip. Let's make it optional or just include labels/yaml.
+            # For now, just labels and yaml. User can copy images separately if needed.
+            # If images are desired, they should be structured as per dataset.yaml (e.g., train/images, val/images)
+            # The current self.label_folder is flat. The self.yaml_path might point to structured image folders.
+            # For simplicity, this export will just zip the flat label folder and the main dataset.yaml.
+
+            # Zip the temporary directory
+            shutil.make_archive(os.path.splitext(save_path)[0], 'zip', temp_dir_for_zip)
+            
+            # Clean up temporary directory
+            shutil.rmtree(temp_dir_for_zip)
+
+            messagebox.showinfo("Export Successful", f"YOLO dataset (labels and dataset.yaml) zipped to:\n{save_path}", parent=self.root)
+
+        except Exception as e:
+            messagebox.showerror("Export Error", f"Failed to export YOLO dataset as ZIP:\n{e}", parent=self.root)
+            logging.error("Failed to export YOLO ZIP", exc_info=True)
+            # Clean up temp dir on error too
+            if 'temp_dir_for_zip' in locals() and os.path.exists(temp_dir_for_zip):
+                try:
+                    shutil.rmtree(temp_dir_for_zip)
+                except Exception as e_clean:
+                    logging.error(f"Failed to cleanup temp export dir: {e_clean}")
