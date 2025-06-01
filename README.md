@@ -6,7 +6,7 @@
 
 A **production-ready**, comprehensive image annotation tool designed for computer vision dataset creation. Built with Python and Tkinter, this professional-grade application supports both bounding box and polygon annotations with advanced features including AI-powered auto-annotation, comprehensive export formats, robust project management, and an intuitive user interface.
 
-![Application Screenshot](assets/screenshot.png) <!-- Add a screenshot when available -->
+
 
 ## 🚀 Key Highlights
 
