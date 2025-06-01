@@ -2,7 +2,7 @@
 *Computer Vision Annotation Tool for Bounding Boxes and Polygons*
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)]()
+[![Platform](https://img.shields.io/badge/platform-Windows%20(tested)%20%7C%20Linux%20%7C%20macOS-lightgrey)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A Python-based image annotation tool built with Tkinter for creating bounding box and polygon annotations for computer vision datasets. Features project management, multiple export formats, YOLO model integration for auto-annotation, and a user-friendly interface designed for efficient dataset creation.
@@ -43,7 +43,7 @@ A Python-based image annotation tool built with Tkinter for creating bounding bo
 
 ### Prerequisites
 - **Python 3.8 or higher**
-- **Operating System**: Windows, Linux, or macOS
+- **Operating System**: Windows (tested), Linux, or macOS (not yet tested)
 
 ### Required Dependencies
 ```bash
@@ -82,6 +82,8 @@ pip install ultralytics
 
 ### Note on Python Environment
 This tool is designed to work with your existing deep learning environment. The application runs entirely locally with no cloud dependencies.
+
+**Platform Note**: Currently tested and verified on Windows. Linux and macOS compatibility should work due to cross-platform libraries used (Tkinter, OpenCV, Pillow), but have not been formally tested yet.
 
 ## 🚀 Quick Start
 
@@ -360,7 +362,7 @@ Contributions are welcome! This project follows standard open-source contributio
 - ✨ New annotation features and tools
 - 🎨 UI/UX improvements
 - 📚 Documentation enhancements
-- 🧪 Testing and platform compatibility
+- 🧪 Testing and platform compatibility (especially Linux/macOS)
 - 🚀 Performance optimizations
 
 ### Reporting Issues:
@@ -368,6 +370,7 @@ Contributions are welcome! This project follows standard open-source contributio
 - Include detailed steps to reproduce
 - Attach relevant error logs  
 - Specify your OS and Python version
+- **Linux/macOS users**: Please report any platform-specific issues
 
 ---
 
