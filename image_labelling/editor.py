@@ -8,6 +8,8 @@ import csv
 import xml.etree.ElementTree as ET
 from datetime import datetime
 import time
+import random
+from collections import OrderedDict
 
 import tkinter as tk
 from tkinter import ttk # Import ttk
@@ -66,8 +68,10 @@ class BoundingBoxEditor(tk.Frame):
         self.auto_save_interval = data.get("auto_save_interval", 0)
 
         # Color mapping for classes
-        self.update_class_colors()        # Dictionary to hold status of each image
+        self.update_class_colors()
         self.image_status = {}
+        self.image_cache = OrderedDict()
+        self.max_cache_size = data.get("image_cache_size", 20)
 
         # -----------------------------
         # Main UI Layout
@@ -144,13 +148,11 @@ class BoundingBoxEditor(tk.Frame):
         self.history_index = -1
         self.max_history_size = 20
 
-        self.load_dataset()
+        self.load_dataset_async()
         self.setup_bindings()
         self.save_history()
         if self.auto_save_interval and self.auto_save_interval > 0:
             self.start_auto_save()
-
-        self.root.after_idle(self._attempt_load_initial_image)
 
     def _attempt_load_initial_image(self):
         """Attempts to load the last opened image or the first image in the dataset."""
@@ -160,8 +162,18 @@ class BoundingBoxEditor(tk.Frame):
         loaded_an_image = False
         if 'last_opened_image_relative' in self.project:
             last_image_relative_path = self.project['last_opened_image_relative']
-            if last_image_relative_path: 
+            if last_image_relative_path:
                 last_image_full_path = os.path.join(self.folder_path, last_image_relative_path)
+                parent = os.path.dirname(last_image_relative_path)
+                if parent:
+                    parts = parent.split(os.sep)
+                    acc = ''
+                    for p in parts:
+                        acc = p if not acc else os.path.join(acc, p)
+                        folder_id = f'folder_{acc}'
+                        if self.image_tree.exists(folder_id):
+                            self.image_tree.item(folder_id, open=True)
+                            self.on_folder_expand(None, folder_id)
                 if os.path.exists(last_image_full_path) and last_image_relative_path in self.image_files:
                     try:
                         if self.image_tree.exists(last_image_relative_path):
@@ -172,7 +184,7 @@ class BoundingBoxEditor(tk.Frame):
                             loaded_an_image = True
                         else:
                             pass  # Last opened image not found in tree
-                    except tk.TclError as e:
+                    except tk.TclError:
                         pass  # TclError while trying to select last opened image
                         
         if not loaded_an_image and self.image_files:
@@ -429,7 +441,7 @@ class BoundingBoxEditor(tk.Frame):
             loading_thread.start()
 
     def train_yolo_model(self):
-        """Open a dialog for YOLO model training configuration and execution"""
+        """Open a dialog for standard training configuration and execution"""
         annotated_count = 0
         for image_path_rel in self.image_files: # Iterate over relative paths
             label_path = os.path.join(self.label_folder, os.path.splitext(image_path_rel)[0] + '.txt')
@@ -442,6 +454,273 @@ class BoundingBoxEditor(tk.Frame):
             return
 
         self.open_training_dialog()
+
+    def open_active_learning_dialog(self):
+        """Open a dialog to configure and start an active learning annotation loop"""
+        al_win = tk.Toplevel(self.root)
+        al_win.title("Active Learning Loop")
+        al_win.transient(self.root)
+        al_win.grab_set()
+        al_win.geometry("650x600")
+
+        # Overview of active learning workflow
+        msg = tk.Message(
+            al_win,
+            text=(
+                "Active learning will iteratively train a model on initially labeled samples "
+                "and select the most informative new images for annotation based on the chosen strategy."
+            ),
+            width=630,
+            foreground="gray"
+        )
+        msg.pack(padx=10, pady=(10, 0))
+
+        config_frame = tk.LabelFrame(al_win, text="Active Learning Configuration")
+        config_frame.pack(fill=tk.X, padx=10, pady=5)
+
+        # Task selection: choose detection (bounding boxes) or segmentation (masks)
+        task_var = tk.StringVar(value="detect")
+        tk.Label(config_frame, text="Task:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
+        tk.Radiobutton(
+            config_frame, text="Detection", variable=task_var, value="detect"
+        ).grid(row=0, column=1, sticky="w", padx=5, pady=2)
+        tk.Radiobutton(
+            config_frame, text="Segmentation", variable=task_var, value="segment"
+        ).grid(row=0, column=2, sticky="w", padx=5, pady=2)
+        tk.Label(
+            config_frame,
+            text="Choose Detection for bounding boxes or Segmentation for mask annotation",
+            foreground="gray",
+            wraplength=630
+        ).grid(row=1, column=0, columnspan=3, sticky="w", padx=5)
+
+        tk.Label(config_frame, text="Initial Seed Size:").grid(row=2, column=0, sticky="w", padx=5, pady=2)
+        seed_var = tk.StringVar(value="20")
+        tk.Entry(config_frame, textvariable=seed_var, width=10).grid(row=2, column=1, sticky="w", padx=5, pady=2)
+        tk.Label(
+            config_frame,
+            text="# of initially labeled images to train the first model",
+            foreground="gray"
+        ).grid(row=3, column=0, columnspan=3, sticky="w", padx=5)
+
+        tk.Label(config_frame, text="Iteration Budget:").grid(row=4, column=0, sticky="w", padx=5, pady=2)
+        budget_var = tk.StringVar(value="10")
+        tk.Entry(config_frame, textvariable=budget_var, width=10).grid(row=4, column=1, sticky="w", padx=5, pady=2)
+        tk.Label(
+            config_frame,
+            text="# of new images to select for annotation each round",
+            foreground="gray"
+        ).grid(row=5, column=0, columnspan=3, sticky="w", padx=5)
+
+        tk.Label(config_frame, text="Query Strategy:").grid(row=6, column=0, sticky="w", padx=5, pady=2)
+        strategy_var = tk.StringVar(value="Uncertainty")
+        strategy_combo = ttk.Combobox(
+            config_frame, textvariable=strategy_var,
+            values=["Uncertainty", "Margin", "Random"], state="readonly", width=12
+        )
+        strategy_combo.grid(row=6, column=1, sticky="w", padx=5, pady=2)
+        tk.Label(
+            config_frame,
+            text="Selection method: Uncertainty=lowest confidence, Margin=smallest class margin, Random=baseline",
+            foreground="gray"
+        ).grid(row=7, column=0, columnspan=3, sticky="w", padx=5)
+
+        tk.Label(config_frame, text="Model Checkpoint:").grid(row=8, column=0, sticky="w", padx=5, pady=2)
+        ckpt_var = tk.StringVar(value="")
+        ckpt_entry = tk.Entry(config_frame, textvariable=ckpt_var, width=40, state="readonly")
+        ckpt_entry.grid(row=8, column=1, sticky="ew", padx=5, pady=2)
+        tk.Button(
+            config_frame, text="Browse",
+            command=lambda: ckpt_var.set(
+                filedialog.askopenfilename(
+                    title="Select YOLO Model",
+                    filetypes=[("PyTorch Model", "*.pt"), ("All Files", "*.*")]
+                )
+            )
+        ).grid(row=8, column=2, sticky="w", padx=5, pady=2)
+        tk.Label(
+            config_frame,
+            text="YOLO model to warm-start learning; leave blank for random initialization",
+            foreground="gray"
+        ).grid(row=9, column=0, columnspan=3, sticky="w", padx=5)
+
+        # Training hyperparameters for each iteration
+        tk.Label(config_frame, text="Epochs:").grid(row=10, column=0, sticky="w", padx=5, pady=2)
+        epoch_var = tk.StringVar(value="50")
+        tk.Entry(config_frame, textvariable=epoch_var, width=10).grid(row=10, column=1, sticky="w", padx=5, pady=2)
+        tk.Label(
+            config_frame,
+            text="# Number of training epochs per iteration",
+            foreground="gray"
+        ).grid(row=11, column=0, columnspan=3, sticky="w", padx=5)
+
+        tk.Label(config_frame, text="Image Size:").grid(row=12, column=0, sticky="w", padx=5, pady=2)
+        imgsz_var = tk.StringVar(value="640")
+        tk.Entry(config_frame, textvariable=imgsz_var, width=10).grid(row=12, column=1, sticky="w", padx=5, pady=2)
+        tk.Label(
+            config_frame,
+            text="# Training input image size (square)",
+            foreground="gray"
+        ).grid(row=13, column=0, columnspan=3, sticky="w", padx=5)
+
+        tk.Label(config_frame, text="Batch Size:").grid(row=14, column=0, sticky="w", padx=5, pady=2)
+        batch_var = tk.StringVar(value="16")
+        tk.Entry(config_frame, textvariable=batch_var, width=10).grid(row=14, column=1, sticky="w", padx=5, pady=2)
+        tk.Label(
+            config_frame,
+            text="# Number of images per training batch",
+            foreground="gray"
+        ).grid(row=15, column=0, columnspan=3, sticky="w", padx=5)
+
+        tk.Label(config_frame, text="Learning Rate:").grid(row=16, column=0, sticky="w", padx=5, pady=2)
+        lr_var = tk.StringVar(value="0.01")
+        tk.Entry(config_frame, textvariable=lr_var, width=10).grid(row=16, column=1, sticky="w", padx=5, pady=2)
+        tk.Label(
+            config_frame,
+            text="# Initial learning rate for training",
+            foreground="gray"
+        ).grid(row=17, column=0, columnspan=3, sticky="w", padx=5)
+
+        progress_frame = tk.LabelFrame(al_win, text="Active Learning Progress")
+        progress_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        self.active_learning_progress = tk.Text(progress_frame, height=6, state=tk.DISABLED)
+        scroll = tk.Scrollbar(progress_frame, orient=tk.VERTICAL, command=self.active_learning_progress.yview)
+        self.active_learning_progress.configure(yscrollcommand=scroll.set)
+        self.active_learning_progress.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+        self.active_learning_stop_flag = threading.Event()
+        btn_frame = tk.Frame(al_win)
+        btn_frame.pack(fill=tk.X, padx=10, pady=10)
+        start_btn = tk.Button(
+            btn_frame, text="Start Active Learning",
+            command=lambda: self._start_active_learning(
+                task_var, seed_var, budget_var, strategy_var, ckpt_var, epoch_var,
+                imgsz_var, batch_var, lr_var, al_win, start_btn
+            )
+        )
+        start_btn.pack(side=tk.LEFT, padx=5)
+        stop_btn = tk.Button(btn_frame, text="🛑 Stop", command=lambda: self.active_learning_stop_flag.set())
+        stop_btn.pack(side=tk.LEFT, padx=5)
+        cancel_btn = tk.Button(btn_frame, text="Cancel", command=al_win.destroy)
+        cancel_btn.pack(side=tk.LEFT, padx=5)
+
+        center_window(al_win, 650, 600)
+
+    def _start_active_learning(self, task_var, seed_var, budget_var, strategy_var, ckpt_var, epoch_var, imgsz_var, batch_var, lr_var, window, start_btn):
+        """Handler for starting one iteration of the active learning loop"""
+        start_btn.config(state=tk.DISABLED)
+        # Clear stop flag and read configuration
+        self.active_learning_stop_flag.clear()
+        task = task_var.get()
+        seed_size = int(seed_var.get())
+        budget = int(budget_var.get())
+        strategy = strategy_var.get()
+        ckpt = ckpt_var.get()
+        epochs = int(epoch_var.get())
+        imgsz = int(imgsz_var.get())
+        batch_size = int(batch_var.get())
+        lr = float(lr_var.get())
+        self._log_active_learning(
+            f"Starting Active Learning: task={task}, seed={seed_size}, budget={budget}, "
+            f"strategy={strategy}, epochs={epochs}, imgsz={imgsz}, batch={batch_size}, lr={lr}, "
+            f"checkpoint={ckpt or 'random init'}"
+        )
+
+        def _worker():
+            iteration = 1
+            # Initial seed selection: ask user to label seed images if no labels yet
+            labeled = [img for img in self.image_files
+                       if os.path.exists(os.path.join(self.label_folder, os.path.splitext(img)[0] + '.txt'))]
+            if not labeled and seed_size > 0:
+                unlabeled = list(self.image_files)
+                seed_imgs = random.sample(unlabeled, min(seed_size, len(unlabeled)))
+                for rel_img in seed_imgs:
+                    if self.image_tree.exists(rel_img):
+                        self.image_tree.item(rel_img, tags=("review_needed",))
+                        self.image_tree.see(rel_img)
+                        self.image_status[rel_img] = "review_needed"
+                self.save_statuses()
+                self._log_active_learning(
+                    f"Initial seed selected ({len(seed_imgs)} images). Please annotate these before training."
+                )
+                self.root.after(0, start_btn.config, {"state": tk.NORMAL})
+                return
+
+
+            # Determine device (prefer GPU if available)
+            devices = ["cpu"]
+            try:
+                import torch
+                if torch.cuda.is_available():
+                    for i in range(torch.cuda.device_count()):
+                        devices.append(f"cuda:{i}")
+                    devices.append("cuda")
+            except ImportError:
+                pass
+            device = devices[-1]
+
+            # Run one training iteration
+            model_name = ckpt or ("yolov8n.pt" if task == "detect" else "yolov8n-seg.pt")
+            self._log_active_learning(f"Iteration {iteration}: training model '{model_name}'...")
+            save_dir = self.execute_training(
+                model_name,
+                epochs, imgsz, batch_size, lr,
+                os.path.join(self.folder_path, "active_learning_runs", f"iter_{iteration:02d}"),
+                True, "train_only",
+                start_btn, window, device,
+                active=True, stop_flag=self.active_learning_stop_flag,
+            )
+            if self.active_learning_stop_flag.is_set():
+                self._log_active_learning("🛑 Active Learning training stopped by user.")
+                self.root.after(0, start_btn.config, {"state": tk.NORMAL})
+                return
+            if not save_dir:
+                self._log_active_learning("❌ Training did not complete successfully.")
+                self.root.after(0, start_btn.config, {"state": tk.NORMAL})
+                return
+
+            # Load trained model for inference
+            YOLO = lazy_importer.get_yolo()
+            model_instance = YOLO(os.path.join(save_dir, "weights", "best.pt"))
+
+            # Score unlabeled images by uncertainty
+            unlabeled = [img for img in self.image_files
+                         if self.image_status.get(img) not in ("edited", "review_needed")]
+            scores = {}
+            for img in unlabeled:
+                if self.active_learning_stop_flag.is_set():
+                    break
+                results = model_instance(os.path.join(self.folder_path, img))
+                confs = [box.conf[0].item() for box in results[0].boxes]
+                scores[img] = 1.0 - max(confs) if confs else 1.0
+            if self.active_learning_stop_flag.is_set():
+                self._log_active_learning("🛑 Active Learning inference stopped by user.")
+                self.root.after(0, start_btn.config, {"state": tk.NORMAL})
+                return
+
+            # Select top-K most uncertain images
+            selected = [img for img, _ in sorted(scores.items(), key=lambda x: x[1], reverse=True)][:budget]
+            for rel_img in selected:
+                if self.image_tree.exists(rel_img):
+                    self.image_tree.item(rel_img, tags=("review_needed",))
+                    self.image_tree.see(rel_img)
+                    self.image_status[rel_img] = "review_needed"
+            self.save_statuses()
+            self._log_active_learning(
+                f"Iteration {iteration}: selected {len(selected)} images for annotation."
+            )
+            self._log_active_learning("Iteration complete. Please annotate the selected images.")
+            self.root.after(0, start_btn.config, {"state": tk.NORMAL})
+
+        threading.Thread(target=_worker, daemon=True).start()
+
+    def _log_active_learning(self, message):
+        """Write a message to the active learning progress widget"""
+        self.active_learning_progress.config(state=tk.NORMAL)
+        self.active_learning_progress.insert(tk.END, message + "\n")
+        self.active_learning_progress.config(state=tk.DISABLED)
+        self.active_learning_progress.see(tk.END)
 
     def export_format_selection_window(self):
         export_win = tk.Toplevel(self.root)
@@ -499,7 +778,7 @@ class BoundingBoxEditor(tk.Frame):
             self.image_list_frame,
             columns=("filename",),
             show="tree headings",
-            selectmode="browse"
+            selectmode="extended"
         )
         self.image_tree.heading("#0", text="Folder Structure")
         self.image_tree.heading("filename", text="File Info")
@@ -520,6 +799,16 @@ class BoundingBoxEditor(tk.Frame):
         self.image_tree.bind("<<TreeviewSelect>>", self.on_image_select)
         self.image_tree.bind("<<TreeviewOpen>>", self.on_folder_expand)
         self.image_tree.bind("<<TreeviewClose>>", self.on_folder_collapse)
+
+        # Batch operations: right-click context menu for multi-image status changes
+        self.batch_menu = tk.Menu(self.root, tearoff=0)
+        self.batch_menu.add_command(label="Mark as Not Viewed", command=lambda: self._batch_mark_status("not_viewed"))
+        self.batch_menu.add_command(label="Mark as Viewed", command=lambda: self._batch_mark_status("viewed"))
+        self.batch_menu.add_command(label="Mark as Edited", command=lambda: self._batch_mark_status("edited"))
+        self.batch_menu.add_command(label="Mark as Review Needed", command=lambda: self._batch_mark_status("review_needed"))
+        self.batch_menu.add_separator()
+        self.batch_menu.add_command(label="Delete Annotations", command=self._batch_delete_annotations)
+        self.image_tree.bind("<Button-3>", self._on_image_tree_right_click)
 
     def setup_canvas(self):
         self.canvas = tk.Canvas(self.content_frame, width=500, height=720)
@@ -606,8 +895,20 @@ class BoundingBoxEditor(tk.Frame):
         self.load_model_button.pack(side=tk.LEFT, padx=5)
         self.export_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['export']} Export Annotations", command=self.export_format_selection_window)
         self.export_button.pack(side=tk.LEFT, padx=5)
-        self.train_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['train']} Train YOLO", command=self.train_yolo_model)
+        self.train_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['train']} Standard Training",
+            command=self.train_yolo_model
+        )
         self.train_button.pack(side=tk.LEFT, padx=5)
+        separator = ttk.Separator(buttons_frame, orient=tk.VERTICAL)
+        separator.pack(side=tk.LEFT, fill=tk.Y, padx=2)
+        self.active_learning_button = tk.Button(
+            buttons_frame,
+            text=f"{ICON_UNICODE['active_learning']} Active-Learning Training",
+            command=self.open_active_learning_dialog
+        )
+        self.active_learning_button.pack(side=tk.LEFT, padx=5)
         self.mode_toggle_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['mode_box']} Mode: Box", command=self.toggle_annotation_mode)
         self.mode_toggle_button.pack(side=tk.LEFT, padx=15)
         self.undo_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['undo']} Undo", command=self.undo, state=tk.DISABLED)
@@ -632,6 +933,13 @@ class BoundingBoxEditor(tk.Frame):
             label = tk.Label(frame, text=f"{display_name}: 0", font=("Arial", 9))
             label.pack()
             self.status_labels[display_name] = label
+
+        self.progress = ttk.Progressbar(
+            self.status_frame,
+            orient=tk.HORIZONTAL,
+            length=200,
+            mode='indeterminate'
+        )
 
     def setup_bindings(self):
         self.root.bind("<Control-s>", lambda event: self.save_labels())
@@ -844,6 +1152,92 @@ class BoundingBoxEditor(tk.Frame):
                 "nc": 1, "names": ["person"], "auto_save_interval": 120
             }
             with open(self.yaml_path, "w") as f: yaml.dump(default_yaml, f, sort_keys=False)
+
+    def load_dataset_async(self):
+        """Load dataset in background to avoid blocking the UI."""
+        for item in self.image_tree.get_children():
+            self.image_tree.delete(item)
+        self.progress.pack(side=tk.RIGHT, padx=10)
+        self.progress.start()
+        threading.Thread(target=self._load_dataset_worker, daemon=True).start()
+
+    def _load_dataset_worker(self):
+        if not self.folder_path:
+            self.root.after(0, lambda: messagebox.showerror("Error", "Dataset folder not set."))
+            self.root.after(0, self._stop_progress)
+            return
+        image_files = []
+        folder_structure = {}
+        for root_dir, _, files in os.walk(self.folder_path):
+            for file in files:
+                if file.lower().endswith((".jpg", ".png", ".jpeg")):
+                    relative_path = os.path.relpath(
+                        os.path.join(root_dir, file), self.folder_path)
+                    image_files.append(relative_path)
+                    dir_part = os.path.dirname(relative_path) or "/"
+                    folder_structure.setdefault(dir_part, []).append(relative_path)
+        image_files.sort()
+        if not image_files:
+            self.root.after(0, lambda: messagebox.showinfo(
+                "No Images", "No images found in the selected folder."))
+            self.root.after(0, self._stop_progress)
+            return
+        self.load_statuses()
+        self.root.after(0, lambda: self._finish_dataset_load(folder_structure, image_files))
+
+    def _finish_dataset_load(self, folder_structure, image_files):
+        self.progress.stop()
+        self.progress.pack_forget()
+        self.image_files = image_files
+        self.folder_structure = folder_structure
+        root_key = "/"
+        for relative_image_path in sorted(self.folder_structure.get(root_key, [])):
+            status = self.image_status.get(relative_image_path, "not_viewed")
+            self.image_tree.insert(
+                "", tk.END, iid=relative_image_path,
+                text=os.path.basename(relative_image_path),
+                values=(f"Status: {status}",), tags=(status,)
+            )
+        for folder_path_key in sorted(self.folder_structure.keys()):
+            if folder_path_key == root_key:
+                continue
+            if os.path.dirname(folder_path_key):
+                continue
+            files_in_folder = self.folder_structure.get(folder_path_key, [])
+            total_files = len(files_in_folder)
+            status_counts = {"not_viewed": 0, "viewed": 0,
+                             "edited": 0, "review_needed": 0}
+            for file_path in files_in_folder:
+                status_counts[self.image_status.get(file_path, "not_viewed")] += 1
+            status_text = f"{total_files} files"
+            if status_counts["edited"] > 0:
+                status_text += f" ({status_counts['edited']} labeled)"
+            folder_id = f"folder_{folder_path_key}"
+            self.image_tree.insert(
+                "", tk.END, iid=folder_id,
+                text=f"📁 {os.path.basename(folder_path_key)}",
+                values=(status_text,), tags=("folder",)
+            )
+            if self._has_children_folder(folder_path_key):
+                self.image_tree.insert(
+                    folder_id, tk.END, text="", values=("",),
+                    tags=("dummy",)
+                )
+        if not self.folder_structure.get(root_key):
+            for folder_path_key in sorted(self.folder_structure.keys()):
+                if folder_path_key == root_key or os.path.dirname(folder_path_key):
+                    continue
+                folder_id = f"folder_{folder_path_key}"
+                self.image_tree.item(folder_id, open=True)
+                self.on_folder_expand(None, folder_id)
+        self.save_statuses()
+        self.update_status_labels()
+        # After dataset load completes, restore last opened image selection
+        self.root.after_idle(self._attempt_load_initial_image)
+
+    def _stop_progress(self):
+        self.progress.stop()
+        self.progress.pack_forget()
     
     def load_dataset(self):
         if not self.folder_path: 
@@ -871,61 +1265,39 @@ class BoundingBoxEditor(tk.Frame):
                     folder_structure[dir_part].append(relative_path)
         
         self.image_files.sort()
-        if not self.image_files: 
+        if not self.image_files:
             messagebox.showinfo("No Images", "No images found in the selected folder.")
             return
-            
+
         self.load_statuses()
-        
-        sorted_folders = sorted(folder_structure.keys())
-        
-        folder_nodes = {} 
-        
-        for folder_path_key in sorted_folders: # Renamed to avoid conflict
-            if folder_path_key == "/":
-                for relative_image_path in sorted(folder_structure[folder_path_key]):
-                    status = self.image_status.get(relative_image_path, "not_viewed")
-                    self.image_tree.insert("", tk.END, iid=relative_image_path, 
-                                         text=os.path.basename(relative_image_path), 
-                                         values=(f"Status: {status}",), tags=(status,))
-            else:
-                folder_id = f"folder_{folder_path_key}"
-                if folder_id not in folder_nodes:
-                    files_in_folder = folder_structure[folder_path_key]
-                    total_files = len(files_in_folder)
-                    status_counts = {"not_viewed": 0, "viewed": 0, "edited": 0, "review_needed": 0}
-                    
-                    for file_path_in_folder in files_in_folder: # Renamed
-                        status = self.image_status.get(file_path_in_folder, "not_viewed")
-                        status_counts[status] += 1
-                    
-                    status_text = f"{total_files} files"
-                    if status_counts["edited"] > 0:
-                        status_text += f" ({status_counts['edited']} labeled)"
-                    
-                    parent_dir = os.path.dirname(folder_path_key)
-                    parent_id = ""
-                    if parent_dir and parent_dir != ".":
-                        parent_id = f"folder_{parent_dir}"
-                        if parent_id not in folder_nodes:
-                            folder_nodes[parent_id] = self.image_tree.insert("", tk.END, iid=parent_id,
-                                                                           text=f"📁 {os.path.basename(parent_dir)}", 
-                                                                           values=("",), tags=("folder",))
-                    
-                    folder_nodes[folder_id] = self.image_tree.insert(parent_id, tk.END, iid=folder_id,
-                                                                   text=f"📁 {os.path.basename(folder_path_key)}", 
-                                                                   values=(status_text,), tags=("folder",))
-                
-                for relative_image_path in sorted(folder_structure[folder_path_key]):
-                    status = self.image_status.get(relative_image_path, "not_viewed")
-                    self.image_tree.insert(folder_id, tk.END, iid=relative_image_path, 
-                                         text=os.path.basename(relative_image_path), 
-                                         values=(f"Status: {status}",), tags=(status,))
-        
-        for child in self.image_tree.get_children():
-            if self.image_tree.item(child)["tags"] and "folder" in self.image_tree.item(child)["tags"]:
-                self.image_tree.item(child, open=True)
-        
+        self.folder_structure = folder_structure
+        root_key = "/"
+        for relative_image_path in sorted(self.folder_structure.get(root_key, [])):
+            status = self.image_status.get(relative_image_path, "not_viewed")
+            self.image_tree.insert("", tk.END, iid=relative_image_path,
+                                   text=os.path.basename(relative_image_path),
+                                   values=(f"Status: {status}",), tags=(status,))
+
+        for folder_path_key in sorted(self.folder_structure.keys()):
+            if folder_path_key == root_key:
+                continue
+            if os.path.dirname(folder_path_key):
+                continue
+            files_in_folder = self.folder_structure.get(folder_path_key, [])
+            total_files = len(files_in_folder)
+            status_counts = {"not_viewed": 0, "viewed": 0, "edited": 0, "review_needed": 0}
+            for file_path in files_in_folder:
+                status_counts[self.image_status.get(file_path, "not_viewed")] += 1
+            status_text = f"{total_files} files"
+            if status_counts["edited"] > 0:
+                status_text += f" ({status_counts['edited']} labeled)"
+            folder_id = f"folder_{folder_path_key}"
+            self.image_tree.insert("", tk.END, iid=folder_id,
+                                   text=f"📁 {os.path.basename(folder_path_key)}",
+                                   values=(status_text,), tags=("folder",))
+            if self._has_children_folder(folder_path_key):
+                self.image_tree.insert(folder_id, tk.END, text="", values=("",), tags=("dummy",))
+
         self.save_statuses()
         self.update_status_labels()
 
@@ -953,8 +1325,59 @@ class BoundingBoxEditor(tk.Frame):
         for child in self.image_tree.get_children():
             collapse_recursive(child)
     
-    def on_folder_expand(self, event):
-        pass
+    def _has_children_folder(self, folder_key):
+        """
+        Determine if a folder_key has any direct subfolders or images in the full folder_structure.
+        """
+        for key in self.folder_structure.keys():
+            if key != "/" and os.path.dirname(key) == folder_key:
+                return True
+        if self.folder_structure.get(folder_key):
+            return True
+        return False
+    
+    def on_folder_expand(self, event=None, folder_id=None):
+        """
+        Lazy-load children of a folder node when expanded.
+        """
+        if folder_id is not None:
+            item = folder_id
+        else:
+            item = self.image_tree.focus()
+        if not item or "folder" not in self.image_tree.item(item).get("tags", []):
+            return
+        dummy_found = False
+        for child in self.image_tree.get_children(item):
+            if "dummy" in self.image_tree.item(child).get("tags", []):
+                self.image_tree.delete(child)
+                dummy_found = True
+                break
+        if not dummy_found:
+            return
+        folder_key = item.replace("folder_", "", 1)
+        for relative_image_path in sorted(self.folder_structure.get(folder_key, [])):
+            status = self.image_status.get(relative_image_path, "not_viewed")
+            self.image_tree.insert(item, tk.END, iid=relative_image_path,
+                                   text=os.path.basename(relative_image_path),
+                                   values=(f"Status: {status}",), tags=(status,))
+        for child_folder_key in sorted(self.folder_structure.keys()):
+            if os.path.dirname(child_folder_key) != folder_key:
+                continue
+            files_in_folder = self.folder_structure.get(child_folder_key, [])
+            total_files = len(files_in_folder)
+            status_counts = {"not_viewed": 0, "viewed": 0, "edited": 0, "review_needed": 0}
+            for p in files_in_folder:
+                status_counts[self.image_status.get(p, "not_viewed")] += 1
+            status_text = f"{total_files} files"
+            if status_counts["edited"] > 0:
+                status_text += f" ({status_counts['edited']} labeled)"
+            sub_id = f"folder_{child_folder_key}"
+            self.image_tree.insert(item, tk.END, iid=sub_id,
+                                   text=f"📁 {os.path.basename(child_folder_key)}",
+                                   values=(status_text,), tags=("folder",))
+            if self._has_children_folder(child_folder_key):
+                self.image_tree.insert(sub_id, tk.END, text="", values=("",), tags=("dummy",))
+        self.update_folder_status_display()
     
     def on_folder_collapse(self, event):
         pass
@@ -1162,18 +1585,28 @@ class BoundingBoxEditor(tk.Frame):
             if not self.image_path: return
             self.current_image_index = -1 
 
-        cv2_module = lazy_importer.get_cv2() 
-        original_image_cv = cv2_module.imread(self.image_path)
-        if original_image_cv is None:
-            messagebox.showerror("Error", f"Failed to load image: {self.image_path}\nFile might be missing, corrupted, or in an unsupported format.")
-            self.image = None; self.original_image = None
-            self.image_name_label.config(text=f"Error loading: {os.path.basename(self.image_path)}")
-            self.bboxes = []; self.polygons = []
-            self.display_image(); self.display_annotations()
-            return
+        if self.image_path in self.image_cache:
+            self.original_image = self.image_cache.pop(self.image_path)
+            self.image_cache[self.image_path] = self.original_image
+        else:
+            cv2_module = lazy_importer.get_cv2()
+            original_image_cv = cv2_module.imread(self.image_path)
+            if original_image_cv is None:
+                messagebox.showerror("Error", f"Failed to load image: {self.image_path}\nFile might be missing, corrupted, or in an unsupported format.")
+                self.image = None
+                self.original_image = None
+                self.image_name_label.config(text=f"Error loading: {os.path.basename(self.image_path)}")
+                self.bboxes = []
+                self.polygons = []
+                self.display_image()
+                self.display_annotations()
+                return
 
-        original_image_cv = cv2_module.cvtColor(original_image_cv, cv2_module.COLOR_BGR2RGB)
-        self.original_image = Image.fromarray(original_image_cv)
+            original_image_cv = cv2_module.cvtColor(original_image_cv, cv2_module.COLOR_BGR2RGB)
+            self.original_image = Image.fromarray(original_image_cv)
+            self.image_cache[self.image_path] = self.original_image
+            if len(self.image_cache) > self.max_cache_size:
+                self.image_cache.popitem(last=False)
         
         canvas_width = self.canvas.winfo_width()
         canvas_height = self.canvas.winfo_height()
@@ -1551,24 +1984,44 @@ class BoundingBoxEditor(tk.Frame):
         self.polygon_just_completed = False
     
     def navigate_image(self, direction):
-        if not self.image_files: 
+        if not self.image_files:
+            return
+        # prevent moving past the first or last image
+        if self.current_image_index == 0 and direction < 0:
+            return
+        if self.current_image_index == len(self.image_files) - 1 and direction > 0:
             return
         self.save_history()
         self.current_image_index += direction
-        if self.current_image_index < 0: self.current_image_index = 0
-        elif self.current_image_index >= len(self.image_files): self.current_image_index = len(self.image_files) - 1
+        if self.current_image_index < 0:
+            self.current_image_index = 0
+        elif self.current_image_index >= len(self.image_files):
+            self.current_image_index = len(self.image_files) - 1
         
         image_path = os.path.join(self.folder_path, self.image_files[self.current_image_index])
         self.load_image(image_path)
         
         relative_image_path = self.image_files[self.current_image_index]
-        try:
-            if self.image_tree.exists(relative_image_path):
+        # Ensure the image node is loaded in the tree (expand parent folders if needed)
+        if not self.image_tree.exists(relative_image_path):
+            parent = os.path.dirname(relative_image_path)
+            if parent:
+                parts = parent.split(os.sep)
+                acc = ''
+                for p in parts:
+                    acc = p if not acc else os.path.join(acc, p)
+                    folder_id = f'folder_{acc}'
+                    if self.image_tree.exists(folder_id):
+                        self.image_tree.item(folder_id, open=True)
+                        self.on_folder_expand(None, folder_id)
+        # Select and scroll to the image if present
+        if self.image_tree.exists(relative_image_path):
+            try:
                 self.image_tree.selection_set(relative_image_path)
                 self.image_tree.focus(relative_image_path)
                 self.image_tree.see(relative_image_path)
-        except tk.TclError:
-            pass 
+            except tk.TclError:
+                pass
 
     # --------------------------------------------------
     # Copy/Paste Features
@@ -1962,56 +2415,39 @@ class BoundingBoxEditor(tk.Frame):
 
     def open_training_dialog(self):
         train_win = tk.Toplevel(self.root)
-        train_win.title("Train YOLO Model")
+        train_win.title("Standard Training")
         train_win.transient(self.root)
         train_win.grab_set()
         train_win.geometry("700x900") 
         
-        model_frame = tk.LabelFrame(train_win, text="🎯 Training Mode Selection")
+        model_frame = tk.LabelFrame(train_win, text="🎯 Standard Training Setup")
         model_frame.pack(fill=tk.X, padx=10, pady=5)
-        tk.Label(model_frame, text="Choose Training Mode:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
+
+        tk.Label(model_frame, text="Initial Weights:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
         model_var = tk.StringVar(value="yolov8n.pt")
         model_options = [
-            "🎯 OBJECT DETECTION:",
+            "None (random init)",
             "yolov8n.pt", "yolov8s.pt", "yolov8m.pt", "yolov8l.pt", "yolov8x.pt",
-            "🎯 SEGMENTATION:",
             "yolov8n-seg.pt", "yolov8s-seg.pt", "yolov8m-seg.pt", "yolov8l-seg.pt", "yolov8x-seg.pt"
         ]
         model_combo = ttk.Combobox(model_frame, textvariable=model_var, values=model_options, state="readonly")
         model_combo.grid(row=0, column=1, sticky="ew", padx=5, pady=2)
-        
-        mode_info_frame = tk.Frame(model_frame)
-        mode_info_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
-        
-        tk.Label(mode_info_frame, text="🎯 OBJECT DETECTION MODE:", 
-                font=("TkDefaultFont", 9, "bold"), fg="darkgreen").pack(anchor="w")
-        tk.Label(mode_info_frame, text="   • Detects objects with bounding boxes", 
-                font=("TkDefaultFont", 8), fg="darkgreen").pack(anchor="w")
-        tk.Label(mode_info_frame, text="   • Works with any annotation type (auto-converts polygons to boxes)", 
-                font=("TkDefaultFont", 8), fg="darkgreen").pack(anchor="w")
-        
-        tk.Label(mode_info_frame, text="🎯 SEGMENTATION MODE:", 
-                font=("TkDefaultFont", 9, "bold"), fg="darkblue").pack(anchor="w", pady=(10,0))
-        tk.Label(mode_info_frame, text="   • Precise pixel-level object segmentation", 
-                font=("TkDefaultFont", 8), fg="darkblue").pack(anchor="w")
-        tk.Label(mode_info_frame, text="   • Auto-converts all annotations to polygon format", 
-                font=("TkDefaultFont", 8), fg="darkblue").pack(anchor="w")
-        
+
         params_frame = tk.LabelFrame(train_win, text="Training Parameters")
         params_frame.pack(fill=tk.X, padx=10, pady=5)
-        
+
         tk.Label(params_frame, text="Epochs:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
         epochs_var = tk.StringVar(value="100")
         tk.Entry(params_frame, textvariable=epochs_var, width=10).grid(row=0, column=1, sticky="w", padx=5, pady=2)
-        
+
         tk.Label(params_frame, text="Image Size:").grid(row=0, column=2, sticky="w", padx=5, pady=2)
         imgsz_var = tk.StringVar(value="640")
         tk.Entry(params_frame, textvariable=imgsz_var, width=10).grid(row=0, column=3, sticky="w", padx=5, pady=2)
-        
+
         tk.Label(params_frame, text="Batch Size:").grid(row=1, column=0, sticky="w", padx=5, pady=2)
         batch_var = tk.StringVar(value="16")
         tk.Entry(params_frame, textvariable=batch_var, width=10).grid(row=1, column=1, sticky="w", padx=5, pady=2)
-        
+
         tk.Label(params_frame, text="Learning Rate:").grid(row=1, column=2, sticky="w", padx=5, pady=2)
         lr_var = tk.StringVar(value="0.01")
         tk.Entry(params_frame, textvariable=lr_var, width=10).grid(row=1, column=3, sticky="w", padx=5, pady=2)
@@ -2025,38 +2461,59 @@ class BoundingBoxEditor(tk.Frame):
             try:
                 import torch
                 if torch.cuda.is_available():
-                    gpu_count = torch.cuda.device_count()
-                    for i in range(gpu_count):
+                    count = torch.cuda.device_count()
+                    for i in range(count):
                         devices.append(f"cuda:{i}")
-                        gpu_name = torch.cuda.get_device_name(i)
-                        gpu_memory = torch.cuda.get_device_properties(i).total_memory / (1024**3)
-                        gpu_info += f"GPU {i}: {gpu_name} ({gpu_memory:.1f} GB)\n"
-                    if gpu_count > 0:
-                        devices.append("cuda") 
+                        name = torch.cuda.get_device_name(i)
+                        mem = torch.cuda.get_device_properties(i).total_memory / (1024**3)
+                        gpu_info += f"GPU {i}: {name} ({mem:.1f} GB)\n"
+                    if count > 0:
+                        devices.append("cuda")
                 else:
                     gpu_info = "No CUDA-compatible GPU detected"
             except ImportError:
                 gpu_info = "PyTorch not available for GPU detection"
-            except Exception as e_gpu: # Renamed
-                gpu_info = f"GPU detection failed: {e_gpu}"
+            except Exception as e:
+                gpu_info = f"GPU detection failed: {e}"
             return devices, gpu_info
-        
-        available_devices, gpu_info = detect_available_devices()
-        
-        default_device = "cpu"
-        if "cuda" in available_devices:
-            default_device = "cuda"
-        elif any(dev.startswith("cuda:") for dev in available_devices):
-            default_device = next(dev for dev in available_devices if dev.startswith("cuda:"))
-            
+
         tk.Label(device_frame, text="Training Device:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
-        device_var = tk.StringVar(value=default_device) 
-        device_combo = ttk.Combobox(device_frame, textvariable=device_var, values=available_devices, state="readonly", width=15)
+        device_var = tk.StringVar(value="Detecting...")
+        device_combo = ttk.Combobox(
+            device_frame,
+            textvariable=device_var,
+            values=["Detecting..."],
+            state="disabled",
+            width=15
+        )
         device_combo.grid(row=0, column=1, sticky="w", padx=5, pady=2)
-        
-        if gpu_info:
-            gpu_info_label = tk.Label(device_frame, text=gpu_info, font=("TkDefaultFont", 8), fg="darkblue", justify="left")
-            gpu_info_label.grid(row=1, column=0, columnspan=2, sticky="w", padx=5, pady=2)
+
+        gpu_info_label = tk.Label(
+            device_frame,
+            text="Detecting GPU devices...",
+            font=("TkDefaultFont", 8),
+            fg="gray50",
+            justify="left"
+        )
+        gpu_info_label.grid(row=1, column=0, columnspan=2, sticky="w", padx=5, pady=2)
+
+        def _detect_devices_worker():
+            devs, info = detect_available_devices()
+            def _on_done():
+                default = "cpu"
+                if "cuda" in devs:
+                    default = "cuda"
+                else:
+                    for d in devs:
+                        if d.startswith("cuda"):
+                            default = d
+                            break
+                device_combo.config(values=devs, state="readonly")
+                device_var.set(default)
+                gpu_info_label.config(text=info)
+            train_win.after(0, _on_done)
+
+        threading.Thread(target=_detect_devices_worker, daemon=True).start()
         
         device_tips_frame = tk.Frame(device_frame)
         device_tips_frame.grid(row=2, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
@@ -2079,6 +2536,7 @@ class BoundingBoxEditor(tk.Frame):
         split_var = tk.StringVar(value="split")
         tk.Radiobutton(data_frame, text="Split data (80/20 train/val)", variable=split_var, value="split").pack(anchor="w", padx=5, pady=2)
         tk.Radiobutton(data_frame, text="Use existing train/val split", variable=split_var, value="existing").pack(anchor="w", padx=5, pady=2)
+        tk.Radiobutton(data_frame, text="Train only (no validation)", variable=split_var, value="train_only").pack(anchor="w", padx=5, pady=2)
         
         output_frame = tk.LabelFrame(train_win, text="Output Location")
         output_frame.pack(fill=tk.X, padx=10, pady=5)
@@ -2102,26 +2560,46 @@ class BoundingBoxEditor(tk.Frame):
         
         def start_training():
             start_btn.config(state=tk.DISABLED)
-            
-            model_val = model_var.get() # Renamed
-            if model_val.startswith("🎯"):
-                messagebox.showerror("Invalid Selection", "Please select an actual model, not a category header.", parent=train_win)
+
+            # Determine selected model
+            model_val = model_var.get()
+            if not model_val or model_val.startswith("🎯") or model_val.startswith("None"):
+                messagebox.showerror(
+                    "Invalid Selection",
+                    "Please select a valid pretrained model or 'None' for random init.",
+                    parent=train_win
+                )
                 start_btn.config(state=tk.NORMAL)
                 return
-            
+
             epochs = int(epochs_var.get())
             imgsz = int(imgsz_var.get())
             batch = int(batch_var.get())
             lr = float(lr_var.get())
             output_dir = output_var.get()
             device = device_var.get()
-            
+
             self.training_stop_flag = threading.Event()
-            
+            stop_btn.config(state=tk.NORMAL)
+
+            active = False
             training_thread = threading.Thread(
                 target=self.execute_training,
-                args=(model_val, epochs, imgsz, batch, lr, output_dir, auto_export_var.get(), 
-                      split_var.get(), start_btn, train_win, device, self.training_stop_flag)
+                args=(
+                    model_val,
+                    epochs,
+                    imgsz,
+                    batch,
+                    lr,
+                    output_dir,
+                    auto_export_var.get(),
+                    split_var.get(),
+                    start_btn,
+                    train_win,
+                    device,
+                    active,
+                    self.training_stop_flag,
+                )
             )
             training_thread.start()
             self.current_training_thread = training_thread
@@ -2135,6 +2613,10 @@ class BoundingBoxEditor(tk.Frame):
         
         start_btn = tk.Button(button_frame, text="🚀 Start Training", command=start_training)
         start_btn.pack(side=tk.LEFT, padx=5)
+
+        stop_btn = tk.Button(button_frame, text="🛑 Stop Training", state=tk.DISABLED,
+                             command=lambda: (self.training_stop_flag.set(), stop_btn.config(state=tk.DISABLED)))
+        stop_btn.pack(side=tk.LEFT, padx=5)
         
         tk.Button(button_frame, text="Cancel", command=safe_cancel).pack(side=tk.RIGHT, expand=True, padx=5)
 
@@ -2308,6 +2790,12 @@ names: {self.class_names}
                 logging.warning("No labeled images found in 'train' subdirectory for 'existing' split. Using all labeled images for training.")
                 source_train_files_rel = labeled_image_files_relative_to_original_dataset
                 source_val_files_rel = []
+        elif split_type == "train_only":
+            source_train_files_rel = labeled_image_files_relative_to_original_dataset
+            source_val_files_rel = []
+            # For train-only split, use training images also as validation to avoid empty val set
+            source_val_files_rel = source_train_files_rel.copy()
+            logging.warning("Train-only split: using all labeled images for validation as well.")
         else:
             logging.error(f"Unknown split_type: {split_type}")
             messagebox.showerror("Dataset YAML Error", f"Unknown split type: {split_type}", parent=self.root)
@@ -2364,7 +2852,7 @@ names: {self.class_names}
             messagebox.showerror("Dataset YAML Error", f"Failed to write dataset.yaml:\n{e}", parent=self.root)
             return None
 
-    def execute_training(self, model_name_arg, epochs, imgsz, batch, lr, output_dir, auto_export, split_type, start_btn, train_win, device, stop_flag=None): # Renamed model to model_name_arg
+    def execute_training(self, model_name_arg, epochs, imgsz, batch, lr, output_dir, auto_export, split_type, start_btn, train_win, device, active=False, stop_flag=None):
         def log_message(msg):
             try:
                 def update_gui():
@@ -2385,6 +2873,7 @@ names: {self.class_names}
                 return
             
             log_message("🚀 Starting YOLO training...")
+            log_message(f"Training Mode: {'Active Learning' if active else 'Standard Training'}")
             log_message(f"Model: {model_name_arg}")
             log_message(f"Epochs: {epochs}, Image Size: {imgsz}, Batch: {batch}, LR: {lr}")
             log_message(f"Device: {device}")
@@ -2407,11 +2896,12 @@ names: {self.class_names}
             except ImportError: log_message("⚠️ Cannot check system resources (psutil not available)")
             except Exception as e_psutil: log_message(f"⚠️ System check failed: {e_psutil}") # Renamed
             
-            dataset_yaml_local = None # Renamed
-            is_segmentation_model = "-seg.pt" in model_name_arg.lower()
-            
-            if is_segmentation_model: log_message("🎯 SEGMENTATION MODE: Converting all annotations to polygons...")
-            else: log_message("🎯 OBJECT DETECTION MODE: Using bounding boxes for detection...")
+            dataset_yaml_local = None
+            is_segmentation_model = ("-seg.pt" in model_name_arg.lower())
+            if is_segmentation_model:
+                log_message("🎯 SEGMENTATION MODE: Converting all annotations to polygons...")
+            else:
+                log_message("🎯 OBJECT DETECTION MODE: Using bounding boxes for detection...")
             
             if auto_export:
                 log_message("📤 Exporting dataset for training...")
@@ -2591,8 +3081,12 @@ names: {self.class_names}
                 
                 log_message("✅ Training completed successfully!")
                 save_dir_path = "Unknown" 
-                if hasattr(results, 'save_dir'): save_dir_path = results.save_dir; log_message(f"📁 Results saved to: {save_dir_path}")
-                else: log_message(f"📁 Results object does not have 'save_dir' attribute. Full results object: {results}")
+                if hasattr(results, 'save_dir'):
+                    save_dir_path = results.save_dir
+                    self.last_train_save_dir = save_dir_path
+                    log_message(f"📁 Results saved to: {save_dir_path}")
+                else:
+                    log_message(f"📁 Results object does not have 'save_dir' attribute. Full results object: {results}")
 
                 del model_instance, results; gc.collect()
                 if hasattr(torch.cuda, 'empty_cache'): torch.cuda.empty_cache()
@@ -2613,10 +3107,12 @@ names: {self.class_names}
             log_message(f"❌ Error: {str(e_outer)}")
             messagebox.showerror("Error", f"An error occurred:\n{str(e_outer)}", parent=train_win)
         finally:
-            try: import gc, torch; gc.collect(); 
+            try: import gc, torch; gc.collect()
             except: pass
-            if 'torch' in locals() and hasattr(torch.cuda, 'empty_cache'): torch.cuda.empty_cache() # Check if torch was imported
+            if 'torch' in locals() and hasattr(torch.cuda, 'empty_cache'): torch.cuda.empty_cache()
             if start_btn.winfo_exists(): start_btn.config(state=tk.NORMAL)
+        # Return the directory where the model was saved (or None if unavailable)
+        return getattr(self, 'last_train_save_dir', None)
 
     # --------------------------------------------------
     # Annotation Export Functionality (related methods)
@@ -2732,3 +3228,49 @@ names: {self.class_names}
             if 'temp_dir_for_zip' in locals() and os.path.exists(temp_dir_for_zip): # Check if var defined
                 try: shutil.rmtree(temp_dir_for_zip)
                 except Exception as e_clean: logging.error(f"Failed to cleanup temp export dir: {e_clean}")
+
+    # --------------------------------------------------
+    # Batch Operations for Image Status Management
+    # --------------------------------------------------
+    def _on_image_tree_right_click(self, event):
+        """Show batch operations menu on right-click over image(s)."""
+        item = self.image_tree.identify_row(event.y)
+        if item:
+            current_selection = self.image_tree.selection()
+            if item not in current_selection:
+                self.image_tree.selection_set(item)
+            # Only show menu for images, not folders
+            if "folder" in self.image_tree.item(item).get("tags", []):
+                return
+            self.batch_menu.tk_popup(event.x_root, event.y_root)
+
+    def _batch_mark_status(self, status):
+        """Mark all selected images with the given status tag."""
+        for item in self.image_tree.selection():
+            if "folder" in self.image_tree.item(item).get("tags", []):
+                continue
+            self.image_status[item] = status
+            self.image_tree.item(item, tags=(status,))
+            self.image_tree.set(item, "filename", f"Status: {status}")
+        self.save_statuses()
+        self.update_folder_status_display()
+        self.update_status_labels()
+
+    def _batch_delete_annotations(self):
+        """Delete annotation files for all selected images and reset status."""
+        for item in self.image_tree.selection():
+            if "folder" in self.image_tree.item(item).get("tags", []):
+                continue
+            label_file = os.path.join(self.label_folder, os.path.splitext(item)[0] + ".txt")
+            try:
+                if os.path.exists(label_file):
+                    os.remove(label_file)
+            except Exception as e:
+                logging.error(f"Failed to delete annotation for {item}: {e}")
+            # Reset status to not_viewed
+            self.image_status[item] = "not_viewed"
+            self.image_tree.item(item, tags=("not_viewed",))
+            self.image_tree.set(item, "filename", "Status: not_viewed")
+        self.save_statuses()
+        self.update_folder_status_display()
+        self.update_status_labels()

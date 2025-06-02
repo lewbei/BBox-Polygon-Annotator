@@ -97,3 +97,725 @@ Traceback (most recent call last):
     self.load_model_button = tk.Button(buttons_frame, text=f"{ICON_UNICODE['load_model']} Load Model", command=self.load_model)
                                                                                                                ^^^^^^^^^^^^^^^
 AttributeError: 'BoundingBoxEditor' object has no attribute 'load_model'
+2025-06-02 13:34:28,309 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_pred.jpg not found
+2025-06-02 13:34:32,965 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_pred.jpg not found
+2025-06-02 13:34:40,739 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_pred.jpg not found
+2025-06-02 13:34:42,751 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_pred.jpg not found
+2025-06-02 13:36:25,119 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_pred.jpg not found
+2025-06-02 13:36:53,863 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_labels.jpg not found
+2025-06-02 13:36:55,911 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch1_pred.jpg not found
+2025-06-02 13:36:57,624 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch1_labels.jpg not found
+2025-06-02 13:37:00,761 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_pred.jpg not found
+2025-06-02 13:37:04,598 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_pred.jpg not found
+2025-06-02 13:37:08,135 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_labels.jpg not found
+2025-06-02 13:37:09,221 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch1_pred.jpg not found
+2025-06-02 13:37:10,322 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch1_labels.jpg not found
+2025-06-02 13:37:11,978 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch0_pred.jpg not found
+2025-06-02 13:37:16,299 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch0_labels.jpg not found
+2025-06-02 13:37:17,402 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\train_batch542.jpg not found
+2025-06-02 13:37:18,651 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\train_batch541.jpg not found
+2025-06-02 13:37:19,860 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\train_batch540.jpg not found
+2025-06-02 13:37:20,928 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\train_batch2.jpg not found
+2025-06-02 13:37:26,411 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 988, in on_mouse_wheel
+    if delta > 0: self.navigate_image(-1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_pred.jpg not found
+2025-06-02 13:56:30,931 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_pred.jpg not found
+2025-06-02 13:56:48,382 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_labels.jpg not found
+2025-06-02 13:56:49,034 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch1_pred.jpg not found
+2025-06-02 13:56:51,146 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch1_labels.jpg not found
+2025-06-02 13:56:52,185 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch0_pred.jpg not found
+2025-06-02 13:56:52,945 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch0_labels.jpg not found
+2025-06-02 13:56:53,689 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\train_batch542.jpg not found
+2025-06-02 13:56:54,477 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\train_batch541.jpg not found
+2025-06-02 13:56:55,317 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\train_batch540.jpg not found
+2025-06-02 13:56:56,037 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\train_batch2.jpg not found
+2025-06-02 13:56:57,017 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\train_batch1.jpg not found
+2025-06-02 13:56:57,793 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\train_batch0.jpg not found
+2025-06-02 13:56:58,631 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\results.png not found
+2025-06-02 13:56:59,549 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\labels_correlogram.jpg not found
+2025-06-02 13:57:00,340 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1995, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\labels.jpg not found
+2025-06-02 14:03:51,277 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 2002, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_pred.jpg not found
+2025-06-02 14:03:52,293 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 951, in <lambda>
+    self.root.bind("<Up>", lambda event: self.navigate_image(-1))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 2002, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_labels.jpg not found
+2025-06-02 14:03:52,842 ERROR Exception in Tkinter callback
+Traceback (most recent call last):
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\__init__.py", line 1968, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 950, in <lambda>
+    self.root.bind("<Down>", lambda event: self.navigate_image(+1))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 2002, in navigate_image
+    self.load_image(image_path)
+  File "c:\Users\lewka\deep_learning\image_labelling\image_labelling\editor.py", line 1640, in load_image
+    self.image_tree.item(relative_image_path, tags=(new_status,))
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 1356, in item
+    return _val_or_dict(self.tk, kw, self._w, "item", item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\lewka\miniconda3\envs\deep_learning\Lib\tkinter\ttk.py", line 281, in _val_or_dict
+    res = tk.call(*(args + options))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Item runs\train\train\val_batch2_pred.jpg not found

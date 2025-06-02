@@ -45,9 +45,9 @@ The application (v10+) is a **mature, feature-complete annotation tool** specifi
    - ✅ Responsive canvas with zoom/pan (completed) 
    - ✅ Keyboard shortcuts dialog (completed)
    - ✅ Auto-save mechanism (completed)
-   - ⏳ **In Progress**: Image caching system for faster dataset navigation
-   - ⏳ **Planned**: Lazy loading for large research datasets
-   - ⏳ **Planned**: Background processing improvements
+   - ✅ **Image caching system** for faster dataset navigation
+   - ✅ **Lazy loading optimization** for large research datasets
+   - ✅ **Background processing improvements** for non-blocking operations
 
 2. **🔧 Research-Specific Performance Optimization**
    - **Target**: Handle typical research datasets (1K-10K images) efficiently
@@ -100,12 +100,23 @@ The application (v10+) is a **mature, feature-complete annotation tool** specifi
 - [x] **Error handling and logging** - Robust data protection for research
 
 ### ⏳ In Progress (Q3-Q4 2025)
-- [ ] **Image caching system** - Speed up navigation in large research datasets
-- [ ] **Lazy loading optimization** - Handle very large datasets efficiently
-- [ ] **Background processing improvements** - Non-blocking operations during research sessions
+- [x] **Image caching system** - Speed up navigation in large research datasets
+- [x] **Lazy loading optimization** - Handle very large datasets efficiently
+- [x] **Background processing improvements** - Non-blocking operations during research sessions
+- [x] **Active learning UI scaffolding** - add configuration options for active learning:
+  - **Task**: choose Detection (bounding boxes) or Segmentation (masks) model
+  - **Initial seed size**: number of initially labeled images to train the first model
+  - **Iteration budget**: number of new images to select for annotation each round
+  - **Query strategy**: method to rank unlabeled images (Uncertainty, Margin, or Random)
+  - **Model checkpoint**: YOLO model to warm-start learning; blank for random initialization
+  - **Epochs**: number of training epochs per iteration
+  - **Image Size**: square resolution for training and inference
+  - **Batch Size**: number of images per training batch
+  - **Learning Rate**: initial learning rate for training
+- [x] **Active learning core loop implementation** - train/infer/score loop
 
 ### 📋 Planned (2025-2026)
-- [ ] **Batch operations** - Process multiple images for status/annotation changes
+- [x] **Batch operations** - Process multiple images for status/annotation changes
 - [ ] **Image list thumbnails** - Quick visual dataset overview for researchers
 - [ ] **Search/filter functionality** - Find specific images in research datasets
 - [ ] **Resizable panels** - Customize workspace layout for different research tasks
@@ -116,6 +127,7 @@ The application (v10+) is a **mature, feature-complete annotation tool** specifi
 - [ ] **Replace debug print statements** - Use proper logging throughout
 - [ ] **Improve test coverage** - Add unit tests for core functionality
 - [ ] **Documentation updates** - Keep inline documentation current
+- [ ] **Fix arrow-key navigation boundary** - Prevent moving beyond first/last image in image list
 
 ### 🚫 Explicitly NOT Planned (Outside Solo Research Scope)
 - ❌ **Multi-user collaboration features** - Not needed for solo research
