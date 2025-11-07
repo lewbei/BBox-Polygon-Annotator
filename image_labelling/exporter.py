@@ -36,11 +36,13 @@ def convert_to_coco_format(image_files, all_bboxes, all_polygons, class_names, b
             "supercategory": "object"
         })
 
+    # Import cv2 once outside the loop for better performance
+    import cv2
+
     annotation_id = 1
     for img_idx, image_path in enumerate(image_files):
         full_image_path = os.path.join(base_folder, image_path)
         if os.path.exists(full_image_path):
-            import cv2
             img = cv2.imread(full_image_path)
             height, width = img.shape[:2] if img is not None else (480, 640)
         else:

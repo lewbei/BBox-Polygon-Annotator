@@ -14,14 +14,21 @@ from collections import OrderedDict
 import tkinter as tk
 from tkinter import ttk # Import ttk
 from tkinter import filedialog, colorchooser, simpledialog, messagebox
-from PIL import Image, ImageTk # Import Image and ImageTk from Pillow
-import numpy as np
+# Defer heavy imports for faster startup - use lazy_importer instead
+# from PIL import Image, ImageTk # Import Image and ImageTk from Pillow
+# import numpy as np
 # import json # Already imported
 
 from image_labelling.constants import ICON_UNICODE, PROJECTS_DIR
 from image_labelling.helpers import center_window, write_annotations_to_file, read_annotations_from_file, copy_files_recursive
 from image_labelling.startup_optimizer import lazy_importer
 from .exporter import convert_to_coco_format, convert_to_pascal_voc_format, convert_to_csv_format
+
+# Get PIL components via lazy loader
+def _get_pil():
+    """Get PIL components lazily."""
+    pil_components = lazy_importer.get_pil()
+    return pil_components['Image'], pil_components['ImageTk']
 
 
 class BoundingBoxEditor(tk.Frame):
@@ -72,6 +79,9 @@ class BoundingBoxEditor(tk.Frame):
         self.image_status = {}
         self.image_cache = OrderedDict()
         self.max_cache_size = data.get("image_cache_size", 20)
+
+        # Performance: cache file existence checks
+        self._file_exists_cache = {}
 
         # -----------------------------
         # Main UI Layout
@@ -147,6 +157,10 @@ class BoundingBoxEditor(tk.Frame):
         self.history = []
         self.history_index = -1
         self.max_history_size = 20
+
+        # Performance optimization: throttle canvas redraws
+        self._pending_redraw = None
+        self._redraw_throttle_ms = 16  # ~60 FPS max
 
         self.load_dataset_async()
         self.setup_bindings()
@@ -369,8 +383,9 @@ class BoundingBoxEditor(tk.Frame):
             original_shape = (self.original_image.height, self.original_image.width)            
             write_annotations_to_file(label_path, self.bboxes, self.polygons, original_shape)
         else:
-            fallback_shape = (480, 640) 
+            fallback_shape = (480, 640)
             if hasattr(self, 'image') and self.image is not None and hasattr(self.image, 'shape'):
+                 Image, _ = _get_pil()
                  pil_image_from_numpy = Image.fromarray(self.image)
                  fallback_shape = (pil_image_from_numpy.height, pil_image_from_numpy.width)
             write_annotations_to_file(label_path, self.bboxes, self.polygons, fallback_shape)
@@ -991,7 +1006,8 @@ class BoundingBoxEditor(tk.Frame):
 
     def on_canvas_resize(self, event):
         if hasattr(self, 'original_image') and self.original_image is not None:
-            self.display_image()
+            # Use throttled display for smooth resize/zoom
+            self._schedule_display_image()
 
     def on_pan_start(self, event):
         if self.zoom_level > 1.0:
@@ -1003,7 +1019,7 @@ class BoundingBoxEditor(tk.Frame):
             self.canvas.config(cursor="hand1")
 
     def on_pan_drag(self, event):
-        if self.panning and self.zoom_level > 1.0 and self.original_image is not None: 
+        if self.panning and self.zoom_level > 1.0 and self.original_image is not None:
             dx = self.pan_start_x - event.x
             dy = self.pan_start_y - event.y
             new_view_offset_x = self.pan_start_view_offset_x + dx
@@ -1014,7 +1030,8 @@ class BoundingBoxEditor(tk.Frame):
             max_offset_y = max(0, zoomed_height - self.canvas.winfo_height())
             self.image_view_offset_x = max(0, min(new_view_offset_x, max_offset_x))
             self.image_view_offset_y = max(0, min(new_view_offset_y, max_offset_y))
-            self.display_image()
+            # Use throttled display for smooth panning
+            self._schedule_display_image()
         elif self.annotation_mode == 'box' and self.current_bbox and self.rect and hasattr(self, 'current_bbox_orig_start') and self.current_bbox_orig_start:
             canvas_x_current, canvas_y_current = event.x, event.y
             image_x_current, image_y_current = self.canvas_to_image_coords(canvas_x_current, canvas_y_current)
@@ -1603,6 +1620,7 @@ class BoundingBoxEditor(tk.Frame):
                 return
 
             original_image_cv = cv2_module.cvtColor(original_image_cv, cv2_module.COLOR_BGR2RGB)
+            Image, _ = _get_pil()
             self.original_image = Image.fromarray(original_image_cv)
             self.image_cache[self.image_path] = self.original_image
             if len(self.image_cache) > self.max_cache_size:
@@ -1659,6 +1677,17 @@ class BoundingBoxEditor(tk.Frame):
         except Exception as e: 
             pass 
 
+    def _schedule_display_image(self):
+        """Throttled version of display_image to avoid excessive redraws."""
+        if self._pending_redraw is not None:
+            return  # Already scheduled
+        self._pending_redraw = self.root.after(self._redraw_throttle_ms, self._execute_display_image)
+
+    def _execute_display_image(self):
+        """Execute the actual display update."""
+        self._pending_redraw = None
+        self.display_image()
+
     def display_image(self):
         if self.original_image is None: return
         canvas_width = self.canvas.winfo_width(); canvas_height = self.canvas.winfo_height()
@@ -1679,16 +1708,17 @@ class BoundingBoxEditor(tk.Frame):
 
         crop_x1 = self.image_view_offset_x; crop_y1 = self.image_view_offset_y
         crop_x2 = self.image_view_offset_x + canvas_width; crop_y2 = self.image_view_offset_y + canvas_height
-        
+
+        Image, ImageTk = _get_pil()
         scaled_image = self.original_image.resize((zoomed_img_width, zoomed_img_height), Image.Resampling.NEAREST)
         display_crop_x1 = int(crop_x1); display_crop_y1 = int(crop_y1)
         display_crop_x2 = int(min(crop_x2, zoomed_img_width)); display_crop_y2 = int(min(crop_y2, zoomed_img_height))
 
         if display_crop_x1 >= zoomed_img_width or display_crop_y1 >= zoomed_img_height:
             self.canvas.delete("image"); self.tk_image = None; return
-        
+
         cropped_image_pil = scaled_image.crop((display_crop_x1, display_crop_y1, display_crop_x2, display_crop_y2))
-        
+
         if zoomed_img_width < canvas_width: self.image_offset_x = (canvas_width - zoomed_img_width) // 2
         else: self.image_offset_x = 0
         if zoomed_img_height < canvas_height: self.image_offset_y = (canvas_height - zoomed_img_height) // 2
